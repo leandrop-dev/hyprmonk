@@ -54,6 +54,10 @@ Singleton {
     readonly property int notificationWidth: 500         // pop-ups and the centre
     readonly property int notificationCenterHeight: 600  // most the centre grows to
 
+    // OSD: as wide as the max with a bar, else fitted to its row
+    readonly property int osdMaxWidth: 360
+    readonly property int osdMinWidth: 160
+
     IpcHandler {
         target: "theme"
 
