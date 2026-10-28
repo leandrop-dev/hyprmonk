@@ -1,7 +1,9 @@
 // The media panel, under the bar's centre card: the track's art (blurred
 // behind everything, and sharp on the left), its title, artist and album, a
 // seek bar, and shuffle, previous, play/pause, next and repeat. The player's
-// name switches between players when there are several.
+// name switches between players when there are several. The lyrics button
+// beside it swaps the track and seek bar for synced lyrics (LyricsView);
+// "In bar" then puts the line being sung in the bar too.
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Layouts
@@ -82,25 +84,52 @@ ClippingRectangle {
             Layout.fillHeight: true
             spacing: 2
 
-            Text {
+            RowLayout {
                 Layout.fillWidth: true
-                text: Player.players.length > 1 ? panel.player?.identity + "  \u{F04E1}" : (panel.player?.identity ?? "")
-                color: Theme.fg(Theme.dimOpacity)
-                font.family: Theme.font
-                font.pixelSize: Theme.smallFontSize
-                elide: Text.ElideRight
+                spacing: 6
 
-                MouseArea {
-                    anchors.fill: parent
-                    enabled: Player.players.length > 1
-                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                    onClicked: Player.pickNext()
+                Text {
+                    Layout.fillWidth: true
+                    text: Player.players.length > 1 ? panel.player?.identity + "  \u{F04E1}" : (panel.player?.identity ?? "")
+                    color: Theme.fg(Theme.dimOpacity)
+                    font.family: Theme.font
+                    font.pixelSize: Theme.smallFontSize
+                    elide: Text.ElideRight
+
+                    MouseArea {
+                        anchors.fill: parent
+                        enabled: Player.players.length > 1
+                        cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                        onClicked: Player.pickNext()
+                    }
                 }
+
+                Chip {
+                    visible: Lyrics.shown
+                    text: "In bar"
+                    on: Lyrics.inBar
+                    onClicked: Lyrics.setInBar(!Lyrics.inBar)
+                }
+
+                Control {
+                    size: 22
+                    glyph: "\u{F0757}"
+                    on: Lyrics.shown
+                    onClicked: Lyrics.setShown(!Lyrics.shown)
+                }
+            }
+
+            LyricsView {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.topMargin: 2
+                visible: Lyrics.shown
             }
 
             Text {
                 Layout.fillWidth: true
                 Layout.topMargin: 4
+                visible: !Lyrics.shown
                 text: panel.player?.trackTitle || "Unknown track"
                 color: Theme.foreground
                 font.family: Theme.font
@@ -111,7 +140,7 @@ ClippingRectangle {
 
             Text {
                 Layout.fillWidth: true
-                visible: text !== ""
+                visible: text !== "" && !Lyrics.shown
                 text: [panel.player?.trackArtist, panel.player?.trackAlbum].filter(s => s).join(" · ")
                 color: Theme.fg(0.7)
                 font.family: Theme.font
@@ -121,11 +150,12 @@ ClippingRectangle {
 
             Item {
                 Layout.fillHeight: true
+                visible: !Lyrics.shown
             }
 
             Slider {
                 Layout.fillWidth: true
-                visible: panel.hasLength
+                visible: panel.hasLength && !Lyrics.shown
                 value: panel.hasLength ? panel.player.position / Player.length : 0
                 dim: !(panel.player?.canSeek ?? false)
                 onMoved: value => {
@@ -135,6 +165,7 @@ ClippingRectangle {
 
             RowLayout {
                 Layout.fillWidth: true
+                visible: !Lyrics.shown
 
                 Text {
                     text: panel.hasLength ? Player.time(panel.player.position) : "Live"
@@ -223,11 +254,12 @@ ClippingRectangle {
 
         property string glyph: ""
         property bool on: false
+        property int size: 30
         signal clicked()
 
-        implicitWidth: 30
-        implicitHeight: 30
-        radius: 15
+        implicitWidth: size
+        implicitHeight: size
+        radius: size / 2
         opacity: enabled ? 1 : Theme.dimOpacity
         color: mouse.containsMouse ? Theme.fg(Theme.hoverOpacity) : "transparent"
 
@@ -236,7 +268,7 @@ ClippingRectangle {
             text: control.glyph
             color: control.on ? Theme.accent : Theme.foreground
             font.family: Theme.font
-            font.pixelSize: 16
+            font.pixelSize: Math.round(control.size * 0.53)
         }
 
         MouseArea {

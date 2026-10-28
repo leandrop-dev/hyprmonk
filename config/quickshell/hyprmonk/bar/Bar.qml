@@ -75,11 +75,12 @@ PanelWindow {
         panelWidth: 490
 
         // The spectrum stays; the media slides out beside it while hovered
-        // (folding a moment after the pointer leaves) or while its panel is
-        // open.
+        // (folding a moment after the pointer leaves), while its panel is
+        // open, or while it sings lyrics "In bar".
         readonly property bool mediaOpen: bar.panelOpen && Panels.open === "media"
         property bool hovered: false
-        readonly property bool showMedia: Player.current !== null && (hovered || mediaOpen)
+        readonly property bool singing: Lyrics.inBar && Lyrics.line !== "" && (Player.current?.isPlaying ?? false)
+        readonly property bool showMedia: Player.current !== null && (hovered || mediaOpen || singing)
 
         HoverHandler {
             onHoveredChanged: {

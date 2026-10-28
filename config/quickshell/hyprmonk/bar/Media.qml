@@ -1,6 +1,7 @@
 // What is playing (services/Player.qml): the cover in a circle, title and
-// artist, and how far into the track an underline has come. It slides out of
-// the centre card on hover (bar/Bar.qml). Click: the media panel; right
+// artist (or, with lyrics "In bar", the line being sung), and how far into
+// the track an underline has come. It slides out of the centre card on hover
+// (bar/Bar.qml). Click: the media panel; right
 // click: play/pause; scroll: next or previous track.
 import QtQuick
 import QtQuick.Layouts
@@ -61,7 +62,7 @@ Module {
             id: title
 
             Layout.maximumWidth: 360
-            text: Player.summary
+            text: Lyrics.inBar && Lyrics.line !== "" ? Lyrics.line : Player.summary
             elide: Text.ElideRight
 
             // How far into the track.

@@ -5,13 +5,13 @@ and colours generated from the wallpaper by matugen.
 
 Early days: the wallpaper (Super+W to pick), the bar with its sound,
 battery, calendar and media panels, a running cat that opens a hardware
-drawer (temperature, CPU, memory, disk, network) and a live spectrum (cava,
-in seven styles), notifications, the OSD, quick actions (Super+A: game mode,
-the panels' tone, Noir among them, the spectrum's style), the power menu
-(Super+Shift+E), the key guide (Super+K), the lock screen (Super+Alt+L, and
-on idle), screenshots (Print, then R, W or S), the polkit agent, the
-Hyprland config and the helpers. More panels come next (see
-[Roadmap](#roadmap)), all in Quickshell.
+drawer (temperature, CPU, memory, disk, network), a live spectrum (cava, in
+seven styles) and synced lyrics, notifications, the OSD, quick actions
+(Super+A: game mode, the panels' tone, Noir among them, the spectrum's
+style), the power menu (Super+Shift+E), the key guide (Super+K), the lock
+screen (Super+Alt+L, and on idle), screenshots (Print, then R, W or S), the
+polkit agent, the Hyprland config and the helpers. More panels come next
+(see [Roadmap](#roadmap)), all in Quickshell.
 
 ## Install
 
@@ -93,8 +93,8 @@ cargo clippy --all-targets -- -D warnings
   Wireless ignored them over its receiver (rivalcfg has no light setting
   for it either), and a keyboard alone would not match the mouse. Back
   only with a way to drive both.
-- Media panel extras from HyprFlow: synced lyrics, art "skins" (the
-  polaroid frame) and a mini player.
+- Media panel extras from HyprFlow: art "skins" (the polaroid frame) and a
+  mini player.
 - Events in the calendar (dots on their days, a list for the day picked);
   where they come from is still to choose: local, Google or CalDAV.
 - Screenshots: the notification's preview of a copied screenshot shows a
@@ -136,6 +136,8 @@ cargo clippy --all-targets -- -D warnings
   by atraxsrc (MIT), renders of subjects from HANCORE-linux's
   [omarchy-greek-noir-theme](https://github.com/HANCORE-linux/omarchy-greek-noir-theme);
   downloaded by the installer, not kept in this repo.
+- Synced lyrics from [LRCLIB](https://lrclib.net), looked up while the media
+  panel shows them.
 - The cursor: [Bibata](https://github.com/ful1e5/Bibata_Cursor) Modern Ice
   (GPL-3.0), downloaded by the installer.
 
