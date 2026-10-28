@@ -61,3 +61,7 @@ cargo clippy --all-targets -- -D warnings
 
 - Ideas from [HyprFlow-Arch](https://github.com/AlejandroMinor/HyprFlow-Arch).
 - The Rival 3 Wireless battery protocol from [rivalcfg](https://github.com/flozz/rivalcfg).
+
+## License
+
+MIT, see [LICENSE](LICENSE).
