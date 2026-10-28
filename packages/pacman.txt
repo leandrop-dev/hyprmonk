@@ -37,6 +37,7 @@ xdg-desktop-portal-gtk   # file pickers
 # Audio, media and batteries
 pipewire
 wireplumber
+pavucontrol   # the sound panel's Mixer
 playerctl
 upower
 

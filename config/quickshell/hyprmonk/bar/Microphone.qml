@@ -1,4 +1,5 @@
-// The default input: click to mute or unmute; red while muted.
+// The default input; red while muted. Click: the microphone panel; right
+// click: mute.
 import QtQuick
 import qs
 import qs.services
@@ -9,5 +10,8 @@ Module {
     icon: Audio.micIcon
     color: Audio.micMuted ? Theme.warning : Theme.foreground
 
-    onClicked: Audio.source.audio.muted = !Audio.micMuted
+    onClicked: button => {
+        if (button === Qt.RightButton) Audio.source.audio.muted = !Audio.micMuted;
+        else if (button === Qt.LeftButton) Panels.toggle("microphone");
+    }
 }

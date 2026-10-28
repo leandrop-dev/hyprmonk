@@ -36,6 +36,7 @@ Singleton {
     // Type
     readonly property string font: "JetBrainsMono Nerd Font"
     readonly property int fontSize: 14
+    readonly property int rowFontSize: 13     // rows in panels
     readonly property int bodyFontSize: 12
     readonly property int smallFontSize: 11
 
@@ -53,6 +54,9 @@ Singleton {
     readonly property int panelRadius: 16
     readonly property int notificationWidth: 500         // pop-ups and the centre
     readonly property int notificationCenterHeight: 600  // most the centre grows to
+
+    // Bar panels: a card grows down into one, and widens to at least this
+    readonly property int barPanelWidth: 444
 
     // OSD: as wide as the max with a bar, else fitted to its row
     readonly property int osdMaxWidth: 360

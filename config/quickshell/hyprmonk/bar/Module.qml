@@ -13,6 +13,8 @@ Item {
     property color color: Theme.foreground
     property bool dim: false
     property bool interactive: false
+    // Its panel is open: tinted with the accent.
+    property bool active: false
     readonly property bool hovered: mouse.containsMouse
 
     signal clicked(int button)
@@ -24,7 +26,8 @@ Item {
     Rectangle {
         anchors.fill: parent
         radius: Theme.moduleRadius
-        color: mod.interactive && mod.hovered ? Theme.fg(Theme.hoverOpacity) : "transparent"
+        color: mod.active ? Qt.alpha(Theme.accent, 0.25)
+             : mod.interactive && mod.hovered ? Theme.fg(Theme.hoverOpacity) : "transparent"
     }
 
     RowLayout {
@@ -37,7 +40,7 @@ Item {
             visible: mod.icon !== ""
             text: mod.icon
             font.pixelSize: mod.iconSize
-            color: mod.color
+            color: mod.active ? Theme.accent : mod.color
         }
 
         BarText {
