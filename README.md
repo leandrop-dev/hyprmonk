@@ -7,7 +7,7 @@ Early days: the wallpaper (Super+W to pick), the bar with its sound,
 battery, calendar and media panels, a running cat that opens a hardware
 drawer (temperature, CPU, memory, disk, network) and a live spectrum (cava),
 notifications, the OSD, quick actions (Super+A: game mode, the panels'
-tone), the power menu (Super+Shift+E), the key guide (Super+K), the lock
+tone, Noir among them), the power menu (Super+Shift+E), the key guide (Super+K), the lock
 screen (Super+Alt+L, and on idle), screenshots (Print, then R, W or S), the
 polkit agent, the Hyprland config and the helpers. More panels come next (see [Roadmap](#roadmap)), all in
 Quickshell.
@@ -85,8 +85,7 @@ cargo clippy --all-targets -- -D warnings
 
 - Quick actions still to come from HyprFlow: the screens (mirror, only the
   main one; need a second screen to test).
-- Appearance: tones more distinct from each other (HyprFlow's look much
-  alike); from HyprFlow, a panel to tweak a tone (card opacity, blur, text
+- Appearance: from HyprFlow, a panel to tweak a tone (card opacity, blur, text
   colour), hyprglass glass on the panels instead of plain blur, and the tone
   reaching kitty.
 - Lights, parked (not a must-have): the keyboard and mouse in the accent.
@@ -124,8 +123,8 @@ cargo clippy --all-targets -- -D warnings
   options: the file manager, the icons and an image viewer (what Open on a
   screenshot starts).
 - More from [cosmic-noir-theme](https://github.com/atraxsrc/cosmic-noir-theme),
-  where the wallpapers come from: its palette (charcoal, sage, orange) as a
-  tone, and its terminal, btop and fastfetch colours.
+  where the wallpapers come from (its palette is the Noir tone): its
+  terminal, btop and fastfetch colours.
 - The cursor in GTK apps (they read it from their own settings, not from
   `XCURSOR_THEME`).
 - Fedora (and Fedora-based) once Arch is stable: a `packages/` list for
@@ -141,7 +140,7 @@ cargo clippy --all-targets -- -D warnings
   by atraxsrc (MIT), renders of subjects from HANCORE-linux's
   [omarchy-greek-noir-theme](https://github.com/HANCORE-linux/omarchy-greek-noir-theme);
   downloaded by the installer, not kept in this repo.
-- The cursor: [Bibata](https://github.com/ful1e5/Bibata_Cursor) Modern Amber
+- The cursor: [Bibata](https://github.com/ful1e5/Bibata_Cursor) Modern Ice
   (GPL-3.0), downloaded by the installer.
 
 ## License

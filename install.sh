@@ -84,9 +84,9 @@ step_folders() {
 
 # The cursor: Bibata (GPL-3.0), not in the official repos, so its release
 # archive, pinned by checksum. uwsm/env names it.
-CURSOR_THEME="Bibata-Modern-Amber"
-CURSOR_URL="https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Amber.tar.xz"
-CURSOR_SHA256="58b7ac00ed3cb45acb6b917cb9807a553873f1cca5c91348c4abaebe638e5884"
+CURSOR_THEME="Bibata-Modern-Ice"
+CURSOR_URL="https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Ice.tar.xz"
+CURSOR_SHA256="a68cae60c4dc706350e194ebc91c5fe48bc7bc9d59e119555834a2a7ee5078ef"
 
 step_cursor() {
     say "Installing the cursor ($CURSOR_THEME)"

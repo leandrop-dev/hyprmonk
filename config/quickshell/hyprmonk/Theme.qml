@@ -1,7 +1,7 @@
 // Colours, type and sizes for every surface.
 //
 // The look: dark translucent cards with a faint rim, monospace type, and one
-// accent taken from the wallpaper. The tone (background and text) is one of
+// accent taken from the wallpaper (or the tone's own). The tone (background and text) is one of
 // `tones`; the accent comes from matugen's colors.json in the state
 // directory, and the defaults below apply until matugen has run.
 //
@@ -9,7 +9,7 @@
 // watch alone misses the first run, when the file does not exist yet.
 //
 // IPC: qs -c hyprmonk ipc call theme tone NAME  (black, slate, espresso,
-//      light, mist, ivory or wallpaper)
+//      noir, light, mist, ivory or wallpaper)
 pragma Singleton
 
 import QtQuick
@@ -23,15 +23,21 @@ Singleton {
 
     // Tones: the background, the text and how opaque cards are. One is in
     // use (quick actions > Appearance, kept in appearance.json); "wallpaper"
-    // takes its colours from matugen's scheme for the wallpaper.
+    // takes its colours from matugen's scheme for the wallpaper. Each sits
+    // apart in hue (cool, warm, neutral) and covers enough of the wallpaper
+    // to show it; light ones need more, or a dark wallpaper greys them. A
+    // tone may bring its own accent (and green) instead of the wallpaper's.
     readonly property var tones: ({
         black:     { label: "Black",     background: "#000000", foreground: "#ffffff", card: 0.38, light: false },
-        slate:     { label: "Slate",     background: "#1b1f26", foreground: "#ffffff", card: 0.6, light: false },
-        espresso:  { label: "Espresso",  background: "#1e1a17", foreground: "#f2ede6", card: 0.6, light: false },
-        light:     { label: "Light",     background: "#ffffff", foreground: "#3c3c43", card: 0.65, light: true },
-        mist:      { label: "Mist",      background: "#f2f2f7", foreground: "#1c1c1e", card: 0.65, light: true },
-        ivory:     { label: "Ivory",     background: "#faf7f0", foreground: "#3b3630", card: 0.65, light: true },
-        wallpaper: { label: "Wallpaper", background: colors.surface, foreground: colors.surfaceText, card: 0.6, light: false }
+        slate:     { label: "Slate",     background: "#1a2433", foreground: "#e4ecf7", card: 0.78, light: false },
+        espresso:  { label: "Espresso",  background: "#2e2018", foreground: "#f5e8d8", card: 0.78, light: false },
+        // From cosmic-noir-theme: charcoal, fog text, orange, sage.
+        noir:      { label: "Noir",      background: "#171717", foreground: "#ccd0cf", card: 0.88, light: false,
+                     accent: "#f25623", positive: "#88a57d" },
+        light:     { label: "Light",     background: "#ffffff", foreground: "#2c2c30", card: 0.86, light: true },
+        mist:      { label: "Mist",      background: "#dbe4f0", foreground: "#1a2433", card: 0.86, light: true },
+        ivory:     { label: "Ivory",     background: "#f4e8d0", foreground: "#45392a", card: 0.86, light: true },
+        wallpaper: { label: "Wallpaper", background: colors.surface, foreground: colors.surfaceText, card: 0.78, light: false }
     })
     // Espresso until the settings are read (and for a name it does not know).
     readonly property string toneName: appearance?.tone in tones ? appearance.tone : "espresso"
@@ -47,8 +53,8 @@ Singleton {
     readonly property real cardOpacity: tone.card
     readonly property color card: Qt.alpha(background, cardOpacity)
     readonly property color rim: tone.light ? Qt.rgba(1, 1, 1, 0.5) : fg(0.08)
-    readonly property color accent: tone.light ? Qt.darker(colors.accent, 1.5) : colors.accent  // darker reads on light
-    readonly property color positive: tone.light ? "#1f9d3a" : "#3dff3d"
+    readonly property color accent: tone.accent ?? (tone.light ? Qt.darker(colors.accent, 1.5) : colors.accent)  // darker reads on light
+    readonly property color positive: tone.positive ?? (tone.light ? "#1f9d3a" : "#3dff3d")
     readonly property color warning: "#ff5f56"
     readonly property color selection: Qt.rgba(0, 0, 0, tone.light ? 0.1 : 0.4)  // the picked row in a list
 
