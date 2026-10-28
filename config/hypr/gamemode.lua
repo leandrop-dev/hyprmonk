@@ -1,5 +1,5 @@
 -- Game mode, switched from the quick actions (Super+A): no animations, blur,
--- shadows or window glass while ~/.local/state/hyprmonk/game-mode reads "on".
+-- or shadows while ~/.local/state/hyprmonk/game-mode reads "on".
 -- The shell writes that file and reloads the config, so a reload keeps game
 -- mode as it was.
 
@@ -16,8 +16,4 @@ if on then
             shadow = { enabled = false },
         },
     })
-    -- Window glass turns shadows back on after every reload: it needs them.
-    if hl.plugin.hyprglass then
-        hl.plugin.hyprglass.config({ enabled = false })
-    end
 end

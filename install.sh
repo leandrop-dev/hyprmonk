@@ -198,7 +198,6 @@ step_udev() {
 
 # name -> repository
 PLUGINS=(
-    "hyprglass:https://github.com/hyprnux/hyprglass"
     "hymission:https://github.com/gfhdhytghd/hymission"
 )
 

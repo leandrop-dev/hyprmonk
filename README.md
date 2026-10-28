@@ -30,7 +30,7 @@ on a system without one, log in on the text console and run
 `uwsm start hyprland.desktop`. Then, from inside Hyprland:
 
 ```bash
-./install.sh plugins   # hyprglass and hymission (compiles)
+./install.sh plugins   # hymission, the overview (compiles)
 ```
 
 `install.sh` symlinks the configs, so the repo is the live config: edit either
@@ -86,8 +86,7 @@ cargo clippy --all-targets -- -D warnings
 - Quick actions still to come from HyprFlow: the screens (mirror, only the
   main one; need a second screen to test).
 - Appearance: from HyprFlow, a panel to tweak a tone (card opacity, blur, text
-  colour), hyprglass glass on the panels instead of plain blur, and the tone
-  reaching kitty.
+  colour), and the tone reaching kitty.
 - Lights, parked (not a must-have): the keyboard and mouse in the accent.
   Through OpenRGB the Keychron took colours and effects, but the Rival 3
   Wireless ignored them over its receiver (rivalcfg has no light setting
