@@ -3,9 +3,9 @@
 My Hyprland desktop on Arch (CachyOS): a Quickshell shell, small Rust helpers,
 and colours generated from the wallpaper by matugen.
 
-Early days: the bar with its sound, battery and calendar panels, notifications,
-the OSD, the polkit agent, the Hyprland config and the first helper. More
-panels come next (see [Roadmap](#roadmap)), all in Quickshell.
+Early days: the bar with its sound, battery, calendar and media panels,
+notifications, the OSD, the polkit agent, the Hyprland config and the first
+helper. More panels come next (see [Roadmap](#roadmap)), all in Quickshell.
 
 ## Install
 
@@ -60,9 +60,10 @@ cargo clippy --all-targets -- -D warnings
 
 ## Roadmap
 
-- Panels in HyprFlow's style: quick actions (Super+K), the media panel,
-  power menu, key guide, a cava spectrum in the centre card, a hardware
-  drawer.
+- Panels in HyprFlow's style: quick actions (Super+K), power menu, key
+  guide, a cava spectrum in the centre card, a hardware drawer.
+- Media panel extras from HyprFlow: synced lyrics, art "skins" (the
+  polaroid frame), a mini player.
 - Events in the calendar (dots on their days, a list for the day picked);
   where they come from is still to choose: local, Google or CalDAV.
 - Notifications grouped by app, as swaync does.

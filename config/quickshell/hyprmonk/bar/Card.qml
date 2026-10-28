@@ -1,6 +1,6 @@
 // One of the bar's cards: a rounded translucent box sized to its modules.
 // Given a `panel`, the same card grows down into it (and widens to at least
-// Theme.barPanelWidth), keeping its modules on top.
+// `panelWidth`), keeping its modules on top.
 import QtQuick
 import QtQuick.Layouts
 import qs
@@ -13,6 +13,8 @@ Rectangle {
     property int side: Qt.AlignHCenter
     // What opens under the modules; null when closed.
     property Component panel: null
+    // The least the card widens to while a panel is open.
+    property int panelWidth: Theme.barPanelWidth
 
     // The panel being shown; kept while it folds away after `panel` clears.
     property Component shown: null
@@ -26,7 +28,7 @@ Rectangle {
     }
 
     readonly property real baseWidth: row.implicitWidth + Theme.cardPadding * 2
-    readonly property real fullWidth: Math.max(baseWidth, Theme.barPanelWidth)
+    readonly property real fullWidth: Math.max(baseWidth, panelWidth)
 
     implicitWidth: baseWidth + (fullWidth - baseWidth) * openness
     implicitHeight: Theme.barHeight + (loader.implicitHeight + 18) * openness

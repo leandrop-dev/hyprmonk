@@ -71,8 +71,10 @@ PanelWindow {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         anchors.topMargin: Theme.barGap
+        panel: bar.panelOpen && Panels.open === "media" ? mediaPanel : null
+        panelWidth: 490
 
-        Media {}
+        Media { active: bar.panelOpen && Panels.open === "media" }
     }
 
     Card {
@@ -115,5 +117,10 @@ PanelWindow {
     Component {
         id: calendarPanel
         CalendarPanel {}
+    }
+
+    Component {
+        id: mediaPanel
+        MediaPanel {}
     }
 }
