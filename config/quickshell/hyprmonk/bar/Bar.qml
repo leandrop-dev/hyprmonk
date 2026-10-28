@@ -87,13 +87,14 @@ PanelWindow {
              : Panels.open === "sound" ? outputPanel
              : Panels.open === "microphone" ? inputPanel
              : Panels.open === "batteries" ? batteryPanel
+             : Panels.open === "calendar" ? calendarPanel
              : null
 
         Batteries { active: bar.panelOpen && Panels.open === "batteries" }
         Volume { active: bar.panelOpen && Panels.open === "sound" }
         Microphone { active: bar.panelOpen && Panels.open === "microphone" }
         NotificationBell {}
-        Clock {}
+        Clock { active: bar.panelOpen && Panels.open === "calendar" }
     }
 
     Component {
@@ -109,5 +110,10 @@ PanelWindow {
     Component {
         id: batteryPanel
         BatteryPanel {}
+    }
+
+    Component {
+        id: calendarPanel
+        CalendarPanel {}
     }
 }
