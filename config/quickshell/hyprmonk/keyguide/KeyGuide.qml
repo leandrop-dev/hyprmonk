@@ -75,7 +75,8 @@ Scope {
     function load(binds: var): void {
         const groups = [];
         for (const bind of binds) {
-            if (bind.non_consuming || !bind.description) continue;
+            // A mode's own keys show on its card (the screenshot mode's).
+            if (bind.non_consuming || bind.submap || !bind.description) continue;
             const at = bind.description.indexOf(": ");
             const section = at > 0 ? bind.description.slice(0, at) : "Other";
             const description = at > 0 ? bind.description.slice(at + 2) : bind.description;

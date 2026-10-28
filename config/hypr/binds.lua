@@ -4,6 +4,8 @@
 
 local mod = "SUPER"
 local section = ""
+-- install.sh puts it here; the session's PATH does not include it.
+local hyprmonk = os.getenv("HOME") .. "/.local/bin/hyprmonk"
 
 local function bind(keys, action, description, opts)
     opts = opts or {}
@@ -57,6 +59,28 @@ bind(mod .. " + K",         hl.dsp.exec_cmd("qs -c hyprmonk ipc call overlays to
 bind(mod .. " + W",         hl.dsp.exec_cmd("qs -c hyprmonk ipc call overlays toggle wallpapers"),   "Wallpapers")
 bind(mod .. " + N",         hl.dsp.exec_cmd("qs -c hyprmonk ipc call notifications toggle"),         "Notification centre")
 bind(mod .. " + SHIFT + N", hl.dsp.exec_cmd("qs -c hyprmonk ipc call notifications clear"),          "Clear notifications")
+
+-- Screenshots: Print enters a mode whose keys pick what to take (the shell
+-- shows them on a card while it lasts); each one leaves the mode. Shift
+-- copies instead of saving. The key guide lists the mode, not its keys.
+section = "Screenshots"
+bind("Print", hl.dsp.submap("screenshot"), "Screenshot (then R, W or S; Shift copies)")
+hl.define_submap("screenshot", function()
+    local function shot(key, args, description)
+        hl.bind(key, function()
+            hl.dispatch(hl.dsp.submap("reset"))
+            hl.dispatch(hl.dsp.exec_cmd(hyprmonk .. " screenshot " .. args))
+        end, { description = description })
+    end
+    shot("R",         "region",        "Region")
+    shot("W",         "window",        "Window")
+    shot("S",         "screen",        "Screen")
+    shot("SHIFT + R", "region --copy", "Region to clipboard")
+    shot("SHIFT + W", "window --copy", "Window to clipboard")
+    shot("SHIFT + S", "screen --copy", "Screen to clipboard")
+    hl.bind("Escape", hl.dsp.submap("reset"), { description = "Cancel" })
+    hl.bind("Print",  hl.dsp.submap("reset"), { description = "Cancel" })
+end)
 
 section = "Session"
 bind(mod .. " + ALT + L",   hl.dsp.exec_cmd("qs -c hyprmonk ipc call lock lock"),             "Lock")

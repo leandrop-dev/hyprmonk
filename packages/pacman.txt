@@ -38,9 +38,14 @@ kwallet
 kwallet-pam
 socat   # pam_kwallet_init talks through it
 
-# Screenshots (no bind uses grim and slurp yet: roadmap) and screen sharing
+# Screenshots (hyprmonk screenshot) and screen sharing
 grim
 slurp
+hyprpicker   # holds the screen still while picking a region or window
+satty   # annotating before saving
+wl-clipboard
+libnotify   # notify-send
+xdg-utils   # xdg-open: Open on the saved screenshot's notification
 xdg-desktop-portal
 xdg-desktop-portal-hyprland   # screen sharing, input capture (deskflow)
 xdg-desktop-portal-gtk   # file pickers

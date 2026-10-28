@@ -2,6 +2,7 @@
 
 mod battery;
 mod hidraw;
+mod screenshot;
 mod steelseries;
 
 use std::io::{self, Write};
@@ -13,8 +14,10 @@ const USAGE: &str = "\
 usage: hyprmonk <command>
 
 commands:
-  battery [--json]   charge of devices UPower cannot see (SteelSeries Rival 3 Wireless)
-  help               show this text
+  battery [--json]                       charge of devices UPower cannot see (SteelSeries Rival 3 Wireless)
+  screenshot region|window|screen [--copy]
+                                         take a screenshot: annotate and save it, or copy it
+  help                                   show this text
 ";
 
 fn main() -> ExitCode {
@@ -33,6 +36,8 @@ fn run(args: &[&str]) -> Result<ExitCode> {
     match args {
         ["battery"] => print_battery(battery::Format::Text),
         ["battery", "--json"] => print_battery(battery::Format::Json),
+        ["screenshot", area] => take_screenshot(area, screenshot::Target::File),
+        ["screenshot", area, "--copy"] => take_screenshot(area, screenshot::Target::Clipboard),
         ["help" | "--help" | "-h"] => {
             print!("{USAGE}");
             Ok(ExitCode::SUCCESS)
@@ -47,5 +52,17 @@ fn run(args: &[&str]) -> Result<ExitCode> {
 fn print_battery(format: battery::Format) -> Result<ExitCode> {
     let readings = battery::read_all()?;
     io::stdout().write_all(battery::render(&readings, format).as_bytes())?;
+    Ok(ExitCode::SUCCESS)
+}
+
+fn take_screenshot(area: &str, target: screenshot::Target) -> Result<ExitCode> {
+    let Ok(area) = area.parse() else {
+        eprint!("{USAGE}");
+        return Ok(ExitCode::from(2));
+    };
+    if let Err(err) = screenshot::take(area, target) {
+        screenshot::report(&err);
+        return Err(err);
+    }
     Ok(ExitCode::SUCCESS)
 }

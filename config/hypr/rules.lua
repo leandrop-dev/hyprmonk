@@ -16,3 +16,15 @@ hl.window_rule({
 
 -- The shell's surfaces are named hyprmonk-*: blur what is behind them.
 hl.layer_rule({ name = "hyprmonk-blur", match = { namespace = "^hyprmonk-.*" }, blur = true, ignore_alpha = 0.01 })
+-- The screenshot mode's card leaves at once, not fading: the picture is
+-- taken right after.
+hl.layer_rule({ name = "hyprmonk-screenshot", match = { namespace = "^hyprmonk-screenshot$" }, no_anim = true })
+
+-- satty (screenshots, to annotate before saving): a floating card.
+hl.window_rule({
+    name  = "satty",
+    match = { class = "^com\\.gabm\\.satty$" },
+    float = true,
+    size  = "(monitor_w*0.7) (monitor_h*0.7)",
+    center = true,
+})

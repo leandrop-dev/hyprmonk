@@ -1,7 +1,7 @@
 [package]
 name = "hyprmonk"
 version = "0.1.0"
-description = "Helpers for the hyprmonk desktop: device batteries and the shell's data"
+description = "Helpers for the hyprmonk desktop: device batteries, screenshots and the shell's data"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -10,6 +10,7 @@ repository.workspace = true
 [dependencies]
 anyhow.workspace = true
 rustix.workspace = true
+serde_json.workspace = true
 
 [lints]
 workspace = true

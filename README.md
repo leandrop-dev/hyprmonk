@@ -8,8 +8,8 @@ battery, calendar and media panels, a running cat that opens a hardware
 drawer (temperature, CPU, memory, disk, network) and a live spectrum (cava),
 notifications, the OSD, quick actions (Super+A: game mode, the panels'
 tone), the power menu (Super+Shift+E), the key guide (Super+K), the lock
-screen (Super+Alt+L, and on idle), the polkit agent, the Hyprland config and
-the first helper. More panels come next (see [Roadmap](#roadmap)), all in
+screen (Super+Alt+L, and on idle), screenshots (Print, then R, W or S), the
+polkit agent, the Hyprland config and the helpers. More panels come next (see [Roadmap](#roadmap)), all in
 Quickshell.
 
 ## Install
@@ -62,11 +62,19 @@ Generated files never land in the repo: matugen writes to
 ## hyprmonk
 
 ```
-hyprmonk battery [--json]   charge of devices UPower cannot see
+hyprmonk battery [--json]                    charge of devices UPower cannot see
+hyprmonk screenshot region|window|screen [--copy]
+                                             take a screenshot
 ```
 
-Today that is the SteelSeries Rival 3 Wireless, read over its receiver's HID
+`battery` reads the SteelSeries Rival 3 Wireless over its receiver's HID
 interface. The headset (Arctis Nova 7) already reaches the bar through UPower.
+
+`screenshot` freezes the screen (hyprpicker) while a region or a window is
+picked (slurp), takes it with grim, then opens it in satty to annotate: Enter
+saves it to `~/Pictures/Screenshots`. With `--copy` it goes to the clipboard
+instead. A notification shows it, with Open and Show in folder. Print starts
+the screenshot mode, whose card lists the keys.
 
 ```bash
 cargo test
@@ -86,14 +94,16 @@ cargo clippy --all-targets -- -D warnings
   Wireless ignored them over its receiver (rivalcfg has no light setting
   for it either), and a keyboard alone would not match the mouse. Back
   only with a way to drive both.
-- Game mode extras from HyprFlow: variable refresh in fullscreen, Steam Big
-  Picture, and notifications off while it is on.
+- Game mode extras from HyprFlow: variable refresh in fullscreen, and
+  notifications off while it is on.
 - Media panel extras from HyprFlow: synced lyrics, art "skins" (the
   polaroid frame), a mini player, the spectrum's other styles (bars, peaks,
   LEDs...) and a picker for them.
 - Events in the calendar (dots on their days, a list for the day picked);
   where they come from is still to choose: local, Google or CalDAV.
 - Notifications grouped by app, as swaync does.
+- Screenshots: the notification's preview of a copied screenshot shows a
+  grey picture instead of the shot.
 - OSD, to look at once things are stable: Caps Lock showed only on the
   first press, not on later ones.
 - A clean install, still to do: run it on a fresh Arch with no desktop (a
@@ -111,13 +121,13 @@ cargo clippy --all-targets -- -D warnings
   it is in `extra`). Update pulls and re-runs what changed; Uninstall
   removes the links (restoring the `*.bak-DATE` copies) and the units.
 - What a fresh install brings besides the shell, to choose after trying the
-  options: the file manager and the icons.
+  options: the file manager, the icons and an image viewer (what Open on a
+  screenshot starts).
 - More from [cosmic-noir-theme](https://github.com/atraxsrc/cosmic-noir-theme),
   where the wallpapers come from: its palette (charcoal, sage, orange) as a
   tone, and its terminal, btop and fastfetch colours.
 - The cursor in GTK apps (they read it from their own settings, not from
   `XCURSOR_THEME`).
-- Screenshots: grim and slurp are installed, but no bind uses them yet.
 - Fedora (and Fedora-based) once Arch is stable: a `packages/` list for
   dnf, and COPRs for what Fedora does not ship.
 

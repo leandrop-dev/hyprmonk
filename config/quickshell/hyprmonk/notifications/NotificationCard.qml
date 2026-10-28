@@ -22,9 +22,12 @@ Rectangle {
     readonly property bool critical: notification.urgency === NotificationUrgency.Critical
     readonly property NotificationAction defaultAction: notification.actions.find(a => a.identifier === "default") ?? null
     readonly property var buttons: notification.actions.filter(a => a.identifier !== "default")
+    // A screenshot (hyprmonk's hint): its picture shown large under the text,
+    // the app icon beside it.
+    readonly property bool preview: notification.hints["x-hyprmonk-preview"] === true
     // `notify-send -i name` sends the name as the image (image://icon/name), not
     // as the app icon. Theme icons resolve to "" when missing, not a checkerboard.
-    readonly property string pictureSource: resolve(notification.image)
+    readonly property string pictureSource: preview ? "" : resolve(notification.image)
     readonly property string iconSource: resolve(notification.appIcon)
         || resolve(DesktopEntries.byId(notification.desktopEntry)?.icon ?? "")
 
@@ -168,6 +171,18 @@ Rectangle {
                 maximumLineCount: card.popup ? 4 : 8
                 elide: Text.ElideRight
                 onLinkActivated: link => Qt.openUrlExternally(link)
+            }
+
+            Image {
+                Layout.fillWidth: true
+                Layout.topMargin: 4
+                Layout.preferredHeight: visible ? Math.min(160, width * implicitHeight / Math.max(1, implicitWidth)) : 0
+                visible: card.preview && status === Image.Ready
+                source: card.preview ? card.resolve(card.notification.image) : ""
+                fillMode: Image.PreserveAspectFit
+                horizontalAlignment: Image.AlignLeft
+                sourceSize.width: 640
+                asynchronous: true
             }
 
             RowLayout {
