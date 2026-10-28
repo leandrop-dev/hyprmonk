@@ -159,18 +159,26 @@ Scope {
         }
     }
 
+    // Game mode also switches the power profile: say game mode, not both.
     Connections {
         target: GameMode
 
         function onOnChanged(): void {
             root.show("\u{F0297}", "Game mode", GameMode.on ? "On" : "Off", -1);
+            gameSettle.restart();
         }
+    }
+
+    Timer {
+        id: gameSettle
+        interval: 1000
     }
 
     Connections {
         target: Power
 
         function onProfileNameChanged(): void {
+            if (gameSettle.running) return;
             root.show("\u{F04C5}", "Power profile", Power.profileName, -1);
         }
     }

@@ -1,6 +1,6 @@
 // The notification daemon (org.freedesktop.Notifications). Every notification
 // is kept for the centre until dismissed; new ones also pop up, unless do not
-// disturb is on (critical ones always do).
+// disturb or game mode is on (critical ones always do).
 //
 // IPC: qs -c hyprmonk ipc call notifications toggle | clear | dnd | count | list
 pragma Singleton
@@ -100,7 +100,7 @@ Singleton {
             });
             // After a shell reload the old ones come back; they already popped up.
             if (notification.lastGeneration) return;
-            if (root.doNotDisturb && notification.urgency !== NotificationUrgency.Critical) return;
+            if ((root.doNotDisturb || GameMode.on) && notification.urgency !== NotificationUrgency.Critical) return;
             root.popups = [notification, ...root.popups].slice(0, root.maxPopups);
         }
     }

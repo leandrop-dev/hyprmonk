@@ -92,8 +92,6 @@ cargo clippy --all-targets -- -D warnings
   Wireless ignored them over its receiver (rivalcfg has no light setting
   for it either), and a keyboard alone would not match the mouse. Back
   only with a way to drive both.
-- Game mode extras from HyprFlow: variable refresh in fullscreen, and
-  notifications off while it is on.
 - Media panel extras from HyprFlow: synced lyrics, art "skins" (the
   polaroid frame), a mini player, the spectrum's other styles (bars, peaks,
   LEDs...) and a picker for them.
