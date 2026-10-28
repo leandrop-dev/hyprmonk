@@ -8,6 +8,7 @@ import Quickshell.Widgets
 import Quickshell.Services.Notifications
 import qs
 import qs.services
+import qs.widgets
 
 Rectangle {
     id: card
@@ -178,34 +179,14 @@ Rectangle {
                 Repeater {
                     model: card.buttons
 
-                    Rectangle {
-                        id: button
-
+                    Button {
                         required property NotificationAction modelData
 
+                        // Equal widths, whatever the labels.
                         Layout.fillWidth: true
-                        implicitHeight: 28
-                        radius: Theme.moduleRadius
-                        color: Theme.fg(press.containsMouse ? 0.16 : 0.08)
-
-                        Text {
-                            anchors.centerIn: parent
-                            width: parent.width - 12
-                            horizontalAlignment: Text.AlignHCenter
-                            text: button.modelData.text
-                            color: Theme.foreground
-                            font.family: Theme.font
-                            font.pixelSize: Theme.bodyFontSize
-                            elide: Text.ElideRight
-                        }
-
-                        MouseArea {
-                            id: press
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: button.modelData.invoke()
-                        }
+                        Layout.preferredWidth: 1
+                        text: modelData.text
+                        onClicked: modelData.invoke()
                     }
                 }
             }

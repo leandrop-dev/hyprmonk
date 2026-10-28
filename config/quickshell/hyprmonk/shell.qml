@@ -1,8 +1,9 @@
 // hyprmonk's shell: `qs -c hyprmonk`. A bar per screen, the notification
-// pop-ups and the notification centre.
+// pop-ups and centre, and the polkit agent.
 import Quickshell
 import qs.bar
 import qs.notifications
+import qs.polkit
 
 ShellRoot {
     Variants {
@@ -16,4 +17,5 @@ ShellRoot {
 
     Popups {}
     Center {}
+    Polkit {}
 }

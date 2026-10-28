@@ -16,6 +16,12 @@ kitty
 dolphin
 hyprlauncher
 
+# Keyboard and mouse shared with other computers (needs the portal below)
+deskflow
+
+# Root prompts: the shell is the polkit agent
+polkit
+
 # Secrets: KWallet, unlocked at login by hyprmonk-kwallet.service
 kwallet
 kwallet-pam
@@ -24,7 +30,8 @@ socat
 # Screenshots and screen sharing
 grim
 slurp
-xdg-desktop-portal-hyprland
+xdg-desktop-portal
+xdg-desktop-portal-hyprland   # screen sharing, input capture (deskflow)
 xdg-desktop-portal-gtk   # file pickers
 
 # Audio, media and batteries

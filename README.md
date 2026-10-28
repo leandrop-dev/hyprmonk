@@ -3,8 +3,9 @@
 My Hyprland desktop on Arch (CachyOS): a Quickshell shell, small Rust helpers,
 and colours generated from the wallpaper by matugen.
 
-Early days: a bar, the Hyprland config and the first helper. More panels
-(notifications, launcher, OSD, lock screen) come next, all in Quickshell.
+Early days: the bar, notifications, the polkit agent, the Hyprland config and
+the first helper. More panels come next (see [Roadmap](#roadmap)), all in
+Quickshell.
 
 ## Install
 
@@ -31,7 +32,7 @@ Run `./install.sh help` for each step.
 | Path | What |
 |------|------|
 | `config/hypr/` | Hyprland (Lua): `hyprland.lua` loads `look`, `input`, `binds`, `rules`, `plugins` |
-| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `Theme.qml`, `bar/` |
+| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `Theme.qml`, `bar/`, `notifications/`, `polkit/`, `services/`, `widgets/` |
 | `config/matugen/` | Templates for Hyprland, the shell and kitty |
 | `config/uwsm/env` | Session environment (NVIDIA, cursor, toolkits) |
 | `config/systemd/user/` | The shell's unit; it only starts under Hyprland |
@@ -56,6 +57,16 @@ interface. The headset (Arctis Nova 7) already reaches the bar through UPower.
 cargo test
 cargo clippy --all-targets -- -D warnings
 ```
+
+## Roadmap
+
+- Panels in HyprFlow's style: OSD, quick actions (Super+K), sound, battery,
+  calendar and media panels, power menu, key guide, a cava spectrum in the
+  centre card, a hardware drawer.
+- Notifications grouped by app, as swaync does.
+- A clean install: hyprmonk must work on an Arch or CachyOS install with no
+  desktop yet, so `packages/` has to list everything it needs (today it
+  leans on what Plasma already installed). Verify on a fresh install.
 
 ## Credits
 
