@@ -1,6 +1,7 @@
 // Every notification still open, under the bar's right card: Super+N or a
-// click on the bell. Do not disturb and clear all at the top; a click outside
-// or Escape closes it.
+// click on the bell. One app's notifications fold into a group
+// (NotificationGroup). Do not disturb and clear all at the top; a click
+// outside or Escape closes it.
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -31,6 +32,11 @@ PanelWindow {
     WlrLayershell.namespace: "hyprmonk-notification-center"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+
+    // Groups shown in full, by app; folded again when the centre closes.
+    property var expanded: ({})
+
+    onVisibleChanged: if (!visible) expanded = ({})
 
     HyprlandFocusGrab {
         windows: [window]
@@ -103,17 +109,25 @@ PanelWindow {
                 Layout.preferredHeight: Math.min(contentHeight, Theme.notificationCenterHeight)
                 visible: Notifications.count > 0
                 clip: true
-                spacing: 6
+                spacing: 10
                 boundsBehavior: Flickable.StopAtBounds
 
                 model: ScriptModel {
-                    values: Notifications.all
+                    values: Notifications.groups
                 }
 
-                delegate: NotificationCard {
+                delegate: NotificationGroup {
                     required property var modelData
-                    notification: modelData
+
                     width: list.width
+                    app: modelData.app
+                    notifications: modelData.notifications
+                    expanded: window.expanded[modelData.app] === true
+                    onToggled: {
+                        const next = Object.assign({}, window.expanded);
+                        next[app] = !expanded;
+                        window.expanded = next;
+                    }
                 }
             }
         }

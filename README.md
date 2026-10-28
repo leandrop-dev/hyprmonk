@@ -99,7 +99,6 @@ cargo clippy --all-targets -- -D warnings
   LEDs...) and a picker for them.
 - Events in the calendar (dots on their days, a list for the day picked);
   where they come from is still to choose: local, Google or CalDAV.
-- Notifications grouped by app, as swaync does.
 - Screenshots: the notification's preview of a copied screenshot shows a
   grey picture instead of the shot.
 - OSD, to look at once things are stable: Caps Lock showed only on the

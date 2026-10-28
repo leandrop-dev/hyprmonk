@@ -16,6 +16,8 @@ Rectangle {
     required property Notification notification
     // Pop-ups time out and float on their own; centre entries sit inside a panel.
     property bool popup: false
+    // Off under a group's header, which names the app already.
+    property bool showApp: true
 
     signal timedOut()
 
@@ -113,7 +115,7 @@ Rectangle {
 
                 Text {
                     Layout.fillWidth: true
-                    text: [card.notification.appName, Notifications.ago(card.notification)].filter(s => s).join(" · ")
+                    text: [card.showApp ? card.notification.appName : "", Notifications.ago(card.notification)].filter(s => s).join(" · ")
                     color: Theme.fg(Theme.dimOpacity)
                     font.family: Theme.font
                     font.pixelSize: Theme.smallFontSize

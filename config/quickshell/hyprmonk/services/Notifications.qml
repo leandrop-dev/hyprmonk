@@ -17,6 +17,18 @@ Singleton {
     // Everything still open, newest first.
     readonly property var all: server.trackedNotifications.values.slice().reverse()
     readonly property int count: server.trackedNotifications.values.length
+    // The same, by app for the centre: [{app, notifications}], the app with
+    // the newest first, each one's newest first.
+    readonly property var groups: {
+        const groups = [];
+        for (const notification of all) {
+            const app = notification.appName || "Other";
+            const group = groups.find(g => g.app === app);
+            if (group) group.notifications.push(notification);
+            else groups.push({ app, notifications: [notification] });
+        }
+        return groups;
+    }
     // Shown as pop-ups right now, newest first.
     property var popups: []
     property bool centerOpen: false
