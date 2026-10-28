@@ -78,6 +78,14 @@ Scope {
         },
         Action {
             section: "Appearance"
+            icon: "\u{F050E}"
+            label: "Appearance"
+            value: Theme.tone.label
+            options: Object.values(Theme.tones).map(tone => tone.label)
+            onPicked: option => Theme.setTone(Object.keys(Theme.tones).find(name => Theme.tones[name].label === option))
+        },
+        Action {
+            section: "Appearance"
             icon: "\u{F0E09}"
             label: "Wallpaper"
             onRun: Overlays.toggle("wallpapers")

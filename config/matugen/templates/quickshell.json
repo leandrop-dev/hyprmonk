@@ -1,3 +1,5 @@
 {
-  "accent": "{{colors.source_color.default.hex | set_lightness: 55.0 | saturate: 25.0, "hsl"}}"
+  "accent": "{{colors.source_color.default.hex | set_lightness: 55.0 | saturate: 25.0, "hsl"}}",
+  "surface": "{{colors.surface.default.hex}}",
+  "surfaceText": "{{colors.on_surface.default.hex}}"
 }

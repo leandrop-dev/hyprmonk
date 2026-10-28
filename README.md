@@ -6,11 +6,11 @@ and colours generated from the wallpaper by matugen.
 Early days: the wallpaper (Super+W to pick), the bar with its sound,
 battery, calendar and media panels, a running cat that opens a hardware
 drawer (temperature, CPU, memory, disk, network) and a live spectrum (cava),
-notifications, the OSD, quick actions (Super+A: game mode, OpenRGB lights),
-the power menu (Super+Shift+E), the key guide (Super+K), the lock screen
-(Super+Alt+L, and on idle), the polkit agent, the Hyprland config and the
-first helper. More panels come next (see [Roadmap](#roadmap)), all in
-Quickshell.
+notifications, the OSD, quick actions (Super+A: game mode, the panels' tone,
+OpenRGB lights), the power menu (Super+Shift+E), the key guide (Super+K), the
+lock screen (Super+Alt+L, and on idle), the polkit agent, the Hyprland config
+and the first helper. More panels come next (see [Roadmap](#roadmap)), all
+in Quickshell.
 
 ## Install
 
@@ -69,7 +69,11 @@ cargo clippy --all-targets -- -D warnings
 ## Roadmap
 
 - Quick actions still to come from HyprFlow: the screens (mirror, only the
-  main one; need a second screen to test), the appearance (tone).
+  main one; need a second screen to test).
+- Appearance: tones more distinct from each other (HyprFlow's look much
+  alike); from HyprFlow, a panel to tweak a tone (card opacity, blur, text
+  colour), hyprglass glass on the panels instead of plain blur, and the tone
+  reaching kitty.
 - Lights, still to test on the devices: on/off on all three, colours
   holding after OpenRGB exits, keyboard effects with and without a colour.
   After suspend or a replug, devices that lose their colour get it back
