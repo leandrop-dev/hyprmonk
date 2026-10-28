@@ -15,6 +15,7 @@ Module {
     visible: !isNaN(celsius)
     icon: "\u{F050F}"
     label: Math.round(celsius) + "°C"
+    tooltip: "CPU temperature\n" + sensor + " sensor, hot from " + hot + "°C"
     color: celsius >= hot ? Theme.warning : Theme.foreground
 
     Process {

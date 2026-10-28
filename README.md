@@ -4,12 +4,13 @@ My Hyprland desktop on Arch (CachyOS): a Quickshell shell, small Rust helpers,
 and colours generated from the wallpaper by matugen.
 
 Early days: the wallpaper (Super+W to pick), the bar with its sound,
-battery, calendar and media panels, a hardware drawer (CPU, memory, disk,
-network) and a live spectrum (cava), notifications, the OSD, quick actions
-(Super+A: game mode, OpenRGB lights), the power menu (Super+Shift+E), the
-key guide (Super+K), the lock screen (Super+Alt+L, and on idle), the polkit
-agent, the Hyprland config and the first helper. More panels come next (see
-[Roadmap](#roadmap)), all in Quickshell.
+battery, calendar and media panels, a running cat that opens a hardware
+drawer (temperature, CPU, memory, disk, network) and a live spectrum (cava),
+notifications, the OSD, quick actions (Super+A: game mode, OpenRGB lights),
+the power menu (Super+Shift+E), the key guide (Super+K), the lock screen
+(Super+Alt+L, and on idle), the polkit agent, the Hyprland config and the
+first helper. More panels come next (see [Roadmap](#roadmap)), all in
+Quickshell.
 
 ## Install
 
@@ -39,7 +40,7 @@ colours become the accent everywhere (matugen).
 | Path | What |
 |------|------|
 | `config/hypr/` | Hyprland (Lua): `hyprland.lua` loads `look`, `input`, `binds`, `rules`, `plugins`, `gamemode`; `hypridle.conf` for idle |
-| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `Theme.qml`, `bar/`, `keyguide/`, `lock/`, `notifications/`, `osd/`, `panels/`, `polkit/`, `power/`, `quickactions/`, `services/`, `wallpaper/`, `widgets/` |
+| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `Theme.qml`, `assets/`, `bar/`, `keyguide/`, `lock/`, `notifications/`, `osd/`, `panels/`, `polkit/`, `power/`, `quickactions/`, `services/`, `wallpaper/`, `widgets/` |
 | `config/matugen/` | Templates for Hyprland, the shell and kitty |
 | `config/uwsm/env` | Session environment (NVIDIA, cursor, toolkits) |
 | `config/systemd/user/` | The shell's and hypridle's units; they only start under Hyprland |
@@ -67,8 +68,6 @@ cargo clippy --all-targets -- -D warnings
 
 ## Roadmap
 
-- Hardware drawer extras from HyprFlow: a running-cat handle that speeds
-  up with CPU use, and tooltips with details (per core, swap, interfaces).
 - Quick actions still to come from HyprFlow: the screens (mirror, only the
   main one; need a second screen to test), the appearance (tone).
 - Lights, still to test on the devices: on/off on all three, colours
@@ -93,6 +92,8 @@ cargo clippy --all-targets -- -D warnings
 
 - Ideas from [HyprFlow-Arch](https://github.com/AlejandroMinor/HyprFlow-Arch).
 - The Rival 3 Wireless battery protocol from [rivalcfg](https://github.com/flozz/rivalcfg).
+- The running cat's font from [runcat-text](https://github.com/AlejandroMinor/runcat-text)
+  (BSD-2-Clause, its licence in `config/quickshell/hyprmonk/assets/runcat/`).
 
 ## License
 

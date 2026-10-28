@@ -1,7 +1,10 @@
-// CPU, memory, disk and network use for the bar's hardware drawer, read
-// every couple of seconds from /proc and df, and only while some drawer is
-// open (watch() and unwatch()). CPU and network are rates: the first read
-// after opening only sets the starting point.
+// CPU, memory, disk and network use for the bar's hardware drawer.
+//
+// CPU use is read every second, always: the running cat in the bar shows it.
+// Memory, the disks and the network every two seconds, only while some
+// drawer is open (watch() and unwatch()); the apps using the most memory only
+// while their tooltip shows (watchApps() and unwatchApps()). The network is a
+// rate: the first read after opening only sets the starting point.
 pragma Singleton
 
 import QtQuick
@@ -11,17 +14,21 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    property int watchers: 0
-
     property real cpu: NaN          // percent
+    property var cores: []          // percent, per core
     property real memUsed: NaN      // bytes
     property real memTotal: NaN
     property real diskUsed: NaN     // bytes, on /
     property real diskSize: NaN
+    property var disks: []          // [{mount, used, size}], one per device
     property real down: NaN         // bytes a second, every interface but lo
     property real up: NaN
+    property var apps: []           // [{name, bytes}], the ten using the most memory
 
-    property var last: null         // the previous read: {idle, total, rx, tx, at}
+    property int watchers: 0
+    property int appWatchers: 0
+    property var lastCpu: []        // per cpu line of /proc/stat: {idle, total}
+    property var lastNet: null      // {rx, tx, at}
 
     function watch(): void {
         watchers += 1;
@@ -29,7 +36,15 @@ Singleton {
 
     function unwatch(): void {
         watchers = Math.max(0, watchers - 1);
-        if (watchers === 0) last = null;
+        if (watchers === 0) lastNet = null;
+    }
+
+    function watchApps(): void {
+        appWatchers += 1;
+    }
+
+    function unwatchApps(): void {
+        appWatchers = Math.max(0, appWatchers - 1);
     }
 
     // 1.2G, 340M, 12K: powers of 1024, as free and df -h print them.
@@ -44,18 +59,29 @@ Singleton {
         return (bytes >= 10 || i === 0 ? Math.round(bytes) : bytes.toFixed(1)) + units[i];
     }
 
+    function parseStat(text: string): void {
+        const now = text.split("\n").filter(line => line.startsWith("cpu")).map(line => {
+            const f = line.trim().split(/\s+/).slice(1).map(Number);
+            return { idle: f[3] + f[4], total: f.reduce((sum, n) => sum + n, 0) };  // idle and iowait
+        });
+        if (lastCpu.length === now.length) {
+            const use = now.map((s, i) => {
+                const total = s.total - lastCpu[i].total;
+                return total > 0 ? 100 * (1 - (s.idle - lastCpu[i].idle) / total) : 0;
+            });
+            cpu = use[0];
+            cores = use.slice(1);
+        }
+        lastCpu = now;
+    }
+
+    // /proc/meminfo and /proc/net/dev, then "---", then df.
     function parse(text: string): void {
-        const now = Date.now();
-        let idle = 0, total = 0, rx = 0, tx = 0;
+        const at = Date.now();
+        const [procs, dfOut] = text.split("\n---\n");
+        let rx = 0, tx = 0;
         const mem = {};
-        const lines = text.split("\n");
-        for (const line of lines) {
-            if (line.startsWith("cpu ")) {
-                const f = line.trim().split(/\s+/).slice(1).map(Number);
-                idle = f[3] + f[4];  // idle and iowait
-                total = f.reduce((sum, n) => sum + n, 0);
-                continue;
-            }
+        for (const line of procs.split("\n")) {
             const meminfo = line.match(/^(MemTotal|MemAvailable):\s+(\d+) kB/);
             if (meminfo) {
                 mem[meminfo[1]] = Number(meminfo[2]) * 1024;
@@ -68,35 +94,87 @@ Singleton {
                 tx += Number(net[3]);
             }
         }
-        // df -P -B1 /: the last line, "device size used available use% /".
-        const df = lines.filter(l => l.trim() !== "").pop()?.trim().split(/\s+/) ?? [];
-        if (df.length >= 6) {
-            diskSize = Number(df[1]);
-            diskUsed = Number(df[2]);
-        }
         memTotal = mem.MemTotal ?? NaN;
         memUsed = memTotal - (mem.MemAvailable ?? NaN);
 
-        if (last) {
-            const seconds = (now - last.at) / 1000;
-            cpu = total > last.total ? 100 * (1 - (idle - last.idle) / (total - last.total)) : cpu;
-            down = Math.max(0, (rx - last.rx) / seconds);
-            up = Math.max(0, (tx - last.tx) / seconds);
+        // "source mount size used", a device once under its shortest mount
+        // (btrfs mounts one device at many subvolumes).
+        const byDevice = {};
+        for (const line of (dfOut ?? "").trim().split("\n").slice(1)) {
+            const [source, mount, size, used] = line.trim().split(/\s+/);
+            const known = byDevice[source];
+            if (!known || mount.length < known.mount.length)
+                byDevice[source] = { mount, size: Number(size), used: Number(used) };
+        }
+        disks = Object.values(byDevice);
+        const rootDisk = disks.find(d => d.mount === "/");
+        diskSize = rootDisk?.size ?? NaN;
+        diskUsed = rootDisk?.used ?? NaN;
+
+        if (lastNet) {
+            const seconds = (at - lastNet.at) / 1000;
+            down = Math.max(0, (rx - lastNet.rx) / seconds);
+            up = Math.max(0, (tx - lastNet.tx) / seconds);
         } else {
             soon.start();  // the rates need a second read: take it shortly
         }
-        last = { idle, total, rx, tx, at: now };
+        lastNet = { rx, tx, at };
+    }
+
+    // `ps` lines "pid ppid rss comm": each process counts toward the app it
+    // belongs to, the ancestor that Hyprland or systemd started (a terminal's
+    // programs toward the terminal); a shell Hyprland ran a program through
+    // gives way to that program.
+    function rank(text: string): void {
+        const procs = {};
+        for (const line of text.trim().split("\n")) {
+            const m = line.trim().match(/^(\d+)\s+(\d+)\s+(\d+)\s+(.+)$/);
+            if (m) procs[m[1]] = { ppid: m[2], kb: Number(m[3]), name: m[4] };
+        }
+        const launchers = ["Hyprland", "start-hyprland", "systemd", "uwsm", "init"];
+        const shells = ["sh", "bash", "zsh", "fish", "dash"];
+        const appOf = pid => {
+            const chain = [pid];
+            for (;;) {
+                const p = procs[chain[chain.length - 1]];
+                const parent = procs[p.ppid];
+                if (!parent || p.ppid === "1" || launchers.includes(parent.name)) break;
+                chain.push(p.ppid);
+            }
+            let i = chain.length - 1;
+            while (i > 0 && shells.includes(procs[chain[i]].name)) i -= 1;
+            return procs[chain[i]].name;
+        };
+        const totals = {};
+        for (const pid in procs) {
+            const name = appOf(pid);
+            totals[name] = (totals[name] ?? 0) + procs[pid].kb * 1024;
+        }
+        apps = Object.entries(totals)
+            .map(([name, bytes]) => ({ name, bytes }))
+            .sort((a, b) => b.bytes - a.bytes)
+            .slice(0, 10);
+    }
+
+    FileView {
+        id: stat
+        path: "/proc/stat"
+        printErrors: false
+        onLoaded: root.parseStat(text())
     }
 
     Timer {
-        id: soon
-        interval: 500
-        onTriggered: reader.running = true
+        running: true
+        interval: 1000
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: stat.reload()
     }
 
     Process {
         id: reader
-        command: ["sh", "-c", "cat /proc/stat /proc/meminfo /proc/net/dev; df -P -B1 /"]
+        command: ["sh", "-c", "cat /proc/meminfo /proc/net/dev; echo ---; "
+            + "df -B1 -l -x tmpfs -x devtmpfs -x efivarfs -x squashfs -x overlay --output=source,target,size,used"]
         stdout: StdioCollector {
             onStreamFinished: root.parse(text)
         }
@@ -108,5 +186,27 @@ Singleton {
         repeat: true
         triggeredOnStart: true
         onTriggered: reader.running = true
+    }
+
+    Timer {
+        id: soon
+        interval: 500
+        onTriggered: reader.running = true
+    }
+
+    Process {
+        id: ps
+        command: ["ps", "-eo", "pid=,ppid=,rss=,comm="]
+        stdout: StdioCollector {
+            onStreamFinished: root.rank(text)
+        }
+    }
+
+    Timer {
+        running: root.appWatchers > 0
+        interval: 2000
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: ps.running = true
     }
 }
