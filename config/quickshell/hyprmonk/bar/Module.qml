@@ -1,4 +1,5 @@
-// A bar module: an icon and an optional label, with a hover fill.
+// A bar module: an icon and an optional label (or `contents` of its own),
+// with a hover fill.
 // Emits clicked(button) and scrolled(steps) for modules that react.
 import QtQuick
 import QtQuick.Layouts
@@ -15,6 +16,8 @@ Item {
     property bool interactive: false
     // Its panel is open: tinted with the accent.
     property bool active: false
+    // More items for the row, after the icon and label.
+    property alias contents: content.data
     readonly property bool hovered: mouse.containsMouse
 
     signal clicked(int button)

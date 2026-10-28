@@ -33,9 +33,10 @@ Singleton {
     // The track's length in seconds, 0 when it has none (a live stream).
     // Browsers drop the length from their metadata a moment after a seek and
     // only send it again on the next play or pause, so the last one seen for
-    // this track is kept.
+    // this track is kept. A live stream reports no length, or the largest one
+    // there is (2^63 µs): anything over a day counts as none.
     readonly property string track: current ? [current.identity, current.trackTitle, current.trackArtist].join("\n") : ""
-    readonly property real reported: current?.lengthSupported && current.length > 0 ? current.length : 0
+    readonly property real reported: current?.lengthSupported && current.length > 0 && current.length < 86400 ? current.length : 0
     property string knownTrack: ""
     property real knownLength: 0
     readonly property real length: reported > 0 ? reported : (track === knownTrack ? knownLength : 0)

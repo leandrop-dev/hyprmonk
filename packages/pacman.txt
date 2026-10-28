@@ -43,6 +43,7 @@ wireplumber
 pavucontrol   # the sound panel's Mixer
 playerctl
 upower
+cava   # the centre card's spectrum
 
 # Power profile and lights (quick actions)
 power-profiles-daemon

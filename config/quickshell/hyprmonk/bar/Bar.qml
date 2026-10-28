@@ -71,10 +71,54 @@ PanelWindow {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         anchors.topMargin: Theme.barGap
-        panel: bar.panelOpen && Panels.open === "media" ? mediaPanel : null
+        panel: mediaOpen ? mediaPanel : null
         panelWidth: 490
 
-        Media { active: bar.panelOpen && Panels.open === "media" }
+        // The spectrum stays; the media slides out beside it while hovered
+        // (folding a moment after the pointer leaves) or while its panel is
+        // open.
+        readonly property bool mediaOpen: bar.panelOpen && Panels.open === "media"
+        property bool hovered: false
+        readonly property bool showMedia: Player.current !== null && (hovered || mediaOpen)
+
+        HoverHandler {
+            onHoveredChanged: {
+                if (hovered) {
+                    fold.stop();
+                    centreCard.hovered = true;
+                } else {
+                    fold.restart();
+                }
+            }
+        }
+
+        Timer {
+            id: fold
+            interval: 400
+            onTriggered: centreCard.hovered = false
+        }
+
+        Spectrum { active: centreCard.mediaOpen }
+
+        Item {
+            id: drawer
+
+            property real reveal: centreCard.showMedia ? 1 : 0
+
+            visible: reveal > 0
+            clip: true
+            implicitWidth: media.implicitWidth * reveal
+            implicitHeight: media.implicitHeight
+
+            Behavior on reveal {
+                NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
+            }
+
+            Media {
+                id: media
+                active: centreCard.mediaOpen
+            }
+        }
     }
 
     Card {

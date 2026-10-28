@@ -3,8 +3,8 @@
 My Hyprland desktop on Arch (CachyOS): a Quickshell shell, small Rust helpers,
 and colours generated from the wallpaper by matugen.
 
-Early days: the bar with its sound, battery, calendar and media panels,
-notifications, the OSD, quick actions (Super+A: game mode, OpenRGB
+Early days: the bar with its sound, battery, calendar and media panels and
+a live spectrum (cava), notifications, the OSD, quick actions (Super+A: game mode, OpenRGB
 lights), the power menu (Super+Shift+E), the key guide (Super+K), the lock
 screen (Super+Alt+L, and on idle), the polkit agent, the Hyprland config
 and the first helper. More panels come next (see [Roadmap](#roadmap)), all
@@ -63,8 +63,7 @@ cargo clippy --all-targets -- -D warnings
 
 ## Roadmap
 
-- Panels in HyprFlow's style: a cava spectrum in the centre card, a
-  hardware drawer.
+- Panels in HyprFlow's style: a hardware drawer.
 - Lock screen extras from HyprFlow: the keyboard layout when it is not the
   default, batteries.
 - A wallpaper: nothing draws one yet.
@@ -78,7 +77,8 @@ cargo clippy --all-targets -- -D warnings
 - Game mode extras from HyprFlow: variable refresh in fullscreen, Steam Big
   Picture, notifications and lights off while it is on.
 - Media panel extras from HyprFlow: synced lyrics, art "skins" (the
-  polaroid frame), a mini player.
+  polaroid frame), a mini player, the spectrum's other styles (bars, peaks,
+  LEDs...) and a picker for them.
 - Events in the calendar (dots on their days, a list for the day picked);
   where they come from is still to choose: local, Google or CalDAV.
 - Notifications grouped by app, as swaync does.

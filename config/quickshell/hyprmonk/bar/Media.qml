@@ -1,7 +1,10 @@
-// The centre card: what is playing (services/Player.qml), or a dim note when
-// nothing is. Click: the media panel; right click: play/pause; scroll: next or
-// previous track.
+// What is playing (services/Player.qml): the cover in a circle, title and
+// artist, and how far into the track an underline has come. It slides out of
+// the centre card on hover (bar/Bar.qml). Click: the media panel; right
+// click: play/pause; scroll: next or previous track.
 import QtQuick
+import QtQuick.Layouts
+import Quickshell.Widgets
 import qs
 import qs.services
 
@@ -10,10 +13,8 @@ Module {
 
     readonly property var player: Player.current
 
-    icon: player?.isPlaying ? "\u{F0387}" : (player ? "\u{F03E4}" : "\u{F0387}")
-    label: Player.summary.length > 48 ? Player.summary.slice(0, 47) + "…" : Player.summary
-    dim: !player?.isPlaying
     interactive: player !== null
+    dim: !player?.isPlaying
 
     onClicked: button => {
         if (!player) return;
@@ -24,4 +25,56 @@ Module {
         if (steps > 0 && player?.canGoNext) player.next();
         else if (steps < 0 && player?.canGoPrevious) player.previous();
     }
+
+    // The position is read when asked: ask every second while it plays.
+    Timer {
+        running: root.visible && (root.player?.isPlaying ?? false)
+        interval: 1000
+        repeat: true
+        onTriggered: root.player.positionChanged()
+    }
+
+    contents: [
+        ClippingRectangle {
+            implicitWidth: 20
+            implicitHeight: 20
+            radius: 10
+            color: Theme.fg(0.08)
+
+            Image {
+                id: cover
+                anchors.fill: parent
+                source: root.player?.trackArtUrl ?? ""
+                fillMode: Image.PreserveAspectCrop
+                sourceSize: Qt.size(40, 40)
+            }
+
+            BarText {
+                anchors.centerIn: parent
+                visible: cover.status !== Image.Ready
+                text: "\u{F075A}"
+                font.pixelSize: 12
+            }
+        },
+
+        BarText {
+            id: title
+
+            Layout.maximumWidth: 360
+            text: Player.summary
+            elide: Text.ElideRight
+
+            // How far into the track.
+            Rectangle {
+                visible: Player.length > 0
+                anchors.top: parent.bottom
+                anchors.topMargin: 1
+                width: parent.width * Math.min(1, (root.player?.position ?? 0) / Math.max(1, Player.length))
+                height: 2
+                radius: 1
+                color: Theme.foreground
+                opacity: 0.8
+            }
+        }
+    ]
 }
