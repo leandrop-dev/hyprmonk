@@ -20,6 +20,12 @@ kwallet
 kwallet-pam
 socat
 
+# Screenshots and screen sharing
+grim
+slurp
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk   # file pickers
+
 # Audio, media and batteries
 pipewire
 wireplumber
