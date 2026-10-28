@@ -1,4 +1,4 @@
-// Opens quick actions (also Super+K).
+// Opens quick actions (also Super+A).
 import QtQuick
 import qs.services
 

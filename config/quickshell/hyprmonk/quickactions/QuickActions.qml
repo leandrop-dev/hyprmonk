@@ -1,4 +1,4 @@
-// Quick actions (Super+K): a card in the middle of the focused screen with
+// Quick actions (Super+A): a card in the middle of the focused screen with
 // the switches used most, under their sections. Typing filters them (the
 // letters in order, gaps allowed: "gm" finds "Game mode"); the arrows or Tab
 // move, Enter or a click runs one and closes the card; Escape or a click

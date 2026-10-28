@@ -1,8 +1,9 @@
-// Which centred card is open (quick actions, the power menu): one at a time,
-// on the screen focused when it opened. Opening one closes any bar panel.
+// Which centred card is open (quick actions, the power menu, the key guide):
+// one at a time, on the screen focused when it opened. Opening one closes any
+// bar panel.
 //
 // IPC: qs -c hyprmonk ipc call overlays toggle NAME | close
-//      ("quickactions" or "power")
+//      ("quickactions", "power" or "keyguide")
 pragma Singleton
 
 import QtQuick

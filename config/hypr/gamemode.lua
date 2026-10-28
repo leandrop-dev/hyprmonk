@@ -1,4 +1,4 @@
--- Game mode, switched from the quick actions (Super+K): no animations, blur,
+-- Game mode, switched from the quick actions (Super+A): no animations, blur,
 -- shadows or window glass while ~/.local/state/hyprmonk/game-mode reads "on".
 -- The shell writes that file and reloads the config, so a reload keeps game
 -- mode as it was.
