@@ -135,8 +135,10 @@ PanelWindow {
              : Panels.open === "microphone" ? inputPanel
              : Panels.open === "batteries" ? batteryPanel
              : Panels.open === "calendar" ? calendarPanel
+             : Panels.open === "tray" ? trayMenu
              : null
 
+        TrayIcons {}
         Batteries { active: bar.panelOpen && Panels.open === "batteries" }
         Volume { active: bar.panelOpen && Panels.open === "sound" }
         Microphone { active: bar.panelOpen && Panels.open === "microphone" }
@@ -164,6 +166,11 @@ PanelWindow {
     Component {
         id: calendarPanel
         CalendarPanel {}
+    }
+
+    Component {
+        id: trayMenu
+        TrayMenu {}
     }
 
     Component {

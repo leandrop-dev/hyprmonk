@@ -3,7 +3,7 @@
 My Hyprland desktop on Arch (CachyOS): a Quickshell shell, small Rust helpers,
 and colours generated from the wallpaper by matugen.
 
-Early days: the wallpaper (Super+W to pick), the bar with its sound,
+Early days: the wallpaper (Super+W to pick), the bar with its tray, sound,
 battery, calendar and media panels, a running cat that opens a hardware
 drawer (temperature, CPU, memory, disk, network), a live spectrum (cava, in
 seven styles) and synced lyrics, notifications, the OSD, quick actions
