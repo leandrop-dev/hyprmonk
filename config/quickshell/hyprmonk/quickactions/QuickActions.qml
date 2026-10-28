@@ -6,12 +6,11 @@
 // them in the same card instead; Escape, or Backspace with nothing typed,
 // goes back.
 //
-// IPC: qs -c hyprmonk ipc call quickactions toggle
+// IPC: qs -c hyprmonk ipc call overlays toggle quickactions
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
-import Quickshell.Wayland
 import qs
 import qs.services
 import qs.widgets
@@ -19,8 +18,7 @@ import qs.widgets
 Scope {
     id: root
 
-    property bool open: false
-    property ShellScreen screen: null
+    readonly property bool open: Overlays.open === "quickactions"
     property string query: ""
     property int current: 0
     property Action opened: null  // the action whose options are showing
@@ -77,6 +75,12 @@ Scope {
             value: root.layouts[root.layoutIndex] ?? ""
             available: root.layouts.length > 1
             onRun: Quickshell.execDetached(["hyprctl", "switchxkblayout", "current", "next"])
+        },
+        Action {
+            section: "System"
+            icon: "\u{F0425}"
+            label: "Power menu"
+            onRun: Overlays.toggle("power")
         },
         Action {
             section: "Appearance"
@@ -139,18 +143,14 @@ Scope {
         query = "";
     }
 
-    function toggle(): void {
-        if (open) {
-            open = false;
-            return;
-        }
+    // Each open starts from the top of the full list.
+    onOpenChanged: {
+        if (!open) return;
         devices.running = true;
         Lights.refresh();
-        screen = Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? null;
         opened = null;
         clearSearch();
         current = 0;
-        open = true;
         search.forceActiveFocus();
     }
 
@@ -161,14 +161,14 @@ Scope {
     function run(item: var): void {
         if (!item) return;
         if (opened) {
-            open = false;
+            Overlays.close();
             opened.picked(item.label);
         } else if (item.options.length > 0) {
             opened = item;
             clearSearch();
             current = Math.max(0, item.options.indexOf(item.value));
         } else {
-            open = false;
+            Overlays.close();
             item.run();
         }
     }
@@ -178,14 +178,6 @@ Scope {
         opened = null;
         clearSearch();
         current = Math.max(0, shown.indexOf(from));
-    }
-
-    IpcHandler {
-        target: "quickactions"
-
-        function toggle(): void {
-            root.toggle();
-        }
     }
 
     Process {
@@ -209,250 +201,202 @@ Scope {
         }
     }
 
-    PanelWindow {
+    Overlay {
         id: window
 
-        readonly property int margin: 32  // room around the card as it unfolds
-        readonly property int top: 44     // the search line, above the list
+        readonly property int top: 44  // the search line, above the list
         // The list scrolls past this.
-        readonly property int listMax: height - margin * 2 - top - 12
+        readonly property int listMax: windowHeight - margin * 2 - top - 12
 
-        screen: root.screen
-        visible: root.open || card.opacity > 0
-        color: "transparent"
+        name: "hyprmonk-quickactions"
+        open: root.open
+        cardHeight: top + list.height + 12
         // Most of the screen's height, the card at its top: filtering or
         // opening options changes the card's height, never where it starts.
-        implicitWidth: 420 + margin * 2
-        implicitHeight: Math.round((screen?.height ?? 1080) * 0.8)
-        exclusionMode: ExclusionMode.Ignore
-        mask: Region { item: card }
+        windowHeight: Math.round((screen?.height ?? 1080) * 0.8)
+        onDismissed: Overlays.close()
 
-        WlrLayershell.namespace: "hyprmonk-quickactions"
-        WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+        TextInput {
+            id: search
 
-        HyprlandFocusGrab {
-            windows: [window]
-            active: root.open
-            onCleared: root.open = false
+            x: 20
+            y: 16
+            width: window.cardWidth - 40
+            focus: true
+            color: Theme.foreground
+            selectionColor: Qt.alpha(Theme.accent, 0.4)
+            font.family: Theme.font
+            font.pixelSize: Theme.rowFontSize
+
+            onTextEdited: {
+                root.query = text;
+                root.current = 0;
+            }
+
+            Keys.onUpPressed: root.move(-1)
+            Keys.onDownPressed: root.move(1)
+            Keys.onTabPressed: root.move(1)
+            Keys.onBacktabPressed: root.move(-1)
+            Keys.onReturnPressed: root.run(root.shown[root.current])
+            Keys.onEnterPressed: root.run(root.shown[root.current])
+            Keys.onEscapePressed: {
+                if (root.opened) root.back();
+                else Overlays.close();
+            }
+            Keys.onPressed: event => {
+                if (event.key === Qt.Key_Backspace && text === "" && root.opened) {
+                    root.back();
+                    event.accepted = true;
+                }
+            }
+
+            Text {
+                visible: !search.text
+                text: root.opened?.label ?? "Quick actions"
+                color: Theme.fg(Theme.dimOpacity)
+                font: search.font
+            }
         }
 
-        Rectangle {
-            id: card
+        Flickable {
+            id: list
 
-            x: window.margin
-            y: window.margin
-            width: 420
-            height: window.top + list.height + 12
-            radius: Theme.panelRadius
-            color: Theme.card
-            border.width: 1
-            border.color: Theme.rim
+            // The picked row, from the top of the list.
+            readonly property Item row: rows.count > root.current ? rows.itemAt(root.current).row : null
+            readonly property real rowY: row ? row.parent.y + row.y : 0
+
+            x: 12
+            y: window.top
+            width: window.cardWidth - 24
+            height: Math.min(contentHeight, window.listMax)
+            contentHeight: root.listHeight(root.shown)
+            interactive: contentHeight > height
+            boundsBehavior: Flickable.StopAtBounds
             clip: true
 
-            Behavior on height {
-                NumberAnimation { duration: 160; easing.type: Easing.OutCubic }
+            // Keep the picked row in view.
+            onRowYChanged: {
+                if (rowY < contentY) contentY = rowY;
+                else if (rowY + root.rowHeight > contentY + height) contentY = rowY + root.rowHeight - height;
             }
 
-            // Unfolds down from its top edge.
-            opacity: root.open ? 1 : 0
-            transform: Rotation {
-                origin.x: card.width / 2
-                origin.y: 0
-                axis { x: 1; y: 0; z: 0 }
-                angle: root.open ? 0 : -90
+            // The picked row; slides to the next one.
+            Rectangle {
+                visible: list.row !== null
+                y: list.rowY
+                width: list.width
+                height: root.rowHeight
+                radius: 10
+                color: Theme.selection
 
-                Behavior on angle {
-                    NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
-                }
-            }
-
-            Behavior on opacity {
-                NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
-            }
-
-            TextInput {
-                id: search
-
-                x: 20
-                y: 16
-                width: card.width - 40
-                focus: true
-                color: Theme.foreground
-                selectionColor: Qt.alpha(Theme.accent, 0.4)
-                font.family: Theme.font
-                font.pixelSize: Theme.rowFontSize
-
-                onTextEdited: {
-                    root.query = text;
-                    root.current = 0;
-                }
-
-                Keys.onUpPressed: root.move(-1)
-                Keys.onDownPressed: root.move(1)
-                Keys.onTabPressed: root.move(1)
-                Keys.onBacktabPressed: root.move(-1)
-                Keys.onReturnPressed: root.run(root.shown[root.current])
-                Keys.onEnterPressed: root.run(root.shown[root.current])
-                Keys.onEscapePressed: {
-                    if (root.opened) root.back();
-                    else root.open = false;
-                }
-                Keys.onPressed: event => {
-                    if (event.key === Qt.Key_Backspace && text === "" && root.opened) {
-                        root.back();
-                        event.accepted = true;
-                    }
-                }
-
-                Text {
-                    visible: !search.text
-                    text: root.opened?.label ?? "Quick actions"
-                    color: Theme.fg(Theme.dimOpacity)
-                    font: search.font
+                Behavior on y {
+                    NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
                 }
             }
 
-            Flickable {
-                id: list
+            Column {
+                width: list.width
 
-                // The picked row, from the top of the list.
-                readonly property Item row: rows.count > root.current ? rows.itemAt(root.current).row : null
-                readonly property real rowY: row ? row.parent.y + row.y : 0
+                Repeater {
+                    id: rows
 
-                x: 12
-                y: window.top
-                width: card.width - 24
-                height: Math.min(contentHeight, window.listMax)
-                contentHeight: root.listHeight(root.shown)
-                interactive: contentHeight > height
-                boundsBehavior: Flickable.StopAtBounds
-                clip: true
+                    model: root.shown
 
-                // Keep the picked row in view.
-                onRowYChanged: {
-                    if (rowY < contentY) contentY = rowY;
-                    else if (rowY + root.rowHeight > contentY + height) contentY = rowY + root.rowHeight - height;
-                }
+                    Column {
+                        id: entry
 
-                // The picked row; slides to the next one.
-                Rectangle {
-                    visible: list.row !== null
-                    y: list.rowY
-                    width: list.width
-                    height: root.rowHeight
-                    radius: 10
-                    color: Theme.selection
+                        required property var modelData
+                        required property int index
+                        readonly property bool picked: index === root.current
+                        readonly property alias row: row
 
-                    Behavior on y {
-                        NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
-                    }
-                }
+                        width: list.width
 
-                Column {
-                    width: list.width
+                        SectionLabel {
+                            visible: root.startsSection(root.shown, entry.index)
+                            height: root.headingHeight
+                            leftPadding: 12
+                            bottomPadding: 6
+                            verticalAlignment: Text.AlignBottom
+                            text: entry.modelData.section
+                            font.pixelSize: 10
+                            font.capitalization: Font.MixedCase
+                        }
 
-                    Repeater {
-                        id: rows
-
-                        model: root.shown
-
-                        Column {
-                            id: entry
-
-                            required property var modelData
-                            required property int index
-                            readonly property bool picked: index === root.current
-                            readonly property alias row: row
+                        Item {
+                            id: row
 
                             width: list.width
+                            height: root.rowHeight
 
-                            SectionLabel {
-                                visible: root.startsSection(root.shown, entry.index)
-                                height: root.headingHeight
-                                leftPadding: 12
-                                bottomPadding: 6
-                                verticalAlignment: Text.AlignBottom
-                                text: entry.modelData.section
-                                font.pixelSize: 10
-                                font.capitalization: Font.MixedCase
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onEntered: root.current = entry.index
+                                onClicked: root.run(entry.modelData)
                             }
 
-                            Item {
-                                id: row
+                            Text {
+                                id: glyph
 
-                                width: list.width
-                                height: root.rowHeight
+                                x: 12
+                                width: 22
+                                anchors.verticalCenter: parent.verticalCenter
+                                horizontalAlignment: Text.AlignHCenter
+                                text: entry.modelData.icon
+                                color: entry.modelData.on === true || entry.modelData.chosen === true
+                                    ? Theme.accent : Theme.foreground
+                                font.family: Theme.font
+                                font.pixelSize: 18
+                                scale: entry.picked ? 1.15 : 1
 
-                                MouseArea {
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onEntered: root.current = entry.index
-                                    onClicked: root.run(entry.modelData)
+                                Behavior on scale {
+                                    NumberAnimation { duration: 120 }
                                 }
+                            }
 
-                                Text {
-                                    id: glyph
+                            Text {
+                                anchors.left: glyph.right
+                                anchors.leftMargin: 12
+                                anchors.right: pill.left
+                                anchors.rightMargin: 12
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: entry.modelData.label
+                                color: Theme.foreground
+                                font.family: Theme.font
+                                font.pixelSize: Theme.fontSize
+                                elide: Text.ElideRight
+                            }
 
-                                    x: 12
-                                    width: 22
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    horizontalAlignment: Text.AlignHCenter
-                                    text: entry.modelData.icon
-                                    color: entry.modelData.on === true || entry.modelData.chosen === true
-                                        ? Theme.accent : Theme.foreground
-                                    font.family: Theme.font
-                                    font.pixelSize: 18
-                                    scale: entry.picked ? 1.15 : 1
+                            Chip {
+                                id: pill
 
-                                    Behavior on scale {
-                                        NumberAnimation { duration: 120 }
-                                    }
-                                }
+                                readonly property bool isSwitch: entry.modelData.on !== undefined
 
-                                Text {
-                                    anchors.left: glyph.right
-                                    anchors.leftMargin: 12
-                                    anchors.right: pill.left
-                                    anchors.rightMargin: 12
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text: entry.modelData.label
-                                    color: Theme.foreground
-                                    font.family: Theme.font
-                                    font.pixelSize: Theme.fontSize
-                                    elide: Text.ElideRight
-                                }
-
-                                Chip {
-                                    id: pill
-
-                                    readonly property bool isSwitch: entry.modelData.on !== undefined
-
-                                    anchors.right: parent.right
-                                    anchors.rightMargin: 12
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: Math.min(implicitWidth, 160)
-                                    visible: isSwitch || entry.modelData.value !== ""
-                                    text: isSwitch ? (entry.modelData.on ? "on" : "off") : entry.modelData.value
-                                    on: entry.modelData.on
-                                    onClicked: root.run(entry.modelData)
-                                }
+                                anchors.right: parent.right
+                                anchors.rightMargin: 12
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: Math.min(implicitWidth, 160)
+                                visible: isSwitch || entry.modelData.value !== ""
+                                text: isSwitch ? (entry.modelData.on ? "on" : "off") : entry.modelData.value
+                                on: entry.modelData.on
+                                onClicked: root.run(entry.modelData)
                             }
                         }
                     }
                 }
+            }
 
-                Text {
-                    visible: root.shown.length === 0
-                    x: 12
-                    height: root.rowHeight
-                    verticalAlignment: Text.AlignVCenter
-                    text: "Nothing matches"
-                    color: Theme.fg(Theme.dimOpacity)
-                    font.family: Theme.font
-                    font.pixelSize: Theme.fontSize
-                }
+            Text {
+                visible: root.shown.length === 0
+                x: 12
+                height: root.rowHeight
+                verticalAlignment: Text.AlignVCenter
+                text: "Nothing matches"
+                color: Theme.fg(Theme.dimOpacity)
+                font.family: Theme.font
+                font.pixelSize: Theme.fontSize
             }
         }
     }

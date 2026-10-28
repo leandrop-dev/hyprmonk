@@ -50,7 +50,7 @@ bind(mod .. " + N",         hl.dsp.exec_cmd("qs -c hyprmonk ipc call notificatio
 bind(mod .. " + SHIFT + N", hl.dsp.exec_cmd("qs -c hyprmonk ipc call notifications clear"),  "Clear notifications")
 
 -- Quick actions
-bind(mod .. " + K", hl.dsp.exec_cmd("qs -c hyprmonk ipc call quickactions toggle"), "Quick actions")
+bind(mod .. " + K", hl.dsp.exec_cmd("qs -c hyprmonk ipc call overlays toggle quickactions"), "Quick actions")
 
 -- Caps and Num Lock keep working; the OSD reads the new state.
 local locks = { non_consuming = true, locked = true }
@@ -58,7 +58,7 @@ bind("Caps_Lock", hl.dsp.exec_cmd("qs -c hyprmonk ipc call osd locks"), "Caps Lo
 bind("Num_Lock",  hl.dsp.exec_cmd("qs -c hyprmonk ipc call osd locks"), "Num Lock",  locks)
 
 -- Session
-bind(mod .. " + SHIFT + E", hl.dsp.exec_cmd("uwsm stop"), "Log out")
+bind(mod .. " + SHIFT + E", hl.dsp.exec_cmd("qs -c hyprmonk ipc call overlays toggle power"), "Power menu")
 
 -- Media keys work on the lock screen too.
 local media = { locked = true }

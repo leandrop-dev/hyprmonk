@@ -97,6 +97,8 @@ PanelWindow {
         Microphone { active: bar.panelOpen && Panels.open === "microphone" }
         NotificationBell {}
         Clock { active: bar.panelOpen && Panels.open === "calendar" }
+        QuickActionsButton {}
+        PowerButton {}
     }
 
     Component {
