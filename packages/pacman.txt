@@ -46,9 +46,8 @@ playerctl
 upower
 cava   # the centre card's spectrum
 
-# Power profile and lights (quick actions)
+# Power profile (quick actions)
 power-profiles-daemon
-openrgb   # its udev rules let the user reach the devices
 
 # Building hyprmonk and the hyprpm plugins
 rustup

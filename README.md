@@ -6,11 +6,11 @@ and colours generated from the wallpaper by matugen.
 Early days: the wallpaper (Super+W to pick), the bar with its sound,
 battery, calendar and media panels, a running cat that opens a hardware
 drawer (temperature, CPU, memory, disk, network) and a live spectrum (cava),
-notifications, the OSD, quick actions (Super+A: game mode, the panels' tone,
-OpenRGB lights), the power menu (Super+Shift+E), the key guide (Super+K), the
-lock screen (Super+Alt+L, and on idle), the polkit agent, the Hyprland config
-and the first helper. More panels come next (see [Roadmap](#roadmap)), all
-in Quickshell.
+notifications, the OSD, quick actions (Super+A: game mode, the panels'
+tone), the power menu (Super+Shift+E), the key guide (Super+K), the lock
+screen (Super+Alt+L, and on idle), the polkit agent, the Hyprland config and
+the first helper. More panels come next (see [Roadmap](#roadmap)), all in
+Quickshell.
 
 ## Install
 
@@ -74,12 +74,13 @@ cargo clippy --all-targets -- -D warnings
   alike); from HyprFlow, a panel to tweak a tone (card opacity, blur, text
   colour), hyprglass glass on the panels instead of plain blur, and the tone
   reaching kitty.
-- Lights, still to test on the devices: on/off on all three, colours
-  holding after OpenRGB exits, keyboard effects with and without a colour.
-  After suspend or a replug, devices that lose their colour get it back
-  only at the next switch or accent change.
+- Lights, parked (not a must-have): the keyboard and mouse in the accent.
+  Through OpenRGB the Keychron took colours and effects, but the Rival 3
+  Wireless ignored them over its receiver (rivalcfg has no light setting
+  for it either), and a keyboard alone would not match the mouse. Back
+  only with a way to drive both.
 - Game mode extras from HyprFlow: variable refresh in fullscreen, Steam Big
-  Picture, notifications and lights off while it is on.
+  Picture, and notifications off while it is on.
 - Media panel extras from HyprFlow: synced lyrics, art "skins" (the
   polaroid frame), a mini player, the spectrum's other styles (bars, peaks,
   LEDs...) and a picker for them.

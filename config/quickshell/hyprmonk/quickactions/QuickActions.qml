@@ -2,7 +2,7 @@
 // the switches used most, under their sections. Typing filters them (the
 // letters in order, gaps allowed: "gm" finds "Game mode"); the arrows or Tab
 // move, Enter or a click runs one and closes the card; Escape or a click
-// elsewhere closes it. An action with options (the keyboard's effect) opens
+// elsewhere closes it. An action with options (the panels' tone) opens
 // them in the same card instead; Escape, or Backspace with nothing typed,
 // goes back.
 //
@@ -96,23 +96,6 @@ Scope {
             label: "Random wallpaper"
             available: Wallpaper.files.length > 1
             onRun: Wallpaper.random()
-        },
-        Action {
-            section: "Appearance"
-            icon: "\u{F0335}"
-            label: "Lights"
-            on: Lights.on
-            available: Lights.devices.length > 0
-            onRun: Lights.toggle()
-        },
-        Action {
-            section: "Appearance"
-            icon: "\u{F09F9}"
-            label: "Keyboard effect"
-            value: Lights.keyboardEffect
-            options: Lights.keyboardEffects
-            available: Lights.keyboardEffects.length > 0
-            onPicked: option => Lights.setKeyboardEffect(option)
         }
     ]
 
@@ -161,7 +144,6 @@ Scope {
     // Each open starts from the top of the full list.
     onOpenChanged: {
         if (!open) return;
-        Lights.refresh();
         opened = null;
         clearSearch();
         current = 0;
