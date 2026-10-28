@@ -1,0 +1,21 @@
+# matugen: one wallpaper in, every app's colours out.
+#   matugen image ~/Pictures/wallpaper.png --source-color-index 0
+# (without --source-color-index, matugen 4 stops to ask which colour to use)
+# Outputs go to the state directory, never into the repo.
+
+[config]
+
+[templates.hyprland]
+input_path = "~/.config/matugen/templates/hyprland.lua"
+output_path = "~/.local/state/hyprmonk/theme/colors.lua"
+post_hook = "hyprctl reload"
+
+[templates.quickshell]
+input_path = "~/.config/matugen/templates/quickshell.json"
+output_path = "~/.local/state/hyprmonk/theme/colors.json"
+post_hook = "qs -c hyprmonk ipc call theme reload"
+
+[templates.kitty]
+input_path = "~/.config/matugen/templates/kitty.conf"
+output_path = "~/.local/state/hyprmonk/theme/kitty.conf"
+post_hook = "pkill -USR1 -x kitty"

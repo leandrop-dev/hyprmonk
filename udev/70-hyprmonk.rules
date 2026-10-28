@@ -1,0 +1,5 @@
+# Lets the logged-in user open the hidraw nodes `hyprmonk battery` reads.
+# uaccess has to be tagged before 73-seat-late.rules applies it, hence 70.
+
+# SteelSeries Rival 3 Wireless (2.4 GHz receiver)
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1038", ATTRS{idProduct}=="1830", TAG+="uaccess"

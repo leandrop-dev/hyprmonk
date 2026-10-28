@@ -1,0 +1,14 @@
+[package]
+name = "hyprmonk"
+version = "0.1.0"
+description = "Helpers for the hyprmonk desktop: device batteries and the shell's data"
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+rustix.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,30 @@
+# Packages from the official repos. `install.sh check` lists the missing ones.
+
+# Session
+hyprland
+hyprpm
+uwsm
+
+# Shell and theming
+quickshell
+matugen
+ttf-jetbrains-mono-nerd
+
+# Apps the binds start
+kitty
+dolphin
+hyprlauncher
+
+# Audio, media and batteries
+pipewire
+wireplumber
+playerctl
+upower
+
+# Building hyprmonk and the hyprpm plugins
+rustup
+base-devel
+cmake
+meson
+cpio
+git
