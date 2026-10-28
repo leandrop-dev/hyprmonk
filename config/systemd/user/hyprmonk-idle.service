@@ -1,0 +1,15 @@
+[Unit]
+Description=hyprmonk idle: lock and screens off (hypridle)
+Documentation=https://github.com/leandrop-dev/hyprmonk
+PartOf=graphical-session.target
+After=graphical-session.target hyprmonk-shell.service
+# Plasma reaches graphical-session.target too; only start under Hyprland.
+ConditionEnvironment=XDG_CURRENT_DESKTOP=Hyprland
+
+[Service]
+ExecStart=/usr/bin/hypridle
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

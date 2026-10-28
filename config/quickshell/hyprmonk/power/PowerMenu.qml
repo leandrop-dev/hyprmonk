@@ -1,6 +1,6 @@
 // The power menu: a row of tiles in the middle of the focused screen, from
-// the bar's power button, Super+Shift+E or quick actions. Suspend runs at
-// once; log out, reboot and shut down ask for a second press on the same
+// the bar's power button, Super+Shift+E or quick actions. Lock and suspend
+// run at once; log out, reboot and shut down ask for a second press on the same
 // tile. The arrows or Tab move, Enter or a tile's letter presses it, Escape
 // or a click elsewhere closes the menu.
 //
@@ -24,6 +24,7 @@ Scope {
     readonly property int gap: 8
 
     readonly property var actions: [
+        { icon: "\u{F033E}", label: "Lock",      key: "l", confirm: false, command: ["qs", "-c", "hyprmonk", "ipc", "call", "lock", "lock"] },
         { icon: "\u{F0343}", label: "Log out",   key: "e", confirm: true,  command: ["uwsm", "stop"] },
         { icon: "\u{F0904}", label: "Suspend",   key: "u", confirm: false, command: ["systemctl", "suspend"] },
         { icon: "\u{F0709}", label: "Reboot",    key: "r", confirm: true,  command: ["systemctl", "reboot"] },

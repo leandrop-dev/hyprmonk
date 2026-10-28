@@ -58,6 +58,7 @@ bind("Caps_Lock", hl.dsp.exec_cmd("qs -c hyprmonk ipc call osd locks"), "Caps Lo
 bind("Num_Lock",  hl.dsp.exec_cmd("qs -c hyprmonk ipc call osd locks"), "Num Lock",  locks)
 
 -- Session
+bind(mod .. " + ALT + L", hl.dsp.exec_cmd("qs -c hyprmonk ipc call lock lock"), "Lock")
 bind(mod .. " + SHIFT + E", hl.dsp.exec_cmd("qs -c hyprmonk ipc call overlays toggle power"), "Power menu")
 
 -- Media keys work on the lock screen too.

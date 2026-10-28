@@ -5,8 +5,8 @@ and colours generated from the wallpaper by matugen.
 
 Early days: the bar with its sound, battery, calendar and media panels,
 notifications, the OSD, quick actions (Super+K: game mode, OpenRGB
-lights), the power menu (Super+Shift+E), the polkit agent, the Hyprland
-config and the first helper. More panels come next (see
+lights), the power menu (Super+Shift+E), the lock screen (Super+Alt+L,
+and on idle), the polkit agent, the Hyprland config and the first helper. More panels come next (see
 [Roadmap](#roadmap)), all in Quickshell.
 
 ## Install
@@ -33,11 +33,11 @@ Run `./install.sh help` for each step.
 
 | Path | What |
 |------|------|
-| `config/hypr/` | Hyprland (Lua): `hyprland.lua` loads `look`, `input`, `binds`, `rules`, `plugins`, `gamemode` |
-| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `Theme.qml`, `bar/`, `notifications/`, `osd/`, `panels/`, `polkit/`, `power/`, `quickactions/`, `services/`, `widgets/` |
+| `config/hypr/` | Hyprland (Lua): `hyprland.lua` loads `look`, `input`, `binds`, `rules`, `plugins`, `gamemode`; `hypridle.conf` for idle |
+| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `Theme.qml`, `bar/`, `lock/`, `notifications/`, `osd/`, `panels/`, `polkit/`, `power/`, `quickactions/`, `services/`, `widgets/` |
 | `config/matugen/` | Templates for Hyprland, the shell and kitty |
 | `config/uwsm/env` | Session environment (NVIDIA, cursor, toolkits) |
-| `config/systemd/user/` | The shell's unit; it only starts under Hyprland |
+| `config/systemd/user/` | The shell's and hypridle's units; they only start under Hyprland |
 | `crates/hyprmonk/` | The `hyprmonk` CLI |
 | `udev/` | Access rules for the devices `hyprmonk` reads |
 | `packages/pacman.txt` | What `install.sh check` expects |
@@ -64,8 +64,8 @@ cargo clippy --all-targets -- -D warnings
 
 - Panels in HyprFlow's style: key guide, a cava spectrum in the centre
   card, a hardware drawer.
-- A lock screen (Quickshell's session lock), then a Lock tile in the power
-  menu and locking on idle.
+- Lock screen extras from HyprFlow: the keyboard layout when it is not the
+  default, batteries.
 - A wallpaper: nothing draws one yet.
 - Quick actions still to come from HyprFlow: the screens (mirror, only the
   main one; need a second screen to test), the appearance (tone), a random

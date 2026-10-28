@@ -22,6 +22,9 @@ deskflow
 # Root prompts: the shell is the polkit agent
 polkit
 
+# Locking when idle and before suspend (the shell draws the lock screen)
+hypridle
+
 # Secrets: KWallet, unlocked at login by hyprmonk-kwallet.service
 kwallet
 kwallet-pam
