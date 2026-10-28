@@ -62,7 +62,7 @@ PanelWindow {
         Launcher {}
         Workspaces { screen: bar.screen }
         Overview {}
-        Temperature {}
+        HardwareDrawer {}
     }
 
     Card {
