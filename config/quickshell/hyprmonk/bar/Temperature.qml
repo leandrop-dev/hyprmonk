@@ -5,7 +5,7 @@ import QtQuick
 import Quickshell.Io
 import qs
 
-BarText {
+Module {
     id: root
 
     property string sensor: "coretemp"
@@ -13,8 +13,9 @@ BarText {
     property real celsius: NaN
 
     visible: !isNaN(celsius)
-    text: "\u{F050F} " + Math.round(celsius) + "°C"
-    color: celsius >= hot ? Theme.warning : Theme.text
+    icon: "\u{F050F}"
+    label: Math.round(celsius) + "°C"
+    color: celsius >= hot ? Theme.warning : Theme.foreground
 
     Process {
         running: true

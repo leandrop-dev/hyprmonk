@@ -1,37 +1,40 @@
 // Peripheral batteries: whatever UPower reports (the headset), plus what
 // `hyprmonk battery` reads from devices UPower cannot see (the mouse).
 import QtQuick
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.UPower
 import qs
 
-Row {
+RowLayout {
     id: root
 
     // The mouse sleeps between uses and its receiver answers nothing then,
     // so a reading is kept until a newer one arrives.
     property var hidDevices: []
 
-    spacing: 12
+    spacing: 2
 
     Repeater {
         model: UPower.devices.values.filter(d => !d.powerSupply && d.isPresent !== false && d.model !== "")
 
-        BarText {
+        Module {
             required property UPowerDevice modelData
-            text: "\u{F02CB} " + Math.round(modelData.percentage * 100) + "%"
-            color: modelData.percentage <= 0.15 ? Theme.warning : Theme.text
+            icon: "\u{F02CB}"
+            label: Math.round(modelData.percentage * 100) + "%"
+            color: modelData.percentage <= 0.15 ? Theme.warning : Theme.foreground
         }
     }
 
     Repeater {
         model: root.hidDevices.filter(d => d.percent !== null)
 
-        BarText {
+        Module {
             required property var modelData
-            text: (modelData.charging ? "\u{F0084}" : "\u{F037D}") + " " + modelData.percent + "%"
-            color: modelData.percent <= 15 && !modelData.charging ? Theme.warning : Theme.text
+            icon: modelData.charging ? "\u{F0084}" : "\u{F037D}"
+            label: modelData.percent + "%"
+            color: modelData.percent <= 15 && !modelData.charging ? Theme.warning : Theme.foreground
         }
     }
 

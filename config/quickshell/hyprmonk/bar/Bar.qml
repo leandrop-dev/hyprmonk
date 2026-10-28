@@ -1,7 +1,7 @@
-// The bar along the top of one screen: workspaces left, clock centre,
-// system status right, on a single translucent strip.
+// The bar on one screen: three floating cards (left, centre, right) on a
+// transparent strip. Only the cards are drawn, so Hyprland's blur (rules.lua,
+// namespace hyprmonk-bar) applies to them alone.
 import QtQuick
-import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import qs
@@ -14,39 +14,37 @@ PanelWindow {
         left: true
         right: true
     }
-    implicitHeight: 36
+    implicitHeight: Theme.barHeight + Theme.barGap * 2
     color: "transparent"
 
     WlrLayershell.namespace: "hyprmonk-bar"
     WlrLayershell.layer: WlrLayer.Top
 
-    Rectangle {
-        anchors.fill: parent
-        anchors.margins: 4
-        anchors.bottomMargin: 0
-        radius: Theme.radius
-        color: Qt.alpha(Theme.surface, 0.82)
+    Card {
+        anchors.left: parent.left
+        anchors.leftMargin: Theme.barMargin
+        anchors.verticalCenter: parent.verticalCenter
 
-        Workspaces {
-            anchors.left: parent.left
-            anchors.leftMargin: 8
-            anchors.verticalCenter: parent.verticalCenter
-            screen: bar.screen
-        }
+        Launcher {}
+        Workspaces { screen: bar.screen }
+        Overview {}
+        Temperature {}
+    }
 
-        Clock {
-            anchors.centerIn: parent
-        }
+    Card {
+        anchors.centerIn: parent
 
-        RowLayout {
-            anchors.right: parent.right
-            anchors.rightMargin: 12
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: 14
+        Media {}
+    }
 
-            Temperature {}
-            Batteries {}
-            Volume {}
-        }
+    Card {
+        anchors.right: parent.right
+        anchors.rightMargin: Theme.barMargin
+        anchors.verticalCenter: parent.verticalCenter
+
+        Batteries {}
+        Volume {}
+        Microphone {}
+        Clock {}
     }
 }

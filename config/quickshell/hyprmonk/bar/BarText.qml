@@ -3,7 +3,7 @@ import QtQuick
 import qs
 
 Text {
-    color: Theme.text
+    color: Theme.foreground
     font.family: Theme.font
     font.pixelSize: Theme.fontSize
     verticalAlignment: Text.AlignVCenter

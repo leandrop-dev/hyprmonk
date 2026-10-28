@@ -1,5 +1,10 @@
-// Colours and type for every surface. matugen writes colors.json into the
-// state directory (config/matugen); until it has run, the defaults below apply.
+// Colours, type and sizes for every surface.
+//
+// The look: dark translucent cards with a faint rim, monospace type, and one
+// accent taken from the wallpaper. The tone (background and text) is fixed;
+// the accent comes from matugen's colors.json in the state directory, and the
+// default below applies until matugen has run.
+//
 // matugen's post_hook calls `qs -c hyprmonk ipc call theme reload`: a file
 // watch alone misses the first run, when the file does not exist yet.
 pragma Singleton
@@ -9,19 +14,39 @@ import Quickshell
 import Quickshell.Io
 
 Singleton {
+    id: theme
+
     readonly property string stateDir: Quickshell.env("HOME") + "/.local/state/hyprmonk"
 
-    readonly property color surface: colors.surface
-    readonly property color surfaceHigh: colors.surface_container_high
-    readonly property color text: colors.on_surface
-    readonly property color textDim: colors.on_surface_variant
-    readonly property color accent: colors.primary
-    readonly property color onAccent: colors.on_primary
-    readonly property color warning: colors.error
+    // Tone
+    readonly property color background: "#1e1a17"
+    readonly property color foreground: "#f2ede6"
+    readonly property real cardOpacity: 0.6
+    readonly property color card: Qt.alpha(background, cardOpacity)
+    readonly property color rim: fg(0.08)
+    readonly property color accent: colors.accent
+    readonly property color positive: "#3dff3d"
+    readonly property color warning: "#ff5f56"
 
+    // Foreground at an opacity: secondary text, hover fills, idle items.
+    function fg(alpha: real): color {
+        return Qt.alpha(foreground, alpha);
+    }
+
+    // Type
     readonly property string font: "JetBrainsMono Nerd Font"
-    readonly property int fontSize: 13
-    readonly property int radius: 10
+    readonly property int fontSize: 14
+    readonly property int smallFontSize: 11
+
+    // Bar
+    readonly property int barHeight: 38       // one card
+    readonly property int barGap: 5           // above and below the cards
+    readonly property int barMargin: 15       // from the screen's sides
+    readonly property int cardRadius: 12
+    readonly property int cardPadding: 6
+    readonly property int moduleRadius: 8
+    readonly property real hoverOpacity: 0.08
+    readonly property real dimOpacity: 0.45
 
     IpcHandler {
         target: "theme"
@@ -33,20 +58,14 @@ Singleton {
 
     FileView {
         id: file
-        path: stateDir + "/theme/colors.json"
+        path: theme.stateDir + "/theme/colors.json"
         watchChanges: true
         printErrors: false
         onFileChanged: reload()
 
         JsonAdapter {
             id: colors
-            property string surface: "#1e1e2e"
-            property string surface_container_high: "#313244"
-            property string on_surface: "#cdd6f4"
-            property string on_surface_variant: "#a6adc8"
-            property string primary: "#89b4fa"
-            property string on_primary: "#1e1e2e"
-            property string error: "#f38ba8"
+            property string accent: "#ef8608"
         }
     }
 }

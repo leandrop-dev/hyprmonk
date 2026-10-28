@@ -1,10 +1,9 @@
-// Date and time, updated on the minute.
-import QtQuick
+// Day/month and time, updated on the minute.
 import Quickshell
 
-BarText {
-    text: Qt.formatDateTime(clock.date, "ddd d MMM   HH:mm")
-    font.bold: true
+Module {
+    icon: "\u{F00ED}"
+    label: Qt.formatDateTime(clock.date, "dd/MM HH:mm")
 
     SystemClock {
         id: clock
