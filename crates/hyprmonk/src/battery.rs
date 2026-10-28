@@ -15,10 +15,27 @@ pub struct Charge {
     pub charging: bool,
 }
 
+/// What a device is, so the shell can show a fitting icon.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Kind {
+    Mouse,
+}
+
+impl Kind {
+    /// The name in the JSON output.
+    #[must_use]
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Kind::Mouse => "mouse",
+        }
+    }
+}
+
 /// One device found, with its charge; `None` while it is off or asleep.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Reading {
     pub name: &'static str,
+    pub kind: Kind,
     pub charge: Option<Charge>,
 }
 
@@ -27,7 +44,8 @@ pub struct Reading {
 pub enum Format {
     /// One `name: 13%` line per device.
     Text,
-    /// A JSON array for the shell: `[{"name": .., "percent": .., "charging": ..}]`.
+    /// A JSON array for the shell:
+    /// `[{"name": .., "kind": "mouse", "percent": .., "charging": ..}]`.
     Json,
 }
 
@@ -43,6 +61,7 @@ pub fn read_all() -> Result<Vec<Reading>> {
             let mut device = Device::open(&node)?;
             readings.push(Reading {
                 name: mouse.name,
+                kind: Kind::Mouse,
                 charge: steelseries::read_battery(&mut device)?,
             });
         }
@@ -85,8 +104,9 @@ fn json_object(reading: &Reading) -> String {
         None => ("null".to_owned(), "null".to_owned()),
     };
     format!(
-        r#"{{"name":"{}","percent":{percent},"charging":{charging}}}"#,
-        json_escape(reading.name)
+        r#"{{"name":"{}","kind":"{}","percent":{percent},"charging":{charging}}}"#,
+        json_escape(reading.name),
+        reading.kind.as_str()
     )
 }
 
@@ -113,6 +133,7 @@ mod tests {
         vec![
             Reading {
                 name: "Mouse",
+                kind: Kind::Mouse,
                 charge: Some(Charge {
                     percent: 13,
                     charging: false,
@@ -120,6 +141,7 @@ mod tests {
             },
             Reading {
                 name: "Pad \"2\"",
+                kind: Kind::Mouse,
                 charge: Some(Charge {
                     percent: 90,
                     charging: true,
@@ -127,6 +149,7 @@ mod tests {
             },
             Reading {
                 name: "Asleep",
+                kind: Kind::Mouse,
                 charge: None,
             },
         ]
@@ -145,9 +168,9 @@ mod tests {
         assert_eq!(
             render(&readings(), Format::Json),
             concat!(
-                r#"[{"name":"Mouse","percent":13,"charging":false},"#,
-                r#"{"name":"Pad \"2\"","percent":90,"charging":true},"#,
-                r#"{"name":"Asleep","percent":null,"charging":null}]"#,
+                r#"[{"name":"Mouse","kind":"mouse","percent":13,"charging":false},"#,
+                r#"{"name":"Pad \"2\"","kind":"mouse","percent":90,"charging":true},"#,
+                r#"{"name":"Asleep","kind":"mouse","percent":null,"charging":null}]"#,
                 "\n"
             )
         );
