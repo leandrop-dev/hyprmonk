@@ -36,6 +36,7 @@ Singleton {
     // Type
     readonly property string font: "JetBrainsMono Nerd Font"
     readonly property int fontSize: 14
+    readonly property int bodyFontSize: 12
     readonly property int smallFontSize: 11
 
     // Bar
@@ -47,6 +48,11 @@ Singleton {
     readonly property int moduleRadius: 8
     readonly property real hoverOpacity: 0.08
     readonly property real dimOpacity: 0.45
+
+    // Panels and pop-ups
+    readonly property int panelRadius: 16
+    readonly property int panelWidth: 400
+    readonly property int popupWidth: 380
 
     IpcHandler {
         target: "theme"

@@ -1,6 +1,8 @@
-// hyprmonk's shell: `qs -c hyprmonk`. One bar per screen for now.
+// hyprmonk's shell: `qs -c hyprmonk`. A bar per screen, the notification
+// pop-ups and the notification centre.
 import Quickshell
 import qs.bar
+import qs.notifications
 
 ShellRoot {
     Variants {
@@ -11,4 +13,7 @@ ShellRoot {
             screen: modelData
         }
     }
+
+    Popups {}
+    Center {}
 }

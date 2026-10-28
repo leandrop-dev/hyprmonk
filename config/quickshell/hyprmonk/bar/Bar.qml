@@ -45,6 +45,7 @@ PanelWindow {
         Batteries {}
         Volume {}
         Microphone {}
+        NotificationBell {}
         Clock {}
     }
 }

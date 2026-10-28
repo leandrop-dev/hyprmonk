@@ -45,6 +45,10 @@ bind(mod .. " + Tab", function()
     if hl.plugin.hymission then hl.plugin.hymission.toggle() end
 end, "Overview")
 
+-- Notifications
+bind(mod .. " + N",         hl.dsp.exec_cmd("qs -c hyprmonk ipc call notifications toggle"), "Notification centre")
+bind(mod .. " + SHIFT + N", hl.dsp.exec_cmd("qs -c hyprmonk ipc call notifications clear"),  "Clear notifications")
+
 -- Session
 bind(mod .. " + SHIFT + E", hl.dsp.exec_cmd("uwsm stop"), "Log out")
 
