@@ -5,7 +5,9 @@
 // A card opened while another is still folding away (quick actions running
 // "Power menu") waits until that one is gone: when a surface that held the
 // keyboard unmaps, Hyprland hands the keyboard to a window, even with
-// another card asking for it, and the new card would get no keys.
+// another card asking for it, and the new card would get no keys. For the
+// same reason the OSD and the notification pop-ups stay mapped (empty)
+// while a card is open, instead of unmapping under it.
 //
 // IPC: qs -c hyprmonk ipc call overlays toggle NAME | close
 //      ("quickactions", "power", "keyguide" or "wallpapers")

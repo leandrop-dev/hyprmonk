@@ -200,7 +200,10 @@ Scope {
         id: window
 
         screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-        visible: root.open || card.opacity > 0
+        // Kept mapped, empty, while a centred card is open: Hyprland hands
+        // the keyboard to a window whenever a layer unmaps, even away from
+        // a card that holds it (services/Overlays.qml).
+        visible: root.open || card.opacity > 0 || Overlays.open !== ""
 
         // No anchors: the compositor centres it.
         implicitWidth: card.width

@@ -40,7 +40,11 @@ Singleton {
         wallpaper: { label: "Wallpaper", background: colors.surface, foreground: colors.surfaceText, card: 0.78, light: false }
     })
     // Espresso until the settings are read (and for a name it does not know).
-    readonly property string toneName: appearance?.tone in tones ? appearance.tone : "espresso"
+    // A previewed tone (quick actions, while moving through them) shows
+    // without being saved.
+    readonly property string savedTone: appearance?.tone in tones ? appearance.tone : "espresso"
+    property string previewTone: ""
+    readonly property string toneName: previewTone in tones ? previewTone : savedTone
     readonly property var tone: tones[toneName] ?? tones.espresso
 
     function setTone(name: string): void {

@@ -26,7 +26,11 @@ Singleton {
         dots: "Dots",
         mirror: "Mirror"
     })
-    readonly property string style: settings.style in styles ? settings.style : "wave"
+    // A previewed style (quick actions, while moving through them) shows
+    // without being saved.
+    readonly property string savedStyle: settings.style in styles ? settings.style : "wave"
+    property string previewStyle: ""
+    readonly property string style: previewStyle in styles ? previewStyle : savedStyle
 
     function setStyle(name: string): void {
         if (name in styles) settings.style = name;

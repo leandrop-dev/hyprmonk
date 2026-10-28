@@ -11,7 +11,10 @@ PanelWindow {
     id: window
 
     screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-    visible: Notifications.popups.length > 0 && !Notifications.centerOpen
+    // Kept mapped, empty, while a centred card is open: Hyprland hands the
+    // keyboard to a window whenever a layer unmaps, even away from a card
+    // that holds it (services/Overlays.qml).
+    visible: (Notifications.popups.length > 0 && !Notifications.centerOpen) || Overlays.open !== ""
 
     anchors {
         top: true
@@ -24,6 +27,7 @@ PanelWindow {
     implicitWidth: Theme.notificationWidth
     implicitHeight: Math.max(1, stack.implicitHeight)
     color: "transparent"
+    mask: Region { item: stack }  // empty, it takes no clicks
 
     WlrLayershell.namespace: "hyprmonk-notifications"
     WlrLayershell.layer: WlrLayer.Overlay

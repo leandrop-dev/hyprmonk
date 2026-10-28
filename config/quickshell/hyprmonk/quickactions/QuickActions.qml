@@ -60,7 +60,8 @@ Scope {
             icon: "\u{F04C5}"
             label: "Power profile"
             value: Power.profileName
-            onRun: Power.nextProfile()
+            options: Power.names
+            onPicked: option => Power.setProfile(option)
         },
         Action {
             section: "System"
@@ -80,17 +81,23 @@ Scope {
             section: "Appearance"
             icon: "\u{F050E}"
             label: "Appearance"
-            value: Theme.tone.label
+            value: Theme.tones[Theme.savedTone].label
             options: Object.values(Theme.tones).map(tone => tone.label)
+            previews: true
             onPicked: option => Theme.setTone(Object.keys(Theme.tones).find(name => Theme.tones[name].label === option))
+            onPreviewed: option => Theme.previewTone = Object.keys(Theme.tones).find(name => Theme.tones[name].label === option) ?? ""
+            onUnpreviewed: Theme.previewTone = ""
         },
         Action {
             section: "Appearance"
             icon: "\u{F0128}"
             label: "Spectrum"
-            value: Cava.styles[Cava.style]
+            value: Cava.styles[Cava.savedStyle]
             options: Object.values(Cava.styles)
+            previews: true
             onPicked: option => Cava.setStyle(Object.keys(Cava.styles).find(name => Cava.styles[name] === option))
+            onPreviewed: option => Cava.previewStyle = Object.keys(Cava.styles).find(name => Cava.styles[name] === option) ?? ""
+            onUnpreviewed: Cava.previewStyle = ""
         },
         Action {
             section: "Appearance"
@@ -149,9 +156,18 @@ Scope {
         query = "";
     }
 
+    // While a list that previews is open, the option under the cursor is
+    // tried live; Enter keeps it, leaving the list puts back what was there.
+    readonly property string tried: opened?.previews ? (shown[current]?.label ?? "") : ""
+
+    onTriedChanged: if (opened?.previews && tried !== "") opened.previewed(tried)
+
     // Each open starts from the top of the full list.
     onOpenChanged: {
-        if (!open) return;
+        if (!open) {
+            opened?.unpreviewed();
+            return;
+        }
         opened = null;
         clearSearch();
         current = 0;
@@ -165,8 +181,8 @@ Scope {
     function run(item: var): void {
         if (!item) return;
         if (opened) {
-            Overlays.close();
             opened.picked(item.label);
+            Overlays.close();
         } else if (item.options.length > 0) {
             opened = item;
             clearSearch();
@@ -179,6 +195,7 @@ Scope {
 
     function back(): void {
         const from = opened;
+        from.unpreviewed();
         opened = null;
         clearSearch();
         current = Math.max(0, shown.indexOf(from));

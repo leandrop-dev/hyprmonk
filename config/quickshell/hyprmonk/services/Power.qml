@@ -1,4 +1,5 @@
-// The power profile (power-profiles-daemon): its name, and the next one along.
+// The power profile (power-profiles-daemon): its name, and setting one by
+// name (quick actions' picker).
 pragma Singleton
 
 import QtQuick
@@ -21,7 +22,10 @@ Singleton {
         }
     }
 
-    function nextProfile(): void {
-        PowerProfiles.profile = profiles[(profiles.indexOf(PowerProfiles.profile) + 1) % profiles.length];
+    readonly property var names: profiles.map(nameOf)
+
+    function setProfile(name: string): void {
+        const profile = profiles.find(p => nameOf(p) === name);
+        if (profile !== undefined) PowerProfiles.profile = profile;
     }
 }
