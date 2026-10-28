@@ -1,8 +1,10 @@
-// What one screen shows while locked. On the main screen: a large clock and
-// the date low on the left, a glass bar along the bottom with the avatar
-// (~/.face), the user and the password field, and what is playing above the
-// bar's right end (music players only: a browser's tab titles stay private).
-// Other screens show only the tinted, frosted desktop.
+// What one screen shows while locked. On the main screen: the wallpaper with
+// a frosted band along the bottom, a large clock and the date low on the
+// left, a glass bar along the bottom with the avatar (~/.face), the user, the
+// password field, the keyboard layout (when not the default) and the
+// batteries, and what is playing above the bar's right end (music players
+// only: a browser's tab titles stay private). Other screens show only the
+// frosted wallpaper. The desktop never shows through.
 //
 // Sizes follow HyprFlow's lock, laid out for 2560x1440 and scaled to the
 // screen.
@@ -23,8 +25,55 @@ Rectangle {
     readonly property bool main: lock.primary === "" || screen?.name === lock.primary
     readonly property real s: Math.min(width / 2560, height / 1440)
 
-    // Over the blurred desktop; solid when nothing blurs it (game mode).
-    color: GameMode.on ? Theme.background : Qt.alpha(Theme.background, 0.45)
+    // Until the wallpaper is in, or with none set.
+    color: Theme.background
+
+    // The wallpaper as the desktop draws it (the same size, so the decoded
+    // picture is shared).
+    Image {
+        id: wallpaper
+        anchors.fill: parent
+        source: Wallpaper.path ? "file://" + Wallpaper.path : ""
+        fillMode: Image.PreserveAspectCrop
+        sourceSize: Qt.size(width, height)
+        asynchronous: true
+    }
+
+    // Frosted and a little darker: the band behind the clock and the bar on
+    // the main screen, fading in over its top third; all of it elsewhere.
+    MultiEffect {
+        anchors.fill: wallpaper
+        source: wallpaper
+        visible: wallpaper.status === Image.Ready
+        autoPaddingEnabled: false
+        blurEnabled: true
+        blur: 1
+        blurMax: 48
+        brightness: -0.12
+        contrast: -0.05
+        maskEnabled: surface.main
+        maskSource: band
+        maskThresholdMin: 0.5  // with the spread: the mask's alpha 0 to 1, in full
+        maskSpreadAtMin: 1
+    }
+
+    Item {
+        id: band
+
+        anchors.fill: parent
+        visible: false
+        layer.enabled: true
+
+        Rectangle {
+            anchors.bottom: parent.bottom
+            width: parent.width
+            height: 560 * surface.s
+            gradient: Gradient {
+                GradientStop { position: 0; color: "transparent" }
+                GradientStop { position: 1 / 3; color: "white" }
+            }
+        }
+    }
 
     SystemClock {
         id: clock
@@ -262,6 +311,35 @@ Rectangle {
                 NumberAnimation { target: shake; property: "x"; to: 12; duration: 80 }
                 NumberAnimation { target: shake; property: "x"; to: -6; duration: 70 }
                 NumberAnimation { target: shake; property: "x"; to: 0; duration: 60 }
+            }
+        }
+
+        // The layout when it is not the default, then the batteries.
+        Row {
+            anchors.right: parent.right
+            anchors.rightMargin: 92 * surface.s
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 32 * surface.s
+
+            Text {
+                visible: !Keyboard.isDefault && Keyboard.name !== ""
+                text: "\u{F030C}  " + Keyboard.name
+                color: Theme.accent
+                font.family: Theme.font
+                font.pixelSize: Math.round(20 * surface.s)
+            }
+
+            Repeater {
+                model: Battery.devices
+
+                Text {
+                    required property var modelData
+
+                    text: (modelData.charging ? "\u{F0084}" : modelData.icon) + " " + modelData.percent + "%"
+                    color: Battery.isLow(modelData) ? Theme.warning : Theme.fg(0.73)
+                    font.family: Theme.font
+                    font.pixelSize: Math.round(20 * surface.s)
+                }
             }
         }
     }

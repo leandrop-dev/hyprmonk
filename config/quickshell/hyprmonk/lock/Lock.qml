@@ -1,12 +1,10 @@
 // The lock screen: Wayland's session lock, so nothing reaches the desktop
 // until the password checks out (lock/pam/hyprmonk-lock). Each screen gets a
 // surface; the focused one at lock time carries the clock and the password
-// field, the rest only the frosted desktop.
+// field, the rest only the frosted wallpaper. The surfaces are opaque.
 //
-// Hyprland keeps drawing the workspaces under the lock and blurs them
-// (misc.session_lock_xray and session_lock_blur in look.lua); with blur off
-// (game mode) the surfaces are opaque instead. If the shell dies while
-// locked, restarting it locks again (misc.allow_session_lock_restore).
+// If the shell dies while locked, restarting it locks again
+// (misc.allow_session_lock_restore in look.lua).
 //
 // IPC: qs -c hyprmonk ipc call lock lock
 //      qs -c hyprmonk ipc call lock preview  (the surface in a plain window,

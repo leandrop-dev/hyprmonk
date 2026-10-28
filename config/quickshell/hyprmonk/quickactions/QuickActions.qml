@@ -9,8 +9,6 @@
 // IPC: qs -c hyprmonk ipc call overlays toggle quickactions
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
-import Quickshell.Io
 import qs
 import qs.services
 import qs.widgets
@@ -22,10 +20,6 @@ Scope {
     property string query: ""
     property int current: 0
     property Action opened: null  // the action whose options are showing
-
-    // Hyprland's main keyboard, read on each open: its layouts and the one in use.
-    property var layouts: []
-    property int layoutIndex: 0
 
     readonly property list<Action> actions: [
         Action {
@@ -72,9 +66,9 @@ Scope {
             section: "System"
             icon: "\u{F030C}"
             label: "Keyboard layout"
-            value: root.layouts[root.layoutIndex] ?? ""
-            available: root.layouts.length > 1
-            onRun: Quickshell.execDetached(["hyprctl", "switchxkblayout", "current", "next"])
+            value: Keyboard.layouts[Keyboard.index] ?? ""
+            available: Keyboard.layouts.length > 1
+            onRun: Keyboard.next()
         },
         Action {
             section: "System"
@@ -159,7 +153,6 @@ Scope {
     // Each open starts from the top of the full list.
     onOpenChanged: {
         if (!open) return;
-        devices.running = true;
         Lights.refresh();
         opened = null;
         clearSearch();
@@ -191,27 +184,6 @@ Scope {
         opened = null;
         clearSearch();
         current = Math.max(0, shown.indexOf(from));
-    }
-
-    Process {
-        id: devices
-        command: ["hyprctl", "devices", "-j"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const keyboard = JSON.parse(text).keyboards.find(k => k.main);
-                root.layouts = keyboard?.layout ? keyboard.layout.split(",") : [];
-                root.layoutIndex = keyboard?.active_layout_index ?? 0;
-            }
-        }
-    }
-
-    // A layout switched from here (or anywhere) shows on the next open too.
-    Connections {
-        target: Hyprland
-
-        function onRawEvent(event: HyprlandEvent): void {
-            if (event.name === "activelayout") devices.running = true;
-        }
     }
 
     Overlay {

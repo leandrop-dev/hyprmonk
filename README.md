@@ -69,8 +69,6 @@ cargo clippy --all-targets -- -D warnings
 
 - Hardware drawer extras from HyprFlow: a running-cat handle that speeds
   up with CPU use, and tooltips with details (per core, swap, interfaces).
-- Lock screen extras from HyprFlow: the keyboard layout when it is not the
-  default, batteries.
 - Quick actions still to come from HyprFlow: the screens (mirror, only the
   main one; need a second screen to test), the appearance (tone).
 - Lights, still to test on the devices: on/off on all three, colours

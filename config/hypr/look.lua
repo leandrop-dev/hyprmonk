@@ -32,10 +32,7 @@ hl.config({
     misc = {
         force_default_wallpaper = 0,
         disable_hyprland_logo   = true,
-        -- The shell's lock screen is translucent: the desktop under it keeps
-        -- drawing, blurred. A shell restarted while locked locks again.
-        session_lock_xray          = true,
-        session_lock_blur          = true,
+        -- A shell restarted while locked locks again.
         allow_session_lock_restore = true,
     },
 })
