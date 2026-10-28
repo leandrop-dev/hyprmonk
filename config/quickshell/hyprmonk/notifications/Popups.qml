@@ -21,7 +21,7 @@ PanelWindow {
         top: Theme.barGap
         right: Theme.barMargin
     }
-    implicitWidth: Theme.popupWidth
+    implicitWidth: Theme.notificationWidth
     implicitHeight: Math.max(1, stack.implicitHeight)
     color: "transparent"
 
@@ -52,7 +52,7 @@ PanelWindow {
                 // Slide in from the right edge.
                 transform: Translate {
                     id: slide
-                    x: Theme.popupWidth
+                    x: Theme.notificationWidth
                 }
                 opacity: 0
                 Component.onCompleted: enter.start()

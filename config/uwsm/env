@@ -13,3 +13,6 @@ export NVD_BACKEND=direct
 export QT_QPA_PLATFORM="wayland;xcb"
 export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 export ELECTRON_OZONE_PLATFORM_HINT=auto
+
+# Icons in the shell (the same theme Plasma uses)
+export QS_ICON_THEME=Tela-circle-purple-dark

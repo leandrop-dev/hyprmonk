@@ -24,7 +24,7 @@ PanelWindow {
         top: Theme.barGap
         right: Theme.barMargin
     }
-    implicitWidth: Theme.panelWidth
+    implicitWidth: Theme.notificationWidth
     implicitHeight: panel.implicitHeight
     color: "transparent"
 
@@ -89,7 +89,7 @@ PanelWindow {
                 Layout.bottomMargin: 16
                 visible: Notifications.count === 0
                 horizontalAlignment: Text.AlignHCenter
-                text: "\u{F009B}  Nothing new"
+                text: "\u{F009B}  No notifications"
                 color: Theme.fg(Theme.dimOpacity)
                 font.family: Theme.font
                 font.pixelSize: Theme.bodyFontSize
@@ -99,8 +99,8 @@ PanelWindow {
                 id: list
 
                 Layout.fillWidth: true
-                // Grows with its entries up to two thirds of the screen, then scrolls.
-                Layout.preferredHeight: Math.min(contentHeight, (window.screen?.height ?? 900) * 0.66)
+                // Grows with its entries, then scrolls.
+                Layout.preferredHeight: Math.min(contentHeight, Theme.notificationCenterHeight)
                 visible: Notifications.count > 0
                 clip: true
                 spacing: 6

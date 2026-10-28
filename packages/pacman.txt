@@ -9,6 +9,7 @@ uwsm
 quickshell
 matugen
 ttf-jetbrains-mono-nerd
+tela-circle-icon-theme-purple
 
 # Apps the binds start
 kitty

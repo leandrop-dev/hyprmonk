@@ -51,8 +51,8 @@ Singleton {
 
     // Panels and pop-ups
     readonly property int panelRadius: 16
-    readonly property int panelWidth: 400
-    readonly property int popupWidth: 380
+    readonly property int notificationWidth: 500         // pop-ups and the centre
+    readonly property int notificationCenterHeight: 600  // most the centre grows to
 
     IpcHandler {
         target: "theme"

@@ -27,7 +27,8 @@ Singleton {
     readonly property date now: clock.date
 
     // Milliseconds a pop-up stays when the sender does not say.
-    readonly property int defaultTimeout: 6000
+    readonly property int defaultTimeout: 10000
+    readonly property int lowTimeout: 5000
     readonly property int maxPopups: 4
 
     // How long `notification` stays as a pop-up, in ms; 0 means until dismissed.
@@ -39,7 +40,7 @@ Singleton {
         const ms = notification.expireTimeout;
         if (ms > 0) return ms;
         if (ms === 0) return 0;
-        return defaultTimeout;
+        return notification.urgency === NotificationUrgency.Low ? lowTimeout : defaultTimeout;
     }
 
     function hidePopup(notification: Notification): void {

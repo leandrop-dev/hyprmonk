@@ -21,15 +21,21 @@ Rectangle {
     readonly property bool critical: notification.urgency === NotificationUrgency.Critical
     readonly property NotificationAction defaultAction: notification.actions.find(a => a.identifier === "default") ?? null
     readonly property var buttons: notification.actions.filter(a => a.identifier !== "default")
-    readonly property string iconSource: {
-        const icon = notification.appIcon;
+    // `notify-send -i name` sends the name as the image (image://icon/name), not
+    // as the app icon. Theme icons resolve to "" when missing, not a checkerboard.
+    readonly property string pictureSource: resolve(notification.image)
+    readonly property string iconSource: resolve(notification.appIcon)
+        || resolve(DesktopEntries.byId(notification.desktopEntry)?.icon ?? "")
+
+    function resolve(icon: string): string {
+        if (icon.startsWith("image://icon/")) return Quickshell.iconPath(icon.slice(13), true);
         if (icon.startsWith("/")) return "file://" + icon;
         if (icon.includes("://")) return icon;
-        return Quickshell.iconPath(icon, true);
+        return icon ? Quickshell.iconPath(icon, true) : "";
     }
 
     implicitHeight: layout.implicitHeight + 24
-    radius: popup ? Theme.cardRadius : Theme.moduleRadius
+    radius: popup ? Theme.panelRadius : Theme.moduleRadius
     color: popup ? Theme.card : Theme.fg(hover.hovered ? 0.08 : 0.04)
     border.width: popup || critical ? 1 : 0
     border.color: critical ? Theme.warning : Theme.rim
@@ -69,20 +75,20 @@ Rectangle {
         spacing: 12
 
         // A picture sent with it (a contact, an album), else the app's icon.
-        ClippingRectangle {
+        Item {
             Layout.alignment: Qt.AlignTop
-            implicitWidth: 40
-            implicitHeight: 40
-            radius: Theme.moduleRadius
-            color: "transparent"
+            Layout.leftMargin: 4
+            Layout.topMargin: 4
+            implicitWidth: 20
+            implicitHeight: 20
             visible: picture.status === Image.Ready || appIcon.status === Image.Ready
 
             Image {
                 id: picture
                 anchors.fill: parent
-                source: card.notification.image
+                source: card.pictureSource
                 fillMode: Image.PreserveAspectCrop
-                sourceSize: Qt.size(80, 80)
+                sourceSize: Qt.size(40, 40)
             }
 
             IconImage {
@@ -110,16 +116,23 @@ Rectangle {
                     elide: Text.ElideRight
                 }
 
-                Text {
-                    text: "\u{F0156}"
-                    color: Theme.fg(close.containsMouse ? 0.9 : Theme.dimOpacity)
-                    font.family: Theme.font
-                    font.pixelSize: Theme.fontSize
+                Rectangle {
+                    implicitWidth: 20
+                    implicitHeight: 20
+                    radius: width / 2
+                    color: Theme.fg(close.containsMouse ? 0.15 : 0.08)
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "\u{F0156}"
+                        color: Theme.foreground
+                        font.family: Theme.font
+                        font.pixelSize: Theme.smallFontSize
+                    }
 
                     MouseArea {
                         id: close
                         anchors.fill: parent
-                        anchors.margins: -4
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: card.notification.dismiss()
@@ -134,7 +147,6 @@ Rectangle {
                 color: Theme.foreground
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSize
-                font.bold: true
                 textFormat: Text.PlainText
                 wrapMode: Text.Wrap
                 maximumLineCount: 2
@@ -145,7 +157,7 @@ Rectangle {
                 Layout.fillWidth: true
                 visible: text !== ""
                 text: card.notification.body
-                color: Theme.fg(0.75)
+                color: Theme.fg(0.6)
                 linkColor: Theme.accent
                 font.family: Theme.font
                 font.pixelSize: Theme.bodyFontSize
