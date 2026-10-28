@@ -20,6 +20,8 @@ Rectangle {
     Text {
         id: label
         anchors.centerIn: parent
+        width: Math.min(implicitWidth, chip.width - 16)  // a narrowed chip cuts its text
+        elide: Text.ElideRight
         text: chip.text
         color: chip.isSwitch && chip.on ? Theme.background : Theme.foreground
         font.family: Theme.font

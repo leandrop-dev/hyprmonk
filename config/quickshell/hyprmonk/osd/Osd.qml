@@ -1,7 +1,7 @@
 // The OSD: a card in the middle of the focused screen that says what just
 // changed and hides itself. It follows volume and microphone (level and mute),
-// the audio output, the keyboard layout, Caps and Num Lock, play/pause, and
-// do not disturb. Clicks pass through it.
+// the audio output, the keyboard layout, Caps and Num Lock, play/pause, do not
+// disturb, game mode and the power profile. Clicks pass through it.
 //
 // IPC: qs -c hyprmonk ipc call osd display ICON TITLE CAPTION VALUE  (VALUE < 0: no bar)
 //      qs -c hyprmonk ipc call osd locks  (Hyprland's Caps/Num Lock binds)
@@ -156,6 +156,22 @@ Scope {
         function onDoNotDisturbChanged(): void {
             root.show(Notifications.doNotDisturb ? "\u{F009B}" : "\u{F009A}", "Do not disturb",
                       Notifications.doNotDisturb ? "On" : "Off", -1);
+        }
+    }
+
+    Connections {
+        target: GameMode
+
+        function onOnChanged(): void {
+            root.show("\u{F0297}", "Game mode", GameMode.on ? "On" : "Off", -1);
+        }
+    }
+
+    Connections {
+        target: Power
+
+        function onProfileNameChanged(): void {
+            root.show("\u{F04C5}", "Power profile", Power.profileName, -1);
         }
     }
 

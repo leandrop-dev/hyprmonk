@@ -27,6 +27,7 @@ Singleton {
     readonly property color accent: colors.accent
     readonly property color positive: "#3dff3d"
     readonly property color warning: "#ff5f56"
+    readonly property color selection: Qt.rgba(0, 0, 0, 0.4)  // the picked row in a list
 
     // Foreground at an opacity: secondary text, hover fills, idle items.
     function fg(alpha: real): color {

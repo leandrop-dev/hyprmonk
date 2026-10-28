@@ -41,6 +41,9 @@ pavucontrol   # the sound panel's Mixer
 playerctl
 upower
 
+# Power profile (quick actions)
+power-profiles-daemon
+
 # Building hyprmonk and the hyprpm plugins
 rustup
 base-devel

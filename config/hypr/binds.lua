@@ -49,6 +49,9 @@ end, "Overview")
 bind(mod .. " + N",         hl.dsp.exec_cmd("qs -c hyprmonk ipc call notifications toggle"), "Notification centre")
 bind(mod .. " + SHIFT + N", hl.dsp.exec_cmd("qs -c hyprmonk ipc call notifications clear"),  "Clear notifications")
 
+-- Quick actions
+bind(mod .. " + K", hl.dsp.exec_cmd("qs -c hyprmonk ipc call quickactions toggle"), "Quick actions")
+
 -- Caps and Num Lock keep working; the OSD reads the new state.
 local locks = { non_consuming = true, locked = true }
 bind("Caps_Lock", hl.dsp.exec_cmd("qs -c hyprmonk ipc call osd locks"), "Caps Lock", locks)

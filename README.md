@@ -4,8 +4,8 @@ My Hyprland desktop on Arch (CachyOS): a Quickshell shell, small Rust helpers,
 and colours generated from the wallpaper by matugen.
 
 Early days: the bar with its sound, battery, calendar and media panels,
-notifications, the OSD, the polkit agent, the Hyprland config and the first
-helper. More panels come next (see [Roadmap](#roadmap)), all in Quickshell.
+notifications, the OSD, quick actions (Super+K, with a game mode), the polkit
+agent, the Hyprland config and the first helper. More panels come next (see [Roadmap](#roadmap)), all in Quickshell.
 
 ## Install
 
@@ -31,8 +31,8 @@ Run `./install.sh help` for each step.
 
 | Path | What |
 |------|------|
-| `config/hypr/` | Hyprland (Lua): `hyprland.lua` loads `look`, `input`, `binds`, `rules`, `plugins` |
-| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `Theme.qml`, `bar/`, `notifications/`, `osd/`, `panels/`, `polkit/`, `services/`, `widgets/` |
+| `config/hypr/` | Hyprland (Lua): `hyprland.lua` loads `look`, `input`, `binds`, `rules`, `plugins`, `gamemode` |
+| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `Theme.qml`, `bar/`, `notifications/`, `osd/`, `panels/`, `polkit/`, `quickactions/`, `services/`, `widgets/` |
 | `config/matugen/` | Templates for Hyprland, the shell and kitty |
 | `config/uwsm/env` | Session environment (NVIDIA, cursor, toolkits) |
 | `config/systemd/user/` | The shell's unit; it only starts under Hyprland |
@@ -60,8 +60,15 @@ cargo clippy --all-targets -- -D warnings
 
 ## Roadmap
 
-- Panels in HyprFlow's style: quick actions (Super+K), power menu, key
-  guide, a cava spectrum in the centre card, a hardware drawer.
+- Panels in HyprFlow's style: power menu, key guide, a cava spectrum in the
+  centre card, a hardware drawer.
+- A wallpaper: nothing draws one yet.
+- Quick actions still to come from HyprFlow: the screens (mirror, only the
+  main one; need a second screen to test), lights (OpenRGB for the ASUS Aura
+  controller), the keyboard's effect, the appearance (tone), a random
+  wallpaper, and the power menu once it exists.
+- Game mode extras from HyprFlow: variable refresh in fullscreen, Steam Big
+  Picture, notifications and lights off while it is on.
 - Media panel extras from HyprFlow: synced lyrics, art "skins" (the
   polaroid frame), a mini player.
 - Events in the calendar (dots on their days, a list for the day picked);

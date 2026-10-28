@@ -30,6 +30,7 @@ require("input")
 require("binds")
 require("rules")
 require("plugins")
+require("gamemode")
 
 -- No autostart here: the shell and other daemons are systemd user units,
 -- started by uwsm with graphical-session.target (see systemd/user/).
