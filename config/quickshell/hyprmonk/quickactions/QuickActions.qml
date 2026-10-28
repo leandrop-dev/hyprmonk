@@ -84,6 +84,19 @@ Scope {
         },
         Action {
             section: "Appearance"
+            icon: "\u{F0E09}"
+            label: "Wallpaper"
+            onRun: Overlays.toggle("wallpapers")
+        },
+        Action {
+            section: "Appearance"
+            icon: "\u{F049D}"
+            label: "Random wallpaper"
+            available: Wallpaper.files.length > 1
+            onRun: Wallpaper.random()
+        },
+        Action {
+            section: "Appearance"
             icon: "\u{F0335}"
             label: "Lights"
             on: Lights.on

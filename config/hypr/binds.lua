@@ -54,6 +54,7 @@ bind(mod .. " + Tab", function()
 end, "Overview")
 bind(mod .. " + A",         hl.dsp.exec_cmd("qs -c hyprmonk ipc call overlays toggle quickactions"), "Quick actions")
 bind(mod .. " + K",         hl.dsp.exec_cmd("qs -c hyprmonk ipc call overlays toggle keyguide"),     "Key guide")
+bind(mod .. " + W",         hl.dsp.exec_cmd("qs -c hyprmonk ipc call overlays toggle wallpapers"),   "Wallpapers")
 bind(mod .. " + N",         hl.dsp.exec_cmd("qs -c hyprmonk ipc call notifications toggle"),         "Notification centre")
 bind(mod .. " + SHIFT + N", hl.dsp.exec_cmd("qs -c hyprmonk ipc call notifications clear"),          "Clear notifications")
 

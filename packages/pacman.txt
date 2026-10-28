@@ -8,6 +8,7 @@ uwsm
 # Shell and theming
 quickshell
 matugen
+qt6-imageformats   # WebP wallpapers
 ttf-jetbrains-mono-nerd
 tela-circle-icon-theme-purple
 

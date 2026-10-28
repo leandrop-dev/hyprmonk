@@ -3,13 +3,13 @@
 My Hyprland desktop on Arch (CachyOS): a Quickshell shell, small Rust helpers,
 and colours generated from the wallpaper by matugen.
 
-Early days: the bar with its sound, battery, calendar and media panels, a
-hardware drawer (CPU, memory, disk, network) and a live spectrum (cava),
-notifications, the OSD, quick actions (Super+A: game mode, OpenRGB lights),
-the power menu (Super+Shift+E), the key guide (Super+K), the lock screen
-(Super+Alt+L, and on idle), the polkit agent, the Hyprland config and the
-first helper. More panels come next (see [Roadmap](#roadmap)), all in
-Quickshell.
+Early days: the wallpaper (Super+W to pick), the bar with its sound,
+battery, calendar and media panels, a hardware drawer (CPU, memory, disk,
+network) and a live spectrum (cava), notifications, the OSD, quick actions
+(Super+A: game mode, OpenRGB lights), the power menu (Super+Shift+E), the
+key guide (Super+K), the lock screen (Super+Alt+L, and on idle), the polkit
+agent, the Hyprland config and the first helper. More panels come next (see
+[Roadmap](#roadmap)), all in Quickshell.
 
 ## Install
 
@@ -23,20 +23,23 @@ cd hyprmonk
 Log in to **Hyprland (uwsm-managed)**. Then, from inside Hyprland:
 
 ```bash
-./install.sh plugins                                           # hyprglass and hymission (compiles)
-matugen image ~/Pictures/wallpaper.png --source-color-index 0  # colours from a wallpaper
+./install.sh plugins   # hyprglass and hymission (compiles)
 ```
 
 `install.sh` symlinks the configs, so the repo is the live config: edit either
 side and both change. Anything already in the way is moved to `*.bak-DATE`.
 Run `./install.sh help` for each step.
 
+Wallpapers come from `~/Pictures/Wallpapers` (another folder: set `folder` in
+`~/.local/state/hyprmonk/wallpaper.json`). Pick one with Super+W; its
+colours become the accent everywhere (matugen).
+
 ## Layout
 
 | Path | What |
 |------|------|
 | `config/hypr/` | Hyprland (Lua): `hyprland.lua` loads `look`, `input`, `binds`, `rules`, `plugins`, `gamemode`; `hypridle.conf` for idle |
-| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `Theme.qml`, `bar/`, `keyguide/`, `lock/`, `notifications/`, `osd/`, `panels/`, `polkit/`, `power/`, `quickactions/`, `services/`, `widgets/` |
+| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `Theme.qml`, `bar/`, `keyguide/`, `lock/`, `notifications/`, `osd/`, `panels/`, `polkit/`, `power/`, `quickactions/`, `services/`, `wallpaper/`, `widgets/` |
 | `config/matugen/` | Templates for Hyprland, the shell and kitty |
 | `config/uwsm/env` | Session environment (NVIDIA, cursor, toolkits) |
 | `config/systemd/user/` | The shell's and hypridle's units; they only start under Hyprland |
@@ -68,10 +71,8 @@ cargo clippy --all-targets -- -D warnings
   up with CPU use, and tooltips with details (per core, swap, interfaces).
 - Lock screen extras from HyprFlow: the keyboard layout when it is not the
   default, batteries.
-- A wallpaper: nothing draws one yet.
 - Quick actions still to come from HyprFlow: the screens (mirror, only the
-  main one; need a second screen to test), the appearance (tone), a random
-  wallpaper.
+  main one; need a second screen to test), the appearance (tone).
 - Lights, still to test on the devices: on/off on all three, colours
   holding after OpenRGB exits, keyboard effects with and without a colour.
   After suspend or a replug, devices that lose their colour get it back
