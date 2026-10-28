@@ -1,18 +1,21 @@
 # Session environment, read by uwsm before Hyprland and every unit start.
 
-# Cursor (the same theme Plasma uses)
+# Cursor (packages/pacman.txt installs it)
 export XCURSOR_THEME=capitaine-cursors
 export XCURSOR_SIZE=24
 
-# NVIDIA (proprietary driver): hardware video decoding and GLX vendor
-export LIBVA_DRIVER_NAME=nvidia
-export __GLX_VENDOR_LIBRARY_NAME=nvidia
-export NVD_BACKEND=direct
+# NVIDIA (proprietary driver): hardware video decoding and GLX vendor. Only
+# when that driver is loaded: on AMD or Intel these would break decoding.
+if [ -e /proc/driver/nvidia/version ]; then
+    export LIBVA_DRIVER_NAME=nvidia
+    export __GLX_VENDOR_LIBRARY_NAME=nvidia
+    export NVD_BACKEND=direct
+fi
 
 # Toolkits on Wayland
 export QT_QPA_PLATFORM="wayland;xcb"
 export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 export ELECTRON_OZONE_PLATFORM_HINT=auto
 
-# Icons in the shell (the same theme Plasma uses)
+# Icons in the shell (packages/pacman.txt installs them)
 export QS_ICON_THEME=Tela-circle-purple-dark

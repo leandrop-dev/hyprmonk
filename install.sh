@@ -9,11 +9,13 @@ usage() {
     cat <<EOF
 usage: install.sh [step...]
 
-With no step: check link bin services.
+With no step: packages link folders bin services.
 
 steps:
   check     list packages from packages/pacman.txt that are not installed
+  packages  install the missing ones (uses sudo)
   link      symlink the configs into ~/.config (existing ones are moved to *.bak-DATE)
+  folders   create ~/Pictures/Wallpapers, where the wallpaper picker looks
   bin       build hyprmonk and install it to ~/.local/bin
   services  enable the systemd user units (they only start under Hyprland)
   udev      install the udev rule for device batteries (uses sudo)
@@ -40,17 +42,42 @@ units() {
     for unit in "$REPO/$UNITS_DIR"/*.service; do basename "$unit"; done
 }
 
+wanted_packages() {
+    sed -e 's/#.*//' -e '/^\s*$/d' "$REPO/packages/pacman.txt"
+}
+
+missing_packages() {
+    pacman -T $(wanted_packages) || true
+}
+
 step_check() {
     say "Checking packages"
-    local wanted missing
-    wanted=$(sed -e 's/#.*//' -e '/^\s*$/d' "$REPO/packages/pacman.txt")
-    missing=$(pacman -T $wanted || true)
+    local missing
+    missing=$(missing_packages)
     if [[ -z $missing ]]; then
         echo "   everything is installed"
     else
         echo "   missing: $(echo $missing)"
-        echo "   sudo pacman -S --needed $(echo $missing)"
+        echo "   install them: ./install.sh packages"
     fi
+}
+
+step_packages() {
+    say "Installing packages (sudo)"
+    local missing
+    missing=$(missing_packages)
+    if [[ -z $missing ]]; then
+        echo "   everything is installed"
+        return
+    fi
+    sudo pacman -S --needed $missing
+}
+
+step_folders() {
+    say "Creating folders"
+    command -v xdg-user-dirs-update >/dev/null && xdg-user-dirs-update
+    mkdir -p "$HOME/Pictures/Wallpapers"
+    echo "   ok       ~/Pictures/Wallpapers"
 }
 
 link_one() {
@@ -87,6 +114,10 @@ step_link() {
 
 step_bin() {
     say "Building hyprmonk"
+    # A fresh rustup has no toolchain, and cargo refuses to run without one.
+    if ! rustup default >/dev/null 2>&1; then
+        rustup default stable
+    fi
     cargo install --locked --path "$REPO/crates/hyprmonk" --root "$HOME/.local"
 }
 
@@ -145,11 +176,11 @@ step_plugins() {
 
 main() {
     local steps=("$@")
-    [[ ${#steps[@]} -eq 0 ]] && steps=(check link bin services)
+    [[ ${#steps[@]} -eq 0 ]] && steps=(packages link folders bin services)
     local step
     for step in "${steps[@]}"; do
         case $step in
-            check | link | bin | services | udev | plugins) "step_$step" ;;
+            check | packages | link | folders | bin | services | udev | plugins) "step_$step" ;;
             -h | --help | help) usage ;;
             *)
                 usage >&2

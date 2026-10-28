@@ -14,14 +14,20 @@ Quickshell.
 
 ## Install
 
+On Arch (or an Arch-based distro) with or without a desktop; every package
+comes from the official repos:
+
 ```bash
+sudo pacman -S --needed git
 git clone https://github.com/leandrop-dev/hyprmonk.git
 cd hyprmonk
-./install.sh            # check packages, link configs, build hyprmonk, enable the shell
+./install.sh            # install packages, link configs, make folders, build hyprmonk, enable the shell
 ./install.sh udev       # once: lets hyprmonk read the mouse battery (sudo)
 ```
 
-Log in to **Hyprland (uwsm-managed)**. Then, from inside Hyprland:
+Then start Hyprland: from a login screen pick **Hyprland (uwsm-managed)**;
+on a system without one, log in on the text console and run
+`uwsm start hyprland.desktop`. Then, from inside Hyprland:
 
 ```bash
 ./install.sh plugins   # hyprglass and hymission (compiles)
@@ -89,9 +95,27 @@ cargo clippy --all-targets -- -D warnings
 - Notifications grouped by app, as swaync does.
 - OSD, to look at once things are stable: Caps Lock showed only on the
   first press, not on later ones.
-- A clean install: hyprmonk must work on an Arch or CachyOS install with no
-  desktop yet, so `packages/` has to list everything it needs (today it
-  leans on what Plasma already installed). Verify on a fresh install.
+- A clean install, still to do: run it on a fresh Arch with no desktop (a
+  VM) and fix what shows up. `packages/pacman.txt` was checked against
+  everything the shell, the config and the units run; what remains open:
+  - A login screen to choose (greetd with tuigreet, SDDM, ly, or none: the
+    text console and `uwsm start`). KWallet unlocks at login only if that
+    login's PAM file has `pam_kwallet5.so` (Plasma's login has it today).
+  - The GPU driver: hyprmonk does not install one (NVIDIA needs its own
+    packages; `uwsm/env` sets the NVIDIA variables only when it is loaded).
+  - How apps look outside Plasma (GTK and Qt themes for Dolphin and the
+    rest).
+- An installer that is pleasant to use: a gum menu (Install, Update,
+  Uninstall, Check, Quit), installing gum first when it is missing (on Arch
+  it is in `extra`). Update pulls and re-runs what changed; Uninstall
+  removes the links (restoring the `*.bak-DATE` copies) and the units.
+- What a fresh install brings besides the shell, to choose after trying the
+  options: the file manager, icons, and wallpapers in the repo so the
+  picker is not empty, with one as the default (only pictures whose licence
+  lets them be shared).
+- Screenshots: grim and slurp are installed, but no bind uses them yet.
+- Fedora (and Fedora-based) once Arch is stable: a `packages/` list for
+  dnf, and COPRs for what Fedora does not ship.
 
 ## Credits
 

@@ -1,4 +1,7 @@
-# Packages from the official repos. `install.sh check` lists the missing ones.
+# Packages from the official repos (all in Arch's extra or core: nothing from
+# the AUR). `install.sh check` lists the missing ones, `install.sh packages`
+# installs them. A bare Arch install (no desktop) needs every one: what a
+# desktop would have brought (fonts, the PulseAudio layer, the cursor) is here.
 
 # Session
 hyprland
@@ -11,6 +14,10 @@ matugen
 qt6-imageformats   # WebP wallpapers
 ttf-jetbrains-mono-nerd
 tela-circle-icon-theme-purple
+capitaine-cursors   # XCURSOR_THEME in uwsm/env
+noto-fonts   # text in apps and notifications beyond JetBrains Mono
+noto-fonts-emoji
+xdg-user-dirs   # ~/Pictures and the rest, where the wallpapers live
 
 # Apps the binds start
 kitty
@@ -29,9 +36,9 @@ hypridle
 # Secrets: KWallet, unlocked at login by hyprmonk-kwallet.service
 kwallet
 kwallet-pam
-socat
+socat   # pam_kwallet_init talks through it
 
-# Screenshots and screen sharing
+# Screenshots (no bind uses grim and slurp yet: roadmap) and screen sharing
 grim
 slurp
 xdg-desktop-portal
@@ -40,6 +47,8 @@ xdg-desktop-portal-gtk   # file pickers
 
 # Audio, media and batteries
 pipewire
+pipewire-pulse   # apps speaking PulseAudio (pavucontrol, browsers)
+pipewire-alsa   # apps speaking ALSA
 wireplumber
 pavucontrol   # the sound panel's Mixer
 playerctl
