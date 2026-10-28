@@ -30,6 +30,27 @@ Singleton {
         picked = players[(players.indexOf(current) + 1) % players.length];
     }
 
+    // The track's length in seconds, 0 when it has none (a live stream).
+    // Browsers drop the length from their metadata a moment after a seek and
+    // only send it again on the next play or pause, so the last one seen for
+    // this track is kept.
+    readonly property string track: current ? [current.identity, current.trackTitle, current.trackArtist].join("\n") : ""
+    readonly property real reported: current?.lengthSupported && current.length > 0 ? current.length : 0
+    property string knownTrack: ""
+    property real knownLength: 0
+    readonly property real length: reported > 0 ? reported : (track === knownTrack ? knownLength : 0)
+
+    function remember(): void {
+        if (reported > 0) {
+            knownTrack = track;
+            knownLength = reported;
+        }
+    }
+
+    onReportedChanged: remember()
+    onTrackChanged: remember()
+    Component.onCompleted: remember()
+
     // 4:07, or 1:02:03 past an hour.
     function time(seconds: real): string {
         const s = Math.max(0, Math.floor(seconds));

@@ -15,7 +15,7 @@ ClippingRectangle {
     id: panel
 
     readonly property MprisPlayer player: Player.current
-    readonly property bool hasLength: (player?.lengthSupported ?? false) && player.length > 0
+    readonly property bool hasLength: Player.length > 0
 
     implicitHeight: 172
     radius: Theme.moduleRadius + 2
@@ -126,10 +126,10 @@ ClippingRectangle {
             Slider {
                 Layout.fillWidth: true
                 visible: panel.hasLength
-                value: panel.hasLength ? panel.player.position / panel.player.length : 0
+                value: panel.hasLength ? panel.player.position / Player.length : 0
                 dim: !(panel.player?.canSeek ?? false)
                 onMoved: value => {
-                    if (panel.player?.canSeek) panel.player.position = value * panel.player.length;
+                    if (panel.player?.canSeek) panel.player.position = value * Player.length;
                 }
             }
 
@@ -149,7 +149,7 @@ ClippingRectangle {
 
                 Text {
                     visible: panel.hasLength
-                    text: panel.hasLength ? Player.time(panel.player.length) : ""
+                    text: panel.hasLength ? Player.time(Player.length) : ""
                     color: Theme.fg(Theme.dimOpacity)
                     font.family: Theme.font
                     font.pixelSize: Theme.smallFontSize
