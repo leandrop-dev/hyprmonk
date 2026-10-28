@@ -1,0 +1,17 @@
+[Unit]
+Description=Unlock KWallet with the login password
+Documentation=https://github.com/leandrop-dev/hyprmonk
+# Plasma runs pam_kwallet_init from XDG autostart, but that entry is marked
+# X-systemd-skip, so uwsm never runs it: without this unit the secret service
+# stays down and apps that keep tokens in it (gh, browsers) lose them.
+PartOf=graphical-session.target
+After=graphical-session.target
+ConditionEnvironment=XDG_CURRENT_DESKTOP=Hyprland
+ConditionEnvironment=PAM_KWALLET5_LOGIN
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/pam_kwallet_init
+
+[Install]
+WantedBy=graphical-session.target

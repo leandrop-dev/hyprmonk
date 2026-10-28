@@ -15,6 +15,11 @@ kitty
 dolphin
 hyprlauncher
 
+# Secrets: KWallet, unlocked at login by hyprmonk-kwallet.service
+kwallet
+kwallet-pam
+socat
+
 # Audio, media and batteries
 pipewire
 wireplumber

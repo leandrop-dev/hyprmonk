@@ -30,8 +30,15 @@ LINKS=(
     "config/matugen:.config/matugen"
     "config/kitty:.config/kitty"
     "config/uwsm:.config/uwsm"
-    "config/systemd/user/hyprmonk-shell.service:.config/systemd/user/hyprmonk-shell.service"
 )
+
+# Every user unit in the repo is linked and enabled; each one checks for
+# Hyprland itself, so none start in another desktop.
+UNITS_DIR="config/systemd/user"
+units() {
+    local unit
+    for unit in "$REPO/$UNITS_DIR"/*.service; do basename "$unit"; done
+}
 
 step_check() {
     say "Checking packages"
@@ -69,9 +76,12 @@ link_one() {
 
 step_link() {
     say "Linking configs"
-    local pair
+    local pair unit
     for pair in "${LINKS[@]}"; do
         link_one "${pair%%:*}" "${pair#*:}"
+    done
+    for unit in $(units); do
+        link_one "$UNITS_DIR/$unit" ".config/systemd/user/$unit"
     done
 }
 
@@ -83,7 +93,7 @@ step_bin() {
 step_services() {
     say "Enabling user services"
     systemctl --user daemon-reload
-    systemctl --user enable hyprmonk-shell.service
+    systemctl --user enable $(units)
 }
 
 step_udev() {
