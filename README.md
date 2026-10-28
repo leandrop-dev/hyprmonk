@@ -6,7 +6,8 @@ and colours generated from the wallpaper by matugen.
 Early days: the wallpaper (Super+W to pick), the bar with its tray, sound,
 battery, calendar and media panels, a running cat that opens a hardware
 drawer (temperature, CPU, memory, disk, network), a live spectrum (cava, in
-seven styles) and synced lyrics, notifications, the OSD, quick actions
+seven styles) and synced lyrics, notifications, the OSD, the launcher
+(Super+Space: apps, commands, SSH hosts), quick actions
 (Super+A: game mode, the panels' tone, Noir among them, the spectrum's
 style), the power menu (Super+Shift+E), the key guide (Super+K), the lock
 screen (Super+Alt+L, and on idle), screenshots (Print, then R, W or S), the

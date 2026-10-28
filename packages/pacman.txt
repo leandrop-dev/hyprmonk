@@ -22,7 +22,6 @@ xdg-user-dirs   # ~/Pictures and the rest, where the wallpapers live
 # Apps the binds start
 kitty
 dolphin
-hyprlauncher
 
 # Keyboard and mouse shared with other computers (needs the portal below)
 deskflow

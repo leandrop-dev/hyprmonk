@@ -1,10 +1,11 @@
 // hyprmonk's shell: `qs -c hyprmonk`. The wallpaper and a bar per screen, the
-// notification pop-ups and centre, the OSD, quick actions, the power menu,
-// the key guide, the wallpaper picker, the screenshot mode's card, the lock
-// screen and the polkit agent.
+// notification pop-ups and centre, the OSD, the launcher, quick actions, the
+// power menu, the key guide, the wallpaper picker, the screenshot mode's
+// card, the lock screen and the polkit agent.
 import Quickshell
 import qs.bar
 import qs.keyguide
+import qs.launcher
 import qs.lock
 import qs.notifications
 import qs.osd
@@ -29,6 +30,7 @@ ShellRoot {
     Popups {}
     Center {}
     Osd {}
+    Launcher {}
     QuickActions {}
     PowerMenu {}
     KeyGuide {}

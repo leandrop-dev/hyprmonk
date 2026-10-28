@@ -59,7 +59,7 @@ PanelWindow {
         anchors.top: parent.top
         anchors.topMargin: Theme.barGap
 
-        Launcher {}
+        LauncherButton {}
         Workspaces { screen: bar.screen }
         Overview {}
         HardwareDrawer {}

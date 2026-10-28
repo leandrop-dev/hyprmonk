@@ -19,7 +19,7 @@ load_optional(state .. "/theme/colors.lua")
 
 terminal    = "kitty"
 fileManager = "dolphin"
-launcher    = "hyprlauncher"
+launcher    = "qs -c hyprmonk ipc call overlays toggle launcher"
 
 hl.monitor({ output = "HDMI-A-1", mode = "2560x1080@75", position = "0x0", scale = 1 })
 -- Anything else plugged in later gets a sensible default to the right.
