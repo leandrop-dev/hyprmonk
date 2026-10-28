@@ -2,14 +2,15 @@
 // the switches used most, under their sections. Typing filters them (the
 // letters in order, gaps allowed: "gm" finds "Game mode"); the arrows or Tab
 // move, Enter or a click runs one and closes the card; Escape or a click
-// elsewhere closes it.
+// elsewhere closes it. An action with options (the keyboard's effect) opens
+// them in the same card instead; Escape, or Backspace with nothing typed,
+// goes back.
 //
 // IPC: qs -c hyprmonk ipc call quickactions toggle
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
-import Quickshell.Services.UPower
 import Quickshell.Wayland
 import qs
 import qs.services
@@ -22,6 +23,7 @@ Scope {
     property ShellScreen screen: null
     property string query: ""
     property int current: 0
+    property Action opened: null  // the action whose options are showing
 
     // Hyprland's main keyboard, read on each open: its layouts and the one in use.
     property var layouts: []
@@ -75,11 +77,38 @@ Scope {
             value: root.layouts[root.layoutIndex] ?? ""
             available: root.layouts.length > 1
             onRun: Quickshell.execDetached(["hyprctl", "switchxkblayout", "current", "next"])
+        },
+        Action {
+            section: "Appearance"
+            icon: "\u{F0335}"
+            label: "Lights"
+            on: Lights.on
+            available: Lights.devices.length > 0
+            onRun: Lights.toggle()
+        },
+        Action {
+            section: "Appearance"
+            icon: "\u{F09F9}"
+            label: "Keyboard effect"
+            value: Lights.keyboardEffect
+            options: Lights.keyboardEffects
+            available: Lights.keyboardEffects.length > 0
+            onPicked: option => Lights.setKeyboardEffect(option)
         }
     ]
 
-    readonly property var available: actions.filter(a => a.available)
-    readonly property var shown: available.filter(a => matches(a.label, query))
+    // The rows: the actions, or the options of the one opened.
+    readonly property var items: opened
+        ? opened.options.map(option => ({
+            section: opened.label,
+            icon: option === opened.value ? "\u{F043E}" : "\u{F043D}",
+            label: option,
+            chosen: option === opened.value,
+            value: "",
+            options: []
+        }))
+        : actions.filter(a => a.available)
+    readonly property var shown: items.filter(item => matches(item.label, query))
 
     // The letters typed appear in the label in order (spaces ignored).
     function matches(label: string, typed: string): bool {
@@ -92,7 +121,7 @@ Scope {
         return true;
     }
 
-    // A heading goes before the first action of each section.
+    // A heading goes before the first row of each section.
     function startsSection(list: var, index: int): bool {
         return index === 0 || list[index].section !== list[index - 1].section;
     }
@@ -105,15 +134,21 @@ Scope {
         return list.reduce((sum, _, i) => sum + rowHeight + (startsSection(list, i) ? headingHeight : 0), 0);
     }
 
+    function clearSearch(): void {
+        search.text = "";
+        query = "";
+    }
+
     function toggle(): void {
         if (open) {
             open = false;
             return;
         }
         devices.running = true;
+        Lights.refresh();
         screen = Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? null;
-        search.text = "";
-        query = "";
+        opened = null;
+        clearSearch();
         current = 0;
         open = true;
         search.forceActiveFocus();
@@ -123,10 +158,26 @@ Scope {
         if (shown.length > 0) current = (current + step + shown.length) % shown.length;
     }
 
-    function run(action: Action): void {
-        if (!action) return;
-        open = false;
-        action.run();
+    function run(item: var): void {
+        if (!item) return;
+        if (opened) {
+            open = false;
+            opened.picked(item.label);
+        } else if (item.options.length > 0) {
+            opened = item;
+            clearSearch();
+            current = Math.max(0, item.options.indexOf(item.value));
+        } else {
+            open = false;
+            item.run();
+        }
+    }
+
+    function back(): void {
+        const from = opened;
+        opened = null;
+        clearSearch();
+        current = Math.max(0, shown.indexOf(from));
     }
 
     IpcHandler {
@@ -163,14 +214,16 @@ Scope {
 
         readonly property int margin: 32  // room around the card as it unfolds
         readonly property int top: 44     // the search line, above the list
+        // The list scrolls past this.
+        readonly property int listMax: height - margin * 2 - top - 12
 
         screen: root.screen
         visible: root.open || card.opacity > 0
         color: "transparent"
-        // As tall as the whole list, so filtering shrinks the card up towards
-        // a fixed top instead of moving it.
+        // Most of the screen's height, the card at its top: filtering or
+        // opening options changes the card's height, never where it starts.
         implicitWidth: 420 + margin * 2
-        implicitHeight: top + root.listHeight(root.available) + 12 + margin * 2
+        implicitHeight: Math.round((screen?.height ?? 1080) * 0.8)
         exclusionMode: ExclusionMode.Ignore
         mask: Region { item: card }
 
@@ -190,7 +243,7 @@ Scope {
             x: window.margin
             y: window.margin
             width: 420
-            height: window.top + root.listHeight(root.shown) + 12
+            height: window.top + list.height + 12
             radius: Theme.panelRadius
             color: Theme.card
             border.width: 1
@@ -241,32 +294,51 @@ Scope {
                 Keys.onBacktabPressed: root.move(-1)
                 Keys.onReturnPressed: root.run(root.shown[root.current])
                 Keys.onEnterPressed: root.run(root.shown[root.current])
-                Keys.onEscapePressed: root.open = false
+                Keys.onEscapePressed: {
+                    if (root.opened) root.back();
+                    else root.open = false;
+                }
+                Keys.onPressed: event => {
+                    if (event.key === Qt.Key_Backspace && text === "" && root.opened) {
+                        root.back();
+                        event.accepted = true;
+                    }
+                }
 
                 Text {
                     visible: !search.text
-                    text: "Quick actions"
+                    text: root.opened?.label ?? "Quick actions"
                     color: Theme.fg(Theme.dimOpacity)
                     font: search.font
                 }
             }
 
-            Item {
+            Flickable {
                 id: list
+
+                // The picked row, from the top of the list.
+                readonly property Item row: rows.count > root.current ? rows.itemAt(root.current).row : null
+                readonly property real rowY: row ? row.parent.y + row.y : 0
 
                 x: 12
                 y: window.top
                 width: card.width - 24
-                height: root.listHeight(root.shown)
+                height: Math.min(contentHeight, window.listMax)
+                contentHeight: root.listHeight(root.shown)
+                interactive: contentHeight > height
+                boundsBehavior: Flickable.StopAtBounds
+                clip: true
+
+                // Keep the picked row in view.
+                onRowYChanged: {
+                    if (rowY < contentY) contentY = rowY;
+                    else if (rowY + root.rowHeight > contentY + height) contentY = rowY + root.rowHeight - height;
+                }
 
                 // The picked row; slides to the next one.
                 Rectangle {
-                    // itemAt() is not watched: reading count re-reads it as rows come and go.
-                    readonly property Item row: rows.count > root.current ? rows.itemAt(root.current).row : null
-
-                    visible: row !== null
-                    x: 0
-                    y: row ? row.parent.y + row.y : 0
+                    visible: list.row !== null
+                    y: list.rowY
                     width: list.width
                     height: root.rowHeight
                     radius: 10
@@ -288,7 +360,7 @@ Scope {
                         Column {
                             id: entry
 
-                            required property Action modelData
+                            required property var modelData
                             required property int index
                             readonly property bool picked: index === root.current
                             readonly property alias row: row
@@ -328,7 +400,8 @@ Scope {
                                     anchors.verticalCenter: parent.verticalCenter
                                     horizontalAlignment: Text.AlignHCenter
                                     text: entry.modelData.icon
-                                    color: entry.modelData.on === true ? Theme.accent : Theme.foreground
+                                    color: entry.modelData.on === true || entry.modelData.chosen === true
+                                        ? Theme.accent : Theme.foreground
                                     font.family: Theme.font
                                     font.pixelSize: 18
                                     scale: entry.picked ? 1.15 : 1

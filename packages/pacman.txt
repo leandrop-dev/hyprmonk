@@ -41,8 +41,9 @@ pavucontrol   # the sound panel's Mixer
 playerctl
 upower
 
-# Power profile (quick actions)
+# Power profile and lights (quick actions)
 power-profiles-daemon
+openrgb   # its udev rules let the user reach the devices
 
 # Building hyprmonk and the hyprpm plugins
 rustup
