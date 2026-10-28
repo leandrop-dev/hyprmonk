@@ -36,7 +36,7 @@ LINKS=(
 step_check() {
     say "Checking packages"
     local wanted missing
-    wanted=$(grep -vE '^\s*(#|$)' "$REPO/packages/pacman.txt")
+    wanted=$(sed -e 's/#.*//' -e '/^\s*$/d' "$REPO/packages/pacman.txt")
     missing=$(pacman -T $wanted || true)
     if [[ -z $missing ]]; then
         echo "   everything is installed"
@@ -93,6 +93,21 @@ step_udev() {
     sudo udevadm trigger --subsystem-match=hidraw --action=change
 }
 
+# name -> repository
+PLUGINS=(
+    "hyprglass:https://github.com/hyprnux/hyprglass"
+    "hymission:https://github.com/gfhdhytghd/hymission"
+)
+
+# ok, failed (registered but its build failed) or missing. hyprpm has no
+# machine-readable output, so this reads `hyprpm list` without its colours.
+plugin_state() {
+    hyprpm list | sed 's/\x1b\[[0-9;]*m//g' | awk -v name="$1" '
+        $2 == "Repository" { here = (tolower($3) == tolower(name)); if (here) found = 1 }
+        here && /failed to build/ { failed = 1 }
+        END { print found ? (failed ? "failed" : "ok") : "missing" }'
+}
+
 step_plugins() {
     say "Installing hyprpm plugins (this compiles them)"
     if [[ -z ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
@@ -100,10 +115,21 @@ step_plugins() {
         return 1
     fi
     hyprpm update
-    hyprpm add https://github.com/hyprnux/hyprglass
-    hyprpm add https://github.com/gfhdhytghd/hymission
-    hyprpm enable hyprglass
-    hyprpm enable hymission
+    local pair name url
+    for pair in "${PLUGINS[@]}"; do
+        name=${pair%%:*} url=${pair#*:}
+        case $(plugin_state "$name") in
+            ok) echo "   ok       $name" ;;
+            failed)
+                # A failed build stays registered; add again from scratch.
+                echo "   rebuild  $name (its last build failed)"
+                hyprpm remove "$name"
+                hyprpm add "$url"
+                ;;
+            missing) hyprpm add "$url" ;;
+        esac
+        hyprpm enable "$name"
+    done
     hyprpm reload
 }
 
