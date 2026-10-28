@@ -2,9 +2,9 @@
 // the switches used most, under their sections. Typing filters them (the
 // letters in order, gaps allowed: "gm" finds "Game mode"); the arrows or Tab
 // move, Enter or a click runs one and closes the card; Escape or a click
-// elsewhere closes it. An action with options (the panels' tone) opens
-// them in the same card instead; Escape, or Backspace with nothing typed,
-// goes back.
+// elsewhere closes it. An action with options (the panels' tone, the
+// spectrum's style) opens them in the same card instead; Escape, or
+// Backspace with nothing typed, goes back.
 //
 // IPC: qs -c hyprmonk ipc call overlays toggle quickactions
 import QtQuick
@@ -83,6 +83,14 @@ Scope {
             value: Theme.tone.label
             options: Object.values(Theme.tones).map(tone => tone.label)
             onPicked: option => Theme.setTone(Object.keys(Theme.tones).find(name => Theme.tones[name].label === option))
+        },
+        Action {
+            section: "Appearance"
+            icon: "\u{F0128}"
+            label: "Spectrum"
+            value: Cava.styles[Cava.style]
+            options: Object.values(Cava.styles)
+            onPicked: option => Cava.setStyle(Object.keys(Cava.styles).find(name => Cava.styles[name] === option))
         },
         Action {
             section: "Appearance"
