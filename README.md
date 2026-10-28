@@ -93,8 +93,6 @@ cargo clippy --all-targets -- -D warnings
   Wireless ignored them over its receiver (rivalcfg has no light setting
   for it either), and a keyboard alone would not match the mouse. Back
   only with a way to drive both.
-- Media panel extras from HyprFlow: art "skins" (the polaroid frame) and a
-  mini player.
 - Events in the calendar (dots on their days, a list for the day picked);
   where they come from is still to choose: local, Google or CalDAV.
 - Screenshots: the notification's preview of a copied screenshot shows a
