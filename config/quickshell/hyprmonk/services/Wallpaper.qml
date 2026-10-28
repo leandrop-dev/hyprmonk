@@ -76,12 +76,36 @@ Singleton {
         }
     }
 
+    // A wallpaper set but no colours made from it yet (the installer picks
+    // one; matugen first runs here): make them, once both files are read.
+    property bool settingsRead: false
+    property bool coloursMissing: false
+
+    function makeFirstColours(): void {
+        if (!settingsRead || !coloursMissing || settings.path === "") return;
+        coloursMissing = false;
+        colours.from(settings.path);
+    }
+
+    FileView {
+        path: Theme.stateDir + "/theme/colors.json"
+        printErrors: false
+        onLoadFailed: {
+            root.coloursMissing = true;
+            root.makeFirstColours();
+        }
+    }
+
     FileView {
         path: Theme.stateDir + "/wallpaper.json"
         printErrors: false
         watchChanges: true  // edited by hand: folder
         onFileChanged: reload()
         onAdapterUpdated: writeAdapter()
+        onLoaded: {
+            root.settingsRead = true;
+            root.makeFirstColours();
+        }
 
         JsonAdapter {
             id: settings

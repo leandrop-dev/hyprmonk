@@ -9,17 +9,19 @@ usage() {
     cat <<EOF
 usage: install.sh [step...]
 
-With no step: packages link folders bin services.
+With no step: packages link folders cursor wallpapers bin services.
 
 steps:
-  check     list packages from packages/pacman.txt that are not installed
-  packages  install the missing ones (uses sudo)
-  link      symlink the configs into ~/.config (existing ones are moved to *.bak-DATE)
-  folders   create ~/Pictures/Wallpapers, where the wallpaper picker looks
-  bin       build hyprmonk and install it to ~/.local/bin
-  services  enable the systemd user units (they only start under Hyprland)
-  udev      install the udev rule for device batteries (uses sudo)
-  plugins   install and enable the hyprpm plugins (compiles; run inside Hyprland)
+  check      list packages from packages/pacman.txt that are not installed
+  packages   install the missing ones (uses sudo)
+  link       symlink the configs into ~/.config (existing ones are moved to *.bak-DATE)
+  folders    create ~/Pictures/Wallpapers, where the wallpaper picker looks
+  cursor     download the cursor theme (Bibata) to ~/.local/share/icons
+  wallpapers download the cosmic-noir wallpapers, and pick one if none is set
+  bin        build hyprmonk and install it to ~/.local/bin
+  services   enable the systemd user units (they only start under Hyprland)
+  udev       install the udev rule for device batteries (uses sudo)
+  plugins    install and enable the hyprpm plugins (compiles; run inside Hyprland)
 EOF
 }
 
@@ -78,6 +80,66 @@ step_folders() {
     command -v xdg-user-dirs-update >/dev/null && xdg-user-dirs-update
     mkdir -p "$HOME/Pictures/Wallpapers"
     echo "   ok       ~/Pictures/Wallpapers"
+}
+
+# The cursor: Bibata (GPL-3.0), not in the official repos, so its release
+# archive, pinned by checksum. uwsm/env names it.
+CURSOR_THEME="Bibata-Modern-Amber"
+CURSOR_URL="https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Amber.tar.xz"
+CURSOR_SHA256="58b7ac00ed3cb45acb6b917cb9807a553873f1cca5c91348c4abaebe638e5884"
+
+step_cursor() {
+    say "Installing the cursor ($CURSOR_THEME)"
+    local icons="$HOME/.local/share/icons"
+    if [[ -f $icons/$CURSOR_THEME/index.theme ]]; then
+        echo "   ok       ~/.local/share/icons/$CURSOR_THEME"
+        return
+    fi
+    local archive
+    archive=$(mktemp --suffix=.tar.xz)
+    curl -fsSL -o "$archive" "$CURSOR_URL"
+    if ! echo "$CURSOR_SHA256  $archive" | sha256sum --check --quiet -; then
+        rm -f "$archive"
+        echo "   the download does not match its checksum; nothing installed" >&2
+        return 1
+    fi
+    mkdir -p "$icons"
+    tar -xf "$archive" -C "$icons"
+    rm -f "$archive"
+    echo "   installed ~/.local/share/icons/$CURSOR_THEME"
+}
+
+# Wallpapers from cosmic-noir-theme (MIT), at a fixed commit, into the
+# picker's folder; the first one becomes the wallpaper unless one is set.
+WALLPAPERS_URL="https://raw.githubusercontent.com/atraxsrc/cosmic-noir-theme/6b2e9d97a99c4a8f8f20afe0687dc58802470c83/backgrounds"
+WALLPAPERS=(
+    noir-anime.png noir-anime-1.png noir-anime-2.png noir-city.png
+    noir-cosmic-astronaut.png noir-eagle.png noir-geisha-vivid.png
+    noir-hyundai-blueprint.png noir-js-mug.png noir-neon-city.png
+    noir-panel.png noir-reaper-skull.png noir-samurai.png
+    noir-sushi-switch.png noir-tower.png
+)
+
+step_wallpapers() {
+    say "Downloading wallpapers (cosmic-noir-theme)"
+    local folder="$HOME/Pictures/Wallpapers" name
+    mkdir -p "$folder"
+    for name in "${WALLPAPERS[@]}"; do
+        if [[ -s $folder/$name ]]; then
+            echo "   ok       $name"
+            continue
+        fi
+        curl -fsSL -o "$folder/$name.part" "$WALLPAPERS_URL/$name"
+        mv "$folder/$name.part" "$folder/$name"
+        echo "   fetched  $name"
+    done
+    # The shell makes the colours from it on its first start.
+    local state="$HOME/.local/state/hyprmonk/wallpaper.json"
+    if [[ ! -e $state ]]; then
+        mkdir -p "$(dirname "$state")"
+        printf '{\n    "path": "%s",\n    "folder": ""\n}\n' "$folder/${WALLPAPERS[0]}" > "$state"
+        echo "   wallpaper ${WALLPAPERS[0]}"
+    fi
 }
 
 link_one() {
@@ -176,11 +238,11 @@ step_plugins() {
 
 main() {
     local steps=("$@")
-    [[ ${#steps[@]} -eq 0 ]] && steps=(packages link folders bin services)
+    [[ ${#steps[@]} -eq 0 ]] && steps=(packages link folders cursor wallpapers bin services)
     local step
     for step in "${steps[@]}"; do
         case $step in
-            check | packages | link | folders | bin | services | udev | plugins) "step_$step" ;;
+            check | packages | link | folders | cursor | wallpapers | bin | services | udev | plugins) "step_$step" ;;
             -h | --help | help) usage ;;
             *)
                 usage >&2

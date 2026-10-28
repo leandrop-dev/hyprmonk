@@ -1,7 +1,7 @@
 # Session environment, read by uwsm before Hyprland and every unit start.
 
-# Cursor (packages/pacman.txt installs it)
-export XCURSOR_THEME=capitaine-cursors
+# Cursor (`install.sh cursor` downloads it)
+export XCURSOR_THEME=Bibata-Modern-Amber
 export XCURSOR_SIZE=24
 
 # NVIDIA (proprietary driver): hardware video decoding and GLX vendor. Only

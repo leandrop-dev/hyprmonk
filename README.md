@@ -21,7 +21,7 @@ comes from the official repos:
 sudo pacman -S --needed git
 git clone https://github.com/leandrop-dev/hyprmonk.git
 cd hyprmonk
-./install.sh            # install packages, link configs, make folders, build hyprmonk, enable the shell
+./install.sh            # packages, configs, folders, cursor, wallpapers, hyprmonk, the shell
 ./install.sh udev       # once: lets hyprmonk read the mouse battery (sudo)
 ```
 
@@ -38,8 +38,9 @@ side and both change. Anything already in the way is moved to `*.bak-DATE`.
 Run `./install.sh help` for each step.
 
 Wallpapers come from `~/Pictures/Wallpapers` (another folder: set `folder` in
-`~/.local/state/hyprmonk/wallpaper.json`). Pick one with Super+W; its
-colours become the accent everywhere (matugen).
+`~/.local/state/hyprmonk/wallpaper.json`). The installer downloads the
+cosmic-noir set there and starts with `noir-anime.png`. Pick another with
+Super+W; its colours become the accent everywhere (matugen).
 
 ## Layout
 
@@ -110,9 +111,12 @@ cargo clippy --all-targets -- -D warnings
   it is in `extra`). Update pulls and re-runs what changed; Uninstall
   removes the links (restoring the `*.bak-DATE` copies) and the units.
 - What a fresh install brings besides the shell, to choose after trying the
-  options: the file manager, icons, and wallpapers in the repo so the
-  picker is not empty, with one as the default (only pictures whose licence
-  lets them be shared).
+  options: the file manager and the icons.
+- More from [cosmic-noir-theme](https://github.com/atraxsrc/cosmic-noir-theme),
+  where the wallpapers come from: its palette (charcoal, sage, orange) as a
+  tone, and its terminal, btop and fastfetch colours.
+- The cursor in GTK apps (they read it from their own settings, not from
+  `XCURSOR_THEME`).
 - Screenshots: grim and slurp are installed, but no bind uses them yet.
 - Fedora (and Fedora-based) once Arch is stable: a `packages/` list for
   dnf, and COPRs for what Fedora does not ship.
@@ -123,6 +127,12 @@ cargo clippy --all-targets -- -D warnings
 - The Rival 3 Wireless battery protocol from [rivalcfg](https://github.com/flozz/rivalcfg).
 - The running cat's font from [runcat-text](https://github.com/AlejandroMinor/runcat-text)
   (BSD-2-Clause, its licence in `config/quickshell/hyprmonk/assets/runcat/`).
+- Wallpapers from [cosmic-noir-theme](https://github.com/atraxsrc/cosmic-noir-theme)
+  by atraxsrc (MIT), renders of subjects from HANCORE-linux's
+  [omarchy-greek-noir-theme](https://github.com/HANCORE-linux/omarchy-greek-noir-theme);
+  downloaded by the installer, not kept in this repo.
+- The cursor: [Bibata](https://github.com/ful1e5/Bibata_Cursor) Modern Amber
+  (GPL-3.0), downloaded by the installer.
 
 ## License
 
