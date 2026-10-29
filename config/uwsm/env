@@ -1,5 +1,11 @@
 # Session environment, read by uwsm before Hyprland and every unit start.
 
+# Commands installed for this user, hyprmonk's among them (install.sh bin)
+case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) export PATH="$HOME/.local/bin:$PATH" ;;
+esac
+
 # Cursor (`install.sh cursor` downloads it)
 export XCURSOR_THEME=Bibata-Modern-Ice
 export XCURSOR_SIZE=24

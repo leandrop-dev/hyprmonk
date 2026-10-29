@@ -5,6 +5,11 @@
 
 [[ -o interactive ]] || return
 
+# Commands installed for this user, hyprmonk's among them; the session has
+# this too (uwsm/env), a text console login does not.
+typeset -U path
+path=(~/.local/bin $path)
+
 # History, shared between terminals as it is written
 HISTFILE=${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history
 HISTSIZE=50000
