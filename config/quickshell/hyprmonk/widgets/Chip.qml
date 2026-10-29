@@ -1,4 +1,5 @@
-// A small rounded button. With `on` set it is a switch: green while on.
+// A small rounded button. With `on` set it is a switch: in the accent
+// while on.
 import QtQuick
 import qs
 
@@ -15,7 +16,7 @@ Rectangle {
     implicitWidth: label.implicitWidth + 16
     implicitHeight: 22
     radius: height / 2
-    color: isSwitch && on ? Theme.positive : Theme.fg(mouse.containsMouse ? 0.16 : 0.08)
+    color: isSwitch && on ? Theme.accent : Theme.fg(mouse.containsMouse ? 0.16 : 0.08)
 
     Text {
         id: label
