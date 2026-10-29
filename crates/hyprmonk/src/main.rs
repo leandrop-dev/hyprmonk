@@ -2,6 +2,7 @@
 
 mod battery;
 mod hidraw;
+mod installer;
 mod screenshot;
 mod steelseries;
 
@@ -17,6 +18,14 @@ commands:
   battery [--json]                       charge of devices UPower cannot see (SteelSeries Rival 3 Wireless)
   screenshot region|window|screen [--copy]
                                          take a screenshot: annotate and save it, or copy it
+
+the installer (the repo's install.sh, found through ~/.config/hypr):
+  menu                                   Install, Update, Check, Uninstall
+  install [step...]                      every step, or the ones named (hyprmonk install help)
+  update                                 pull the repo, then run the steps its changes need
+  check                                  what is missing, and the step that fixes it
+  uninstall                              remove the links and units, putting back what they replaced
+
   help                                   show this text
 ";
 
@@ -43,6 +52,18 @@ fn run(args: &[&str]) -> Result<ExitCode> {
         ["battery", "--json"] => print_battery(battery::Format::Json),
         ["screenshot", area] => take_screenshot(area, screenshot::Target::File),
         ["screenshot", area, "--copy"] => take_screenshot(area, screenshot::Target::Clipboard),
+        ["menu"] => installer::exec(&[]).map(|()| ExitCode::SUCCESS),
+        ["install", steps @ ..] => {
+            let steps = if steps.is_empty() {
+                &["install"]
+            } else {
+                steps
+            };
+            installer::exec(steps).map(|()| ExitCode::SUCCESS)
+        }
+        [command @ ("update" | "check" | "uninstall")] => {
+            installer::exec(&[command]).map(|()| ExitCode::SUCCESS)
+        }
         ["help" | "--help" | "-h"] => {
             print!("{USAGE}");
             Ok(ExitCode::SUCCESS)

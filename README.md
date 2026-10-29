@@ -26,14 +26,15 @@ first (from the repos on CachyOS, else built once from `paru-bin`):
 curl -fsSL https://raw.githubusercontent.com/leandrop-dev/hyprmonk/main/install.sh | bash
 ```
 
-That gets git, clones the repo to `~/hyprmonk` (another folder: set
-`HYPRMONK_DIR` before `bash`) and opens the installer's menu from there. The
-clone stays: the configs are links into it. The same by hand:
+That gets git, clones the repo to `~/.local/share/hyprmonk` (another
+folder: set `HYPRMONK_DIR` before `bash`) and opens the installer's menu from
+there. The clone stays: the configs are links into it. The same by hand, in
+any folder:
 
 ```bash
 sudo pacman -S --needed git
-git clone https://github.com/leandrop-dev/hyprmonk.git ~/hyprmonk
-cd ~/hyprmonk
+git clone https://github.com/leandrop-dev/hyprmonk.git ~/.local/share/hyprmonk
+cd ~/.local/share/hyprmonk
 ./install.sh            # the menu: Install, Update, Check, Uninstall
 ./install.sh udev       # once: lets hyprmonk read the mouse battery (sudo)
 ```
@@ -48,7 +49,8 @@ that fixes it; Uninstall removes the links and units and puts back what they
 replaced (packages, the login screen and the login shell stay, and it says
 how to undo them). Steps also run on their own, `./install.sh check` or
 `./install.sh apps`; with no terminal, `./install.sh` runs Install without
-asking.
+asking. Once installed, `hyprmonk menu`, `hyprmonk update` and the rest do
+the same from any folder (see [hyprmonk](#hyprmonk-1)).
 
 Then reboot: the login screen is SDDM (in place of the display manager that
 was enabled; to go back, `sudo systemctl disable sddm` and enable the other).
@@ -107,7 +109,14 @@ Generated files never land in the repo: matugen writes to
 hyprmonk battery [--json]                    charge of devices UPower cannot see
 hyprmonk screenshot region|window|screen [--copy]
                                              take a screenshot
+hyprmonk menu                                the installer's menu
+hyprmonk install [step...]                   every step, or the ones named
+hyprmonk update | check | uninstall
 ```
+
+The installer commands run the repo's `install.sh` from wherever it was
+cloned, found through `~/.config/hypr` (a link into it); `HYPRMONK_DIR`
+overrides that.
 
 `battery` reads the SteelSeries Rival 3 Wireless over its receiver's HID
 interface. The headset (Arctis Nova 7) already reaches the bar through UPower.

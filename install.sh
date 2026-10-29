@@ -6,19 +6,21 @@ set -euo pipefail
 # Piped from curl there is no file, so no repo around it: main clones one.
 REPO=""
 [[ -n ${BASH_SOURCE[0]:-} ]] && REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CLONE="${HYPRMONK_DIR:-$HOME/hyprmonk}"
+CLONE="${HYPRMONK_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/hyprmonk}"
 
 usage() {
     cat <<EOF
 usage: install.sh [step...]
    or: curl -fsSL https://raw.githubusercontent.com/leandrop-dev/hyprmonk/main/install.sh | bash
-       (clones the repo to ~/hyprmonk, or $HYPRMONK_DIR, then runs it from there;
-       steps go after bash -s --)
+       (clones the repo to ~/.local/share/hyprmonk, or \$HYPRMONK_DIR, then runs it
+       from there; steps go after bash -s --)
+   or, once installed: hyprmonk menu|install|update|check|uninstall
 
 With no step, in a terminal: a menu (Install, Update, Check, Uninstall).
-Otherwise with no step: ${INSTALL_STEPS[*]}.
+Otherwise with no step, or with install: ${INSTALL_STEPS[*]}.
 
 steps:
+  install    every step above, without the menu (the apps as last picked)
   check      what is missing: packages, links, units, services, the login shell
   update     pull the repo, then run the steps its changes need
   uninstall  remove the links and units, putting back the *.bak-DATE copies
@@ -697,6 +699,7 @@ run_steps() {
     local step
     for step in "$@"; do
         case $step in
+            install) run_steps "${INSTALL_STEPS[@]}" ;;
             check | update | uninstall | packages | aur | apps | link | folders | defaults | cursor | wallpapers | bin | services | system | shell | udev | login | plugins) "step_$step" ;;
             -h | --help | help) usage ;;
             *)
