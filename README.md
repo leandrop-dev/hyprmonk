@@ -23,9 +23,17 @@ repo where it has them, else the AUR. The installer gets paru
 first (from the repos on CachyOS, else built once from `paru-bin`):
 
 ```bash
+curl -fsSL https://raw.githubusercontent.com/leandrop-dev/hyprmonk/main/install.sh | bash
+```
+
+That gets git, clones the repo to `~/hyprmonk` (another folder: set
+`HYPRMONK_DIR` before `bash`) and opens the installer's menu from there. The
+clone stays: the configs are links into it. The same by hand:
+
+```bash
 sudo pacman -S --needed git
-git clone https://github.com/leandrop-dev/hyprmonk.git
-cd hyprmonk
+git clone https://github.com/leandrop-dev/hyprmonk.git ~/hyprmonk
+cd ~/hyprmonk
 ./install.sh            # the menu: Install, Update, Check, Uninstall
 ./install.sh udev       # once: lets hyprmonk read the mouse battery (sudo)
 ```

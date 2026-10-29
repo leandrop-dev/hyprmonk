@@ -3,11 +3,17 @@
 # symlinked into ~/.config, so editing either side edits both.
 set -euo pipefail
 
-REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Piped from curl there is no file, so no repo around it: main clones one.
+REPO=""
+[[ -n ${BASH_SOURCE[0]:-} ]] && REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CLONE="${HYPRMONK_DIR:-$HOME/hyprmonk}"
 
 usage() {
     cat <<EOF
 usage: install.sh [step...]
+   or: curl -fsSL https://raw.githubusercontent.com/leandrop-dev/hyprmonk/main/install.sh | bash
+       (clones the repo to ~/hyprmonk, or $HYPRMONK_DIR, then runs it from there;
+       steps go after bash -s --)
 
 With no step, in a terminal: a menu (Install, Update, Check, Uninstall).
 Otherwise with no step: ${INSTALL_STEPS[*]}.
@@ -701,8 +707,30 @@ run_steps() {
     done
 }
 
+# Run as `curl ... | bash`: get git and the repo (kept, the configs link into
+# it), then the installer from there, its keys from the terminal rather than
+# the pipe.
+bootstrap() {
+    if ! command -v git > /dev/null; then
+        say "Installing git (sudo)"
+        sudo pacman -S --needed git
+    fi
+    if [[ -f $CLONE/packages/pacman.txt ]]; then
+        say "Using the clone in $CLONE"
+    else
+        say "Cloning hyprmonk into $CLONE"
+        git clone https://github.com/leandrop-dev/hyprmonk.git "$CLONE"
+    fi
+    if [[ -t 1 ]]; then
+        exec "$CLONE/install.sh" "$@" < /dev/tty
+    fi
+    exec "$CLONE/install.sh" "$@"
+}
+
 main() {
-    if [[ ${1:-} == --updated-from ]]; then
+    if [[ ! -f $REPO/packages/pacman.txt ]]; then
+        bootstrap "$@"
+    elif [[ ${1:-} == --updated-from ]]; then
         updated_from "$2"
     elif [[ $# -gt 0 ]]; then
         run_steps "$@"
