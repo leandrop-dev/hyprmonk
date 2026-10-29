@@ -95,11 +95,11 @@ cargo clippy --all-targets -- -D warnings
 - Appearance: two tones for now, Noir and Wallpaper (Black, Slate, Espresso
   and the light ones were dropped; more to pick later). Only Wallpaper takes
   its colours from the wallpaper; every other tone brings its own accent and
-  green, as Noir does, and the tone's accent reaches everything: the shell
-  and Hyprland's window borders do (the shell writes `theme/tone.lua`);
-  kitty and GTK apps still to come.
+  green, as Noir does, and the tone's accent reaches everything: the shell,
+  Hyprland's window borders and kitty do (the shell writes `theme/tone.lua`
+  and `theme/kitty-tone.conf`); GTK apps still to come.
 - Appearance: from HyprFlow, a panel to tweak a tone (card opacity, blur, text
-  colour), and the tone reaching kitty.
+  colour).
 - Lights, parked (not a must-have): the keyboard and mouse in the accent.
   Through OpenRGB the Keychron took colours and effects, but the Rival 3
   Wireless ignored them over its receiver (rivalcfg has no light setting
@@ -146,12 +146,10 @@ cargo clippy --all-targets -- -D warnings
     Noir takes Yaru's orange, Wallpaper the colour nearest its accent. The
     shell's own icons stay Yaru's orange (`QS_ICON_THEME` is read once);
     Qt apps follow with the Qt theming.
-- The terminal in the theme: kitty's 16 colours from cosmic-noir's
-  terminal palette (`cosmic-term/Noir-term.ron`), so ls, btop and the rest
-  look like it; its background, text, cursor and selection follow the
-  Appearance tone (Noir's own for Noir, the tone and the wallpaper's accent
-  for the others), reloaded live on a pick. A light tone, if one comes
-  back, needs a darker take on the palette to stay readable.
+- The terminal: done, kitty's 16 colours from cosmic-noir's terminal
+  palette (`config/kitty/noir.conf`), its text, background and cursor from
+  the tone, reloaded live on a pick. A light tone, if one comes back, needs
+  a darker take on the palette to stay readable.
 - More from [cosmic-noir-theme](https://github.com/atraxsrc/cosmic-noir-theme),
   where the wallpapers come from (its palette is the Noir tone): its btop
   and fastfetch colours.
@@ -169,7 +167,8 @@ cargo clippy --all-targets -- -D warnings
 - Wallpapers from [cosmic-noir-theme](https://github.com/atraxsrc/cosmic-noir-theme)
   by atraxsrc (MIT), renders of subjects from HANCORE-linux's
   [omarchy-greek-noir-theme](https://github.com/HANCORE-linux/omarchy-greek-noir-theme);
-  downloaded by the installer, not kept in this repo.
+  downloaded by the installer, not kept in this repo. kitty's 16 colours are
+  its terminal scheme (`cosmic-term/Noir-term.ron`).
 - Synced lyrics from [LRCLIB](https://lrclib.net), looked up while the media
   panel shows them.
 - The cursor: [Bibata](https://github.com/ful1e5/Bibata_Cursor) Modern Ice

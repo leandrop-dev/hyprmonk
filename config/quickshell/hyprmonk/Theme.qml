@@ -101,12 +101,42 @@ Singleton {
             + (accent ? `theme.accent = "rgba(${Qt.color(accent).toString().slice(1)}ee)"\n` : "");
     }
 
+    // kitty's text, background, cursor and selection from a tone with its own
+    // accent (theme/kitty-tone.conf, after matugen's in kitty.conf); empty
+    // for one without, so the wallpaper's stay. Its 16 colours do not change.
+    readonly property string kittyTone: {
+        const saved = tones[savedTone] ?? tones.noir;
+        const lines = ["# Written by the shell (Theme.qml) for the saved tone. Do not edit."];
+        if (saved.accent) {
+            const hex = c => Qt.color(c).toString();
+            const mix = alpha => hex(Qt.tint(saved.background, Qt.alpha(saved.foreground, alpha)));
+            const colours = {
+                foreground: hex(saved.foreground),
+                background: hex(saved.background),
+                selection_foreground: hex(saved.background),
+                selection_background: hex(saved.accent),
+                cursor: hex(saved.accent),
+                cursor_text_color: hex(saved.background),
+                url_color: hex(saved.positive ?? saved.accent),
+                active_border_color: hex(saved.accent),
+                inactive_border_color: mix(0.25),
+                active_tab_foreground: hex(saved.background),
+                active_tab_background: hex(saved.accent),
+                inactive_tab_foreground: mix(0.6),
+                inactive_tab_background: mix(0.06)
+            };
+            for (const name in colours) lines.push(name.padEnd(24) + colours[name]);
+        }
+        return lines.join("\n") + "\n";
+    }
+
     onIconThemeChanged: applyTone.restart()
     onHyprlandToneChanged: applyTone.restart()
+    onKittyToneChanged: applyTone.restart()
 
     // The saved tone, outside the shell. Waits for the files to be read (and
-    // a burst of changes to settle); Hyprland reloads only when its file
-    // changes, not on every start.
+    // a burst of changes to settle); Hyprland and kitty reload only when
+    // their file changes, not on every start.
     Timer {
         id: applyTone
         interval: 500
@@ -114,7 +144,21 @@ Singleton {
         onTriggered: {
             gsettings.running = true;
             if (toneFile.text() !== theme.hyprlandTone) toneFile.setText(theme.hyprlandTone);
+            if (kittyFile.text() !== theme.kittyTone) kittyFile.setText(theme.kittyTone);
         }
+    }
+
+    FileView {
+        id: kittyFile
+        path: theme.stateDir + "/theme/kitty-tone.conf"
+        printErrors: false
+        onSaved: kittyReload.running = true
+    }
+
+    // kitty reads its config again on USR1, as after matugen.
+    Process {
+        id: kittyReload
+        command: ["pkill", "-USR1", "-x", "kitty"]
     }
 
     FileView {
