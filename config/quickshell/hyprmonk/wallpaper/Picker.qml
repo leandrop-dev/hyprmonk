@@ -61,6 +61,7 @@ Scope {
         cardWidth: 900
         // Sized for every picture, so filtering does not resize it.
         cardHeight: top + rows * tileHeight + bottom
+        windowHeight: top + 3 * tileHeight + bottom + margin * 2
         onDismissed: Overlays.close()
 
         Text {

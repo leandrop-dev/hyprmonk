@@ -39,8 +39,6 @@ Scope {
 
     onOpenChanged: {
         if (!open) return;
-        tab = 0;
-        reset();
         pointer = Qt.point(-1, -1);
         Apps.refreshPrograms();
         search.forceActiveFocus();
@@ -101,6 +99,11 @@ Scope {
         cardWidth: 820
         cardHeight: 480
         onDismissed: Overlays.close()
+        // Put back while hidden: each open starts on Apps, empty, at the top.
+        onFolded: {
+            root.tab = 0;
+            root.reset();
+        }
 
         // The left column: search, tabs, list.
         ColumnLayout {

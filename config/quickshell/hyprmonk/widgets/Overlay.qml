@@ -4,7 +4,11 @@
 //
 // The window is `windowHeight` tall with the card at its top, so a card that
 // changes height grows and shrinks from a fixed top; by default it fits the
-// card.
+// card, which cuts a card that shrinks while it animates: one that changes
+// height sets it to its tallest.
+//
+// `folded` comes once the card has folded away after closing: the time to
+// put a card back as it opens, unseen.
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
@@ -24,6 +28,9 @@ PanelWindow {
     readonly property int margin: 32  // room around the card as it unfolds
 
     signal dismissed()
+    signal folded()
+
+    onVisibleChanged: if (!visible) folded()
 
     // Picked when it opens; it stays there while open.
     onOpenChanged: if (open) screen = Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? null

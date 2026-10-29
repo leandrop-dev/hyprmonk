@@ -33,8 +33,6 @@ Scope {
 
     onOpenChanged: {
         if (!open) return;
-        current = 0;
-        armed = -1;
         pointer = Qt.point(-1, -1);
         keys.forceActiveFocus();
     }
@@ -74,6 +72,11 @@ Scope {
         cardWidth: root.actions.length * (root.tileWidth + root.gap) - root.gap + 24
         cardHeight: root.tileHeight + 24
         onDismissed: Overlays.close()
+        // Put back while hidden, so it opens on Lock without sliding there.
+        onFolded: {
+            root.current = 0;
+            root.armed = -1;
+        }
 
         Item {
             id: keys

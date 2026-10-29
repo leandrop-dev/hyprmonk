@@ -95,12 +95,16 @@ Scope {
     onOpenChanged: {
         if (!open) return;
         reader.running = true;
+        pointer = Qt.point(-1, -1);
+        search.forceActiveFocus();
+    }
+
+    // Each open starts from the top of the full list, put back while hidden.
+    function reset(): void {
         search.text = "";
         query = "";
         current = 0;
         list.contentY = 0;
-        pointer = Qt.point(-1, -1);
-        search.forceActiveFocus();
     }
 
     // Hovering picks only when the pointer really moves: rows that appear or
@@ -139,7 +143,9 @@ Scope {
         cardWidth: 900
         // Sized for every row, so filtering does not resize it.
         cardHeight: top + Math.min(root.listHeight(root.rows), listMax) + 12
+        windowHeight: top + listMax + 12 + margin * 2
         onDismissed: Overlays.close()
+        onFolded: root.reset()
 
         Text {
             x: 20
@@ -193,6 +199,7 @@ Scope {
 
             readonly property Item row: entries.count > root.current ? entries.itemAt(root.current).row : null
             readonly property real rowY: row ? row.parent.y + row.y : 0
+            readonly property real entryY: row ? row.parent.y : 0  // with its heading
 
             x: 12
             y: window.top
@@ -203,7 +210,7 @@ Scope {
             clip: true
 
             onRowYChanged: {
-                if (rowY < contentY) contentY = rowY;
+                if (entryY < contentY) contentY = entryY;
                 else if (rowY + root.rowHeight > contentY + height) contentY = rowY + root.rowHeight - height;
             }
 

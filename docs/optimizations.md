@@ -61,6 +61,13 @@ bind but no key on this keyboard to test it.
 
 ## 5. Overlay polish
 
+Done 2026-10-29, as below, except the shared widget for the two sectioned
+lists (left: two copies, still small). Moving up shows the entry's heading;
+quick actions, the key guide, the power menu and the launcher reset once
+folded away (Overlay's `folded`), not as they open; a label without a chip
+runs to the row's end; the key guide and the wallpaper picker have a window
+as tall as their tallest card.
+
 - **Moving up in the key guide hides section headings**
   (`keyguide/KeyGuide.qml:193-196`, the same code in
   `quickactions/QuickActions.qml:278-281`). Keeping the row in view lines
