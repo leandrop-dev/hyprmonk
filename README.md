@@ -17,18 +17,30 @@ polkit agent, the Hyprland config and the helpers. More panels come next
 ## Install
 
 On CachyOS (the main target) or Arch, with or without a desktop. Packages
-come from the official repos; the rest (`packages/aur.txt`: the icons,
-qt6ct-kde, Zen, LocalSend, a Portuguese dictionary) through paru, from
-CachyOS's own repo where it has them, else the AUR. The installer gets paru
+come from the official repos; the rest (the icons, qt6ct-kde, and apps such as
+Zen, LocalSend or the Portuguese dictionary) through paru, from CachyOS's own
+repo where it has them, else the AUR. The installer gets paru
 first (from the repos on CachyOS, else built once from `paru-bin`):
 
 ```bash
 sudo pacman -S --needed git
 git clone https://github.com/leandrop-dev/hyprmonk.git
 cd hyprmonk
-./install.sh            # packages, AUR packages, configs, folders, default apps, cursor, wallpapers, hyprmonk, the shell, system services, zsh, the login screen
+./install.sh            # the menu: Install, Update, Check, Uninstall
 ./install.sh udev       # once: lets hyprmonk read the mouse battery (sudo)
 ```
+
+The menu (gum, which it installs first if missing) asks which apps to install
+from `packages/apps.txt`, each ticked to begin with, then runs every step:
+packages, AUR packages, the apps, configs, folders, default apps, cursor,
+wallpapers, hyprmonk, the shell, system services, zsh, the login screen.
+Update pulls the repo and runs only the steps its changes need (restarting
+the shell when its code changed); Check lists what is missing and the step
+that fixes it; Uninstall removes the links and units and puts back what they
+replaced (packages, the login screen and the login shell stay, and it says
+how to undo them). Steps also run on their own, `./install.sh check` or
+`./install.sh apps`; with no terminal, `./install.sh` runs Install without
+asking.
 
 Then reboot: the login screen is SDDM (in place of the display manager that
 was enabled; to go back, `sudo systemctl disable sddm` and enable the other).
@@ -46,12 +58,15 @@ Run `./install.sh help` for each step. The `shell` step makes zsh your login
 shell (it asks your password) and links `~/.zshrc`; your own additions go in
 `~/.config/zsh/local.zsh`.
 
-What it brings besides the desktop: Zen (browser), kitty, Nautilus, Loupe,
-mpv, Papers, Zed, Calculator, btop and Resources, KDE Partition Manager and
-Filelight, LocalSend; NetworkManager, Bluetooth, printing, GNOME Keyring
-(with its SSH agent), clipboard history, USB drives mounted as they are
-plugged in, Flatpak and firmware updates. The list and why each:
-`packages/pacman.txt` and `packages/aur.txt`.
+What always comes besides the desktop: kitty, Nautilus, Loupe,
+NetworkManager, Bluetooth, GNOME Keyring (with its SSH agent), clipboard
+history, USB drives mounted as they are plugged in, codecs. The apps to pick:
+Zen (browser), mpv, Papers, Zed, Calculator, btop and Resources, KDE Partition
+Manager and Filelight, archive tools, LocalSend, GPU Screen Recorder,
+Deskflow, printing, Flatpak, firmware updates, spell checking in English and
+Portuguese. The lists and why each: `packages/pacman.txt`,
+`packages/aur.txt` and `packages/apps.txt`; your picks are kept in
+`~/.config/hyprmonk/apps`.
 
 Wallpapers come from `~/Pictures/Wallpapers` (another folder: set `folder` in
 `~/.local/state/hyprmonk/wallpaper.json`). The installer downloads the
@@ -71,7 +86,7 @@ Super+W; its colours become the accent everywhere (matugen).
 | `config/systemd/user/` | The shell's, hypridle's, udiskie's and the clipboard history's units; they only start under Hyprland |
 | `crates/hyprmonk/` | The `hyprmonk` CLI |
 | `udev/` | Access rules for the devices `hyprmonk` reads |
-| `packages/` | What `install.sh check` expects: `pacman.txt` from the official repos, `aur.txt` through paru |
+| `packages/` | What `install.sh check` expects: `pacman.txt` from the official repos, `aur.txt` through paru, `apps.txt` the apps to pick from |
 | `docs/` | Work planned in detail (`optimizations.md`) |
 
 Generated files never land in the repo: matugen writes to
@@ -150,10 +165,9 @@ cargo clippy --all-targets -- -D warnings
     colour with the tone 3 s later, their icons when opened again. KDE apps
     read their icons and style from `~/.config/kdeglobals`, so the shell
     sets those there too, replacing Plasma's choices.
-- An installer that is pleasant to use: a gum menu (Install, Update,
-  Uninstall, Check, Quit), installing gum first when it is missing (on Arch
-  it is in `extra`). Update pulls and re-runs what changed; Uninstall
-  removes the links (restoring the `*.bak-DATE` copies) and the units.
+- An installer that is pleasant to use: done, a gum menu (Install,
+  Update, Check, Uninstall) with the apps picked one by one; next, trying
+  it on a fresh CachyOS in a virtual machine.
 - What a fresh install brings besides the shell: decided, the list under
   [Install](#install). Still to build for it: Wi-Fi and Bluetooth panels in
   the shell (Quickshell's `Networking` and `Bluetooth`; `nmtui` and
@@ -161,7 +175,7 @@ cargo clippy --all-targets -- -D warnings
   screen recording (gpu-screen-recorder) from quick actions, a key and a
   dot on the bar. Earlier notes:
   - Files: done, Nautilus (GTK 4, sandboxed thumbnailers, `FileManager1`
-    for Show in folder), on Super+E and for folders (`install.sh apps`).
+    for Show in folder), on Super+E and for folders (`install.sh defaults`).
     [Strata](https://github.com/lgse/strata) to look at again once it is
     older than two months and in the official repos.
   - Images: done, Loupe (sandboxed decoders), what Open on a screenshot

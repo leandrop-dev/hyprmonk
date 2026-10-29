@@ -1,6 +1,6 @@
 # Packages from the official repos (all in Arch's extra or core; the AUR ones
-# are in aur.txt). `install.sh check` lists the missing ones, `install.sh
-# packages` installs them. A bare CachyOS or Arch install (no desktop) needs
+# are in aur.txt, the apps to pick from in apps.txt). `install.sh check` lists
+# the missing ones, `install.sh packages` installs them. A bare CachyOS or Arch install (no desktop) needs
 # every one: what a desktop would have brought (fonts, the PulseAudio layer,
 # the network and Bluetooth services) is here. The cursor and the wallpapers
 # are downloaded by install.sh (not in the repos).
@@ -26,24 +26,14 @@ adw-gtk-theme   # GTK3 apps looking like GTK4 ones, in the tone's colours
 breeze   # Qt apps' style (qt6ct)
 kconfig   # kwriteconfig6: KDE apps' icons and style in kdeglobals
 
-# Apps the binds start, and what opens files (install.sh apps). The browser
-# and LocalSend are in aur.txt: CachyOS has them in its own repo.
+# Apps the binds and the shell start, and what opens files (install.sh
+# defaults); the others are picked from apps.txt
 kitty
 nautilus   # files (Super+E); Show in folder on a screenshot
 loupe      # images: Open on a screenshot
-mpv   # video
-mpv-mpris   # mpv in the media panel
-papers   # PDFs and other documents
-zed   # text and code
-gnome-calculator
-btop   # system monitor in the terminal
-resources   # system monitor
-partitionmanager   # disks and partitions
-filelight   # what fills a disk
-unzip   # archives: Nautilus opens them, these in the terminal (and 7z, RAR in Nautilus)
-zip
-7zip
-unrar
+
+# The installer's menu
+gum
 
 # Files beyond the disk: phones, network shares, USB drives mounted as they
 # are plugged in (hyprmonk-udiskie.service), video thumbnails
@@ -65,17 +55,10 @@ nm-connection-editor   # VPNs and the rest of a connection's settings
 bluez
 bluez-utils   # bluetoothctl
 
-# Printing, network printers found through Avahi (install.sh system)
-cups
-cups-pk-helper
-system-config-printer
+# Finding printers and other devices on the network (.local names), for
+# Printing in apps.txt (install.sh system)
 avahi
 nss-mdns
-
-# Flatpak apps, firmware updates, spell checking
-flatpak
-fwupd
-hunspell-en_us
 
 # The terminal's shell: zsh with a prompt, smarter cd, fuzzy search,
 # suggestions, highlighting and history search (config/zsh, install.sh shell)
@@ -90,12 +73,6 @@ fastfetch   # the system at a glance as a terminal opens
 
 # Clipboard history (hyprmonk-clipboard.service keeps it)
 cliphist
-
-# Screen recording
-gpu-screen-recorder
-
-# Keyboard and mouse shared with other computers (needs the portal below)
-deskflow
 
 # Root prompts: the shell is the polkit agent
 polkit
@@ -116,7 +93,7 @@ wl-clipboard
 libnotify   # notify-send
 xdg-utils   # xdg-open: Open on the saved screenshot's notification
 xdg-desktop-portal
-xdg-desktop-portal-hyprland   # screen sharing, input capture (deskflow)
+xdg-desktop-portal-hyprland   # screen sharing, input capture (Deskflow)
 xdg-desktop-portal-gtk   # file pickers
 
 # Audio, media and batteries

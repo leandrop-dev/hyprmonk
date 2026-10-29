@@ -4,6 +4,3 @@
 
 yaru-icon-theme   # the icons; each tone picks one of its colours
 qt6ct-kde   # Qt apps in the tone: qt6ct, patched so KDE apps take its colour scheme
-zen-browser-bin   # the browser (CachyOS: its own repo)
-localsend   # sharing files with nearby devices (CachyOS: its own repo; on Arch it builds)
-hunspell-pt_pt   # spell checking in Portuguese (Portugal)

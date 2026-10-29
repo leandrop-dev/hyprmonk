@@ -9,15 +9,21 @@ usage() {
     cat <<EOF
 usage: install.sh [step...]
 
-With no step: packages aur link folders apps cursor wallpapers bin services system shell login.
+With no step, in a terminal: a menu (Install, Update, Check, Uninstall).
+Otherwise with no step: ${INSTALL_STEPS[*]}.
 
 steps:
-  check      list packages from packages/pacman.txt and aur.txt that are not installed
+  check      what is missing: packages, links, units, services, the login shell
+  update     pull the repo, then run the steps its changes need
+  uninstall  remove the links and units, putting back the *.bak-DATE copies
+             (packages stay installed)
   packages   install the missing ones from pacman.txt (uses sudo)
   aur        install the missing ones from aur.txt with paru (uses sudo; gets paru first)
+  apps       install the apps picked from apps.txt (all until some are picked
+             in the menu; kept in ~/.config/hyprmonk/apps) with paru (uses sudo)
   link       symlink the configs into ~/.config (existing ones are moved to *.bak-DATE)
   folders    create ~/Pictures/Wallpapers, where the wallpaper picker looks
-  apps       what opens what (xdg-open): Zen, Nautilus, Loupe, mpv, Papers, Zed
+  defaults   what opens what (xdg-open): Zen, Nautilus, Loupe, mpv, Papers, Zed
   cursor     download the cursor theme (Bibata) to ~/.local/share/icons
   wallpapers download the cosmic-noir wallpapers, and pick one if none is set
   bin        build hyprmonk and install it to ~/.local/bin
@@ -35,6 +41,9 @@ EOF
 }
 
 say() { printf '\033[1m::\033[0m %s\n' "$*"; }
+
+# What Install runs, in order (plugins too from inside Hyprland).
+INSTALL_STEPS=(packages aur apps link folders defaults cursor wallpapers bin services system shell login)
 
 # repo path -> target, relative to the repo and $HOME
 LINKS=(
@@ -63,19 +72,95 @@ missing_packages() {
     pacman -T $(wanted_packages "$1") || true
 }
 
+# The apps to pick from (packages/apps.txt): "name | packages | what".
+app_lines() {
+    sed -e 's/#.*//' -e '/^\s*$/d' "$REPO/packages/apps.txt"
+}
+
+app_names() {
+    app_lines | awk -F' *[|] *' '{ print $1 }'
+}
+
+app_packages() {
+    app_lines | awk -F' *[|] *' -v name="$1" '$1 == name { print $2 }'
+}
+
+# The picks, one name per line: those saved that apps.txt still has, or all
+# of them until some are saved.
+APPS_PICKED="$HOME/.config/hyprmonk/apps"
+picked_apps() {
+    if [[ -f $APPS_PICKED ]]; then
+        grep -Fx -f <(app_names) "$APPS_PICKED" || true
+    else
+        app_names
+    fi
+}
+
+picked_packages() {
+    local name
+    picked_apps | while IFS= read -r name; do app_packages "$name"; done | tr ' ' '\n' | sed '/^$/d'
+}
+
+missing_picked() {
+    local packages
+    packages=$(picked_packages)
+    [[ -n $packages ]] && { pacman -T $packages || true; }
+}
+
+# One line per thing checked; the count of what is off at the end.
 step_check() {
-    say "Checking packages"
-    local list missing step
-    for list in pacman.txt aur.txt; do
-        missing=$(missing_packages "$list")
-        step=$([[ $list == aur.txt ]] && echo aur || echo packages)
-        if [[ -z $missing ]]; then
-            echo "   $list: everything is installed"
+    say "Checking"
+    local off=0 list missing step pair target unit
+    for list in pacman.txt aur.txt apps; do
+        if [[ $list == apps ]]; then
+            missing=$(missing_picked) step=apps
         else
-            echo "   $list: missing $(echo $missing)"
-            echo "   install them: ./install.sh $step"
+            missing=$(missing_packages "$list")
+            step=$([[ $list == aur.txt ]] && echo aur || echo packages)
+        fi
+        if [[ -z $missing ]]; then
+            echo "   ok       $list"
+        else
+            echo "   missing  $list: $(echo $missing) (./install.sh $step)"
+            off=$((off + 1))
         fi
     done
+    for pair in "${LINKS[@]}" "config/zsh/zshrc:.zshrc"; do
+        target="$HOME/${pair#*:}"
+        if [[ -L $target && $(readlink "$target") == "$REPO/${pair%%:*}" ]]; then
+            echo "   ok       ~/${pair#*:}"
+        else
+            echo "   missing  ~/${pair#*:} (./install.sh $([[ ${pair#*:} == .zshrc ]] && echo shell || echo link))"
+            off=$((off + 1))
+        fi
+    done
+    for unit in $(units) "${SOCKETS[@]}"; do
+        if systemctl --user is-enabled --quiet "$unit"; then
+            echo "   ok       $unit"
+        else
+            echo "   off      $unit (./install.sh services)"
+            off=$((off + 1))
+        fi
+    done
+    for unit in NetworkManager.service bluetooth.service avahi-daemon.service $(pacman -T cups > /dev/null && echo cups.socket) sddm.service; do
+        if systemctl is-enabled --quiet "$unit"; then
+            echo "   ok       $unit"
+        else
+            echo "   off      $unit (./install.sh $([[ $unit == sddm.service ]] && echo login || echo system))"
+            off=$((off + 1))
+        fi
+    done
+    if [[ $(getent passwd "$USER" | cut -d: -f7) == */zsh ]]; then
+        echo "   ok       login shell zsh"
+    else
+        echo "   off      login shell $(getent passwd "$USER" | cut -d: -f7) (./install.sh shell)"
+        off=$((off + 1))
+    fi
+    if ((off == 0)); then
+        say "Everything is in place"
+    else
+        say "$off to fix (the step after each)"
+    fi
 }
 
 step_packages() {
@@ -116,6 +201,22 @@ step_aur() {
     paru -S --needed $missing
 }
 
+step_apps() {
+    say "Installing the apps picked (sudo)"
+    if [[ -z $(picked_apps) ]]; then
+        echo "   none picked"
+        return
+    fi
+    local missing
+    missing=$(missing_picked)
+    if [[ -z $missing ]]; then
+        echo "   everything is installed: $(picked_apps | paste -sd, - | sed 's/,/, /g')"
+        return
+    fi
+    ensure_paru
+    paru -S --needed $missing
+}
+
 step_folders() {
     say "Creating folders"
     command -v xdg-user-dirs-update >/dev/null && xdg-user-dirs-update
@@ -134,11 +235,26 @@ APPS=(
     "dev.zed.Zed.desktop:text/plain text/markdown application/json application/toml application/x-yaml application/x-shellscript text/x-python text/x-csrc text/x-chdr text/x-c++src text/rust"
 )
 
-step_apps() {
+# Whether an app's desktop entry is installed, for the system or the user
+# (Flatpak's included).
+has_desktop_entry() {
+    local dir
+    for dir in /usr/share/applications "$HOME/.local/share/applications" \
+        /var/lib/flatpak/exports/share/applications "$HOME/.local/share/flatpak/exports/share/applications"; do
+        [[ -e $dir/$1 ]] && return 0
+    done
+    return 1
+}
+
+step_defaults() {
     say "Setting default apps"
     local pair app
     for pair in "${APPS[@]}"; do
         app=${pair%%:*}
+        if ! has_desktop_entry "$app"; then
+            echo "   skipped  ${app%.desktop}: not installed"
+            continue
+        fi
         xdg-mime default "$app" ${pair#*:}
         echo "   ok       ${app%.desktop}: ${pair#*:}"
     done
@@ -286,7 +402,7 @@ step_system() {
         fi
     fi
     local unit
-    for unit in bluetooth.service cups.socket avahi-daemon.service; do
+    for unit in bluetooth.service avahi-daemon.service $(pacman -T cups > /dev/null && echo cups.socket); do
         if systemctl is-enabled --quiet "$unit"; then
             echo "   ok       $unit"
         else
@@ -440,13 +556,142 @@ step_plugins() {
     hyprpm reload
 }
 
-main() {
-    local steps=("$@")
-    [[ ${#steps[@]} -eq 0 ]] && steps=(packages aur link folders apps cursor wallpapers bin services system shell login)
+# Pull the repo, then hand over to the installer as pulled (it may have
+# changed): it runs what the changed files need.
+step_update() {
+    say "Updating hyprmonk"
+    if [[ -n $(git -C "$REPO" status --porcelain) ]]; then
+        echo "   the repo has changes of its own; commit or stash them first" >&2
+        return 1
+    fi
+    local before
+    before=$(git -C "$REPO" rev-parse HEAD)
+    git -C "$REPO" pull --ff-only
+    if [[ $(git -C "$REPO" rev-parse HEAD) == "$before" ]]; then
+        echo "   already up to date"
+        return
+    fi
+    exec "$REPO/install.sh" --updated-from "$before"
+}
+
+# The steps the changes since a commit need, in Install's order; the shell
+# restarts when its code changed.
+updated_from() {
+    local changed step wanted=()
+    changed=$(git -C "$REPO" diff --name-only "$1" HEAD)
+    echo "$changed" | sed 's/^/   changed  /'
+    want() { [[ " ${wanted[*]} " == *" $1 "* ]] || wanted+=("$1"); }
+    while IFS= read -r file; do
+        case $file in
+            packages/pacman.txt) want packages ;;
+            packages/aur.txt) want aur ;;
+            packages/apps.txt) want apps ;;
+            install.sh) want link; want defaults; want services; want system; want login ;;
+            config/systemd/user/*) want link; want services ;;
+            crates/* | Cargo.*) want bin ;;
+            udev/*) [[ -e /etc/udev/rules.d/70-hyprmonk.rules ]] && want udev ;;
+        esac
+    done <<< "$changed"
+    for step in "${INSTALL_STEPS[@]}" udev; do
+        [[ " ${wanted[*]} " == *" $step "* ]] && "step_$step"
+    done
+    if echo "$changed" | grep -q '^config/quickshell/' && systemctl --user is-active --quiet hyprmonk-shell.service; then
+        systemctl --user restart hyprmonk-shell.service
+        echo "   restarted the shell"
+    fi
+    say "Updated to $(git -C "$REPO" log -1 --format='%h %s' | cut -c1-70)"
+}
+
+# Undo link and services: links into this repo go, the newest *.bak-DATE
+# copy of each comes back. What stays is listed at the end.
+step_uninstall() {
+    say "Uninstalling hyprmonk's configs"
+    local pair target backup unit
+    for unit in $(units); do
+        systemctl --user disable "$unit" || true
+    done
+    for pair in "${LINKS[@]}" "config/zsh/zshrc:.zshrc" $(units | sed "s|.*|$UNITS_DIR/&:.config/systemd/user/&|"); do
+        target="$HOME/${pair#*:}"
+        [[ -L $target && $(readlink "$target") == "$REPO/${pair%%:*}" ]] || continue
+        rm "$target"
+        backup=$(compgen -G "$target.bak-*" | sort | tail -1 || true)
+        if [[ -n $backup ]]; then
+            mv "$backup" "$target"
+            echo "   restored ~/${pair#*:} (from ${backup##*/})"
+        else
+            echo "   removed  ~/${pair#*:}"
+        fi
+    done
+    if [[ -x $HOME/.local/bin/hyprmonk ]] && command -v cargo > /dev/null; then
+        cargo uninstall --root "$HOME/.local" hyprmonk
+    fi
+    systemctl --user daemon-reload
+    cat <<EOF
+   Left as they are (the shell stops at the next login):
+     packages            pacman -Rns what you no longer want
+     the login screen    sudo systemctl disable sddm, then enable the one before
+     zsh as login shell  chsh -s /bin/bash
+     wallpapers, cursor  ~/Pictures/Wallpapers, ~/.local/share/icons/$CURSOR_THEME
+     state and picks     ~/.local/state/hyprmonk, ~/.config/hyprmonk
+EOF
+}
+
+# The menu, in Noir's colours (the shell's tone is not running yet).
+ACCENT="#f25623" TEXT="#ccd0cf" MUTED="#848685" BACKGROUND="#171717"
+export GUM_CHOOSE_CURSOR_FOREGROUND=$ACCENT GUM_CHOOSE_SELECTED_FOREGROUND=$ACCENT
+export GUM_CHOOSE_HEADER_FOREGROUND=$MUTED GUM_CHOOSE_ITEM_FOREGROUND=$TEXT
+export GUM_CONFIRM_PROMPT_FOREGROUND=$TEXT
+export GUM_CONFIRM_SELECTED_BACKGROUND=$ACCENT GUM_CONFIRM_SELECTED_FOREGROUND=$BACKGROUND
+export GUM_CONFIRM_UNSELECTED_BACKGROUND="#2a2a2a" GUM_CONFIRM_UNSELECTED_FOREGROUND=$TEXT
+
+ensure_gum() {
+    command -v gum > /dev/null && return
+    say "The menu needs gum; installing it (sudo)"
+    sudo pacman -S --needed gum
+}
+
+# The apps checklist, ticked as last saved (all the first time); saved to
+# $APPS_PICKED. Apps unticked later stay installed.
+pick_apps() {
+    local picks
+    picks=$(app_names | gum choose --no-limit --height 20 \
+        --header "Apps to install (space ticks, enter goes on); the rest of the desktop always comes" \
+        --selected="$(picked_apps | paste -sd, -)") || return 1
+    mkdir -p "$(dirname "$APPS_PICKED")"
+    printf '%s\n' "$picks" | sed '/^$/d' > "$APPS_PICKED"
+}
+
+menu() {
+    ensure_gum
+    gum style --border rounded --border-foreground "$ACCENT" --foreground "$TEXT" --padding "0 2" --margin "1 0" \
+        "hyprmonk" "$(gum style --foreground "$MUTED" "Hyprland and a Quickshell desktop, from $REPO")"
+    local action steps
+    action=$(gum choose --header "What to do?" Install Update Check Uninstall Quit) || return 0
+    case $action in
+        Install)
+            pick_apps || return 0
+            steps=("${INSTALL_STEPS[@]}")
+            [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] && steps+=(plugins)
+            gum style --foreground "$MUTED" "Steps: ${steps[*]}" "sudo asks your password for packages and services; chsh for zsh."
+            gum confirm "Install?" || return 0
+            run_steps "${steps[@]}"
+            [[ -z ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] && say "Reboot, log in to Hyprland, then run ./install.sh plugins"
+            ;;
+        Update) step_update ;;
+        Check) step_check ;;
+        Uninstall)
+            gum confirm --default=false "Remove hyprmonk's links and units, putting back what they replaced?" || return 0
+            step_uninstall
+            ;;
+        Quit) ;;
+    esac
+}
+
+run_steps() {
     local step
-    for step in "${steps[@]}"; do
+    for step in "$@"; do
         case $step in
-            check | packages | aur | link | folders | apps | cursor | wallpapers | bin | services | system | shell | udev | login | plugins) "step_$step" ;;
+            check | update | uninstall | packages | aur | apps | link | folders | defaults | cursor | wallpapers | bin | services | system | shell | udev | login | plugins) "step_$step" ;;
             -h | --help | help) usage ;;
             *)
                 usage >&2
@@ -454,6 +699,18 @@ main() {
                 ;;
         esac
     done
+}
+
+main() {
+    if [[ ${1:-} == --updated-from ]]; then
+        updated_from "$2"
+    elif [[ $# -gt 0 ]]; then
+        run_steps "$@"
+    elif [[ -t 0 && -t 1 ]]; then
+        menu
+    else
+        run_steps "${INSTALL_STEPS[@]}"
+    fi
 }
 
 main "$@"
