@@ -27,19 +27,20 @@ Module {
         else if (steps < 0 && player?.canGoPrevious) player.previous();
     }
 
-    // The levels drawn ease towards cava's, a step per frame, so the drawing
-    // moves smoothly at cava's 30 frames a second. Peaks (the caps) hold a
-    // band's highest level for a moment, then fall.
+    // The levels drawn ease towards cava's, a step per tick at cava's own 30
+    // frames a second, and the drawing is redone only when something moved.
+    // Peaks (the caps) hold a band's highest level for a moment, then fall.
     property var shown: Array(Cava.bands).fill(0)
     property var peaks: Array(Cava.bands).fill(0)
-    property var holds: Array(Cava.bands).fill(0)  // frames a cap still holds
+    property var holds: Array(Cava.bands).fill(0)  // ticks a cap still holds
 
-    readonly property int peakHold: 20       // frames, about a third of a second
-    readonly property real peakFall: 0.02    // per frame once released
+    readonly property real ease: 0.58      // of the way to cava's level, per tick
+    readonly property int peakHold: 10     // ticks, about a third of a second
+    readonly property real peakFall: 0.04  // per tick once released
 
     Timer {
         id: easing
-        interval: 16
+        interval: 33
         repeat: true
         running: true
         onTriggered: {
@@ -48,7 +49,7 @@ Module {
                 const target = Cava.levels[i] ?? 0;
                 if (Math.abs(target - level) < 0.005) return target;
                 moving = true;
-                return level + (target - level) * 0.35;
+                return level + (target - level) * root.ease;
             });
             const holds = root.holds.slice();
             const peaks = root.peaks.map((peak, i) => {
@@ -63,10 +64,12 @@ Module {
                 }
                 return Math.max(shown[i], peak - root.peakFall);
             });
+            const changed = shown.some((level, i) => level !== root.shown[i])
+                || peaks.some((peak, i) => peak !== root.peaks[i]);
             root.shown = shown;
             root.peaks = peaks;
             root.holds = holds;
-            canvas.requestPaint();
+            if (changed) canvas.requestPaint();
             if (!moving) stop();
         }
     }
@@ -84,9 +87,15 @@ Module {
     }
 
     // The foreground, dim, warming to the accent at full level.
+    readonly property color quiet: Theme.fg(0.45)
+    readonly property color loud: Theme.accent
+
+    onQuietChanged: canvas.requestPaint()
+    onLoudChanged: canvas.requestPaint()
+
     function tint(level: real): color {
         if (Cava.silent) return Theme.fg(0.25);
-        const from = Theme.fg(0.45), to = Theme.accent;
+        const from = quiet, to = loud;
         return Qt.rgba(from.r + (to.r - from.r) * level, from.g + (to.g - from.g) * level,
                        from.b + (to.b - from.b) * level, from.a + (to.a - from.a) * level);
     }

@@ -9,34 +9,21 @@ seen happening.
 
 ## 1. Idle CPU
 
-The shell used 8:24 of CPU over 42 minutes (render thread 3:53, main thread
-3:25), mostly from the bar redrawing all the time.
+Done 2026-10-29: in silence the shell went from 12.4% of a core to 2.0%,
+cava from 2.2% to 0.4% (cava's `sleep_timer`, a repeated line skipped, the
+spectrum redrawn only when it moved and eased at cava's 30 frames a second;
+cava and the running cat still while locked or in game mode; the lyrics
+clock still while paused). What is left:
 
-- **The spectrum repaints in silence** (`services/cava.conf`,
-  `services/Cava.qml:66`, `bar/Spectrum.qml:69,77`). cava has no
-  `sleep_timer`, so it sends a line of zeros 30 times a second; every line
-  sets a new `levels` array, which starts the easing, which repaints the
-  Canvas (painted by the CPU) even when nothing moved. Fix: `sleep_timer` in
-  cava.conf; skip a line equal to the last one; repaint only when a level or
-  peak changed.
-- **The easing ticks twice as often as cava** (`bar/Spectrum.qml:40-72`).
-  16 ms while music plays: about 60 ticks a second, three new arrays each,
-  and a colour built per band per paint in `tint()`. Fix: tick with the
-  display (`FrameAnimation`) or at 33 ms; work out `tint`'s two end colours
-  once per paint.
-- **The running cat never stops** (`bar/Runcat.qml:40-45`). At least 6
-  frames a second, also while locked and with the screen off; its speed
-  includes the shell's own CPU. Fix: pause it while locked or in game mode.
 - **The bar window is far larger than what it draws** (`bar/Bar.qml:28`):
   the full width and three quarters of the height, so panels can unfold
   without resizing it. Every animated frame redraws and sends all of it, and
-  Hyprland blurs it again. The three fixes above cut the frames; a window
-  only as tall as the bar for the animated modules is the bigger change, and
-  must keep panels opening without a jump.
-- **Lyrics' clock runs while paused** (`services/Lyrics.qml:206-214`), ten
-  times a second; the media drawer and lyrics also both ask the player for
-  its position every second. Fix: run the clock only while playing, ask in
-  one place.
+  Hyprland blurs it again: the running cat alone (6 frames a second when
+  idle) costs about 1.5% of a core. Fix: a window only as tall as the bar
+  for the animated modules, keeping panels opening without a jump.
+- **The player's position is asked for twice a second** while both the
+  media drawer (`bar/Media.qml:343`) and the lyrics (`services/Lyrics.qml`)
+  run: ask in one place.
 
 ## 2. The wrong item picked
 

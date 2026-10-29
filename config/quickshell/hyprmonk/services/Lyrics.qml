@@ -192,6 +192,7 @@ Singleton {
         function onPositionChanged(): void {
             root.readPosition = root.player.position;
             root.readAt = Date.now();
+            root.position = root.readPosition;  // the clock is still while paused
         }
     }
 
@@ -204,7 +205,7 @@ Singleton {
     }
 
     Timer {
-        running: root.needed && root.status === "synced"
+        running: root.needed && root.status === "synced" && (root.player?.isPlaying ?? false)
         interval: 100
         repeat: true
         onTriggered: {

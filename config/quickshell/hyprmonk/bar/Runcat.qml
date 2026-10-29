@@ -25,8 +25,9 @@ Module {
         font.pixelSize: 24
     }
 
+    // Still while the screen is locked or a game runs.
     Timer {
-        running: true
+        running: !Session.locked && !GameMode.on
         repeat: true
         interval: 1000 / 6 - (1000 / 6 - 1000 / 90) * root.load
         onTriggered: root.frame = (root.frame + 1) % 5

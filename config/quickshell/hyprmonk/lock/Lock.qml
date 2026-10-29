@@ -35,6 +35,8 @@ Scope {
         Overlays.close();
         Panels.close();
         session.locked = true;
+        // Set here, not from the lock's signal: it is not sent on unlock.
+        Session.locked = true;
     }
 
     function reset(): void {
@@ -54,6 +56,7 @@ Scope {
 
     WlSessionLock {
         id: session
+
 
         surface: WlSessionLockSurface {
             id: surface
@@ -84,6 +87,7 @@ Scope {
             root.checking = false;
             if (result === PamResult.Success) {
                 session.locked = false;
+                Session.locked = false;
                 root.previewing = false;
                 root.reset();
                 return;
