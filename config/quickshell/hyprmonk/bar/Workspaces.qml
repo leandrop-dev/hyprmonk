@@ -20,9 +20,13 @@ Item {
         spacing: 5
 
         Repeater {
-            model: Hyprland.workspaces.values
-                .filter(ws => ws.id > 0 && ws.monitor === root.monitor)
-                .sort((a, b) => a.id - b.id)
+            // ScriptModel keeps the pills that stay, and their width
+            // animation, when a workspace comes or goes.
+            model: ScriptModel {
+                values: Hyprland.workspaces.values
+                    .filter(ws => ws.id > 0 && ws.monitor === root.monitor)
+                    .sort((a, b) => a.id - b.id)
+            }
 
             Rectangle {
                 id: pill

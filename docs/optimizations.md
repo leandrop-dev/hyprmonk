@@ -100,11 +100,15 @@ first device that fails (one mouse today), `pictures_folder` without
 
 ## 7. Smaller, as they come up
 
-- **Lists rebuilt whole on any change**: workspace pills
-  (`bar/Workspaces.qml:23`) lose their width animation when a workspace is
-  created; every tray icon (`bar/TrayIcons.qml:16`) is rebuilt, tooltip and
-  all, when one changes state; batteries; the notification centre's groups
-  can jump while it is open. Fix: `ScriptModel`, as `Popups.qml` uses.
+- ~~Lists rebuilt whole on any change~~ (done 2026-10-29): the workspace
+  pills, the tray icons, a group's cards, the batteries (bar, panel, lock
+  screen) and the centre's groups go through `ScriptModel`, so only what
+  comes or goes is made again. The batteries and the groups are new objects
+  on every change, so their lists hold keys (`Battery.keys`,
+  `Notifications.apps`) and each row reads its data by key: a ScriptModel
+  matching objects by `objectProp` keeps the old value of one that moves
+  (Quickshell 0.3.2; seen in the centre, a group moved up kept its
+  previous card).
 - ~~The Commands tab sorts every program on PATH per keystroke~~: timed
   2026-10-29 with 3,598 programs: about 2 ms a keystroke, 13 ms when the
   tab opens with nothing typed (one frame). Left as it is.

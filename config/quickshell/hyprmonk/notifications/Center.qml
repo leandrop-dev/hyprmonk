@@ -112,17 +112,18 @@ PanelWindow {
                 spacing: 10
                 boundsBehavior: Flickable.StopAtBounds
 
+                // By app: a group keeps its cards when another changes.
                 model: ScriptModel {
-                    values: Notifications.groups
+                    values: Notifications.apps
                 }
 
                 delegate: NotificationGroup {
-                    required property var modelData
+                    required property string modelData
 
                     width: list.width
-                    app: modelData.app
-                    notifications: modelData.notifications
-                    expanded: window.expanded[modelData.app] === true
+                    app: modelData
+                    notifications: Notifications.notificationsOf(modelData)
+                    expanded: window.expanded[modelData] === true
                     onToggled: {
                         const next = Object.assign({}, window.expanded);
                         next[app] = !expanded;

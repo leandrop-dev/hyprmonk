@@ -5,6 +5,7 @@
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Layouts
+import Quickshell
 import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 import qs
@@ -15,7 +16,10 @@ RowLayout {
     visible: Tray.items.length > 0
 
     Repeater {
-        model: Tray.items
+        // ScriptModel keeps the other icons when one comes, goes or changes.
+        model: ScriptModel {
+            values: Tray.items
+        }
 
         Module {
             id: mod

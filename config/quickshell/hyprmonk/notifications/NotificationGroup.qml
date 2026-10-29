@@ -4,6 +4,7 @@
 // (or a click on those edges) lists every one.
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import Quickshell.Services.Notifications
 import qs
 import qs.services
@@ -60,7 +61,10 @@ ColumnLayout {
     }
 
     Repeater {
-        model: group.shown
+        // ScriptModel keeps the cards shown when one comes or goes.
+        model: ScriptModel {
+            values: group.shown
+        }
 
         NotificationCard {
             required property Notification modelData

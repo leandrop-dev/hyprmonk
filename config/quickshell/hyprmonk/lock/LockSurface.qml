@@ -332,13 +332,16 @@ Rectangle {
             }
 
             Repeater {
-                model: Battery.devices
+                model: ScriptModel {
+                    values: Battery.keys
+                }
 
                 Text {
-                    required property var modelData
+                    required property string modelData
+                    readonly property var device: Battery.device(modelData)
 
-                    text: (modelData.charging ? "\u{F0084}" : modelData.icon) + " " + modelData.percent + "%"
-                    color: Battery.isLow(modelData) ? Theme.warning : Theme.fg(0.73)
+                    text: (device.charging ? "\u{F0084}" : device.icon) + " " + device.percent + "%"
+                    color: Battery.isLow(device) ? Theme.warning : Theme.fg(0.73)
                     font.family: Theme.font
                     font.pixelSize: Math.round(20 * surface.s)
                 }

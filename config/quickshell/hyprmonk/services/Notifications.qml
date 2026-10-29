@@ -29,6 +29,14 @@ Singleton {
         }
         return groups;
     }
+    // The apps of those groups, in order: the centre lists these and reads
+    // each group by its app (a ScriptModel of the groups themselves keeps
+    // an old one for a group that moves up, Quickshell 0.3.2).
+    readonly property var apps: groups.map(g => g.app)
+
+    function notificationsOf(app: string): var {
+        return groups.find(g => g.app === app)?.notifications ?? [];
+    }
     // Shown as pop-ups right now, newest first.
     property var popups: []
     property bool centerOpen: false

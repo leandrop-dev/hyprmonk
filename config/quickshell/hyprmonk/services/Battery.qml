@@ -15,7 +15,18 @@ Singleton {
     // At or under this, a battery not charging shows in the warning colour.
     readonly property int lowPercent: 15
 
-    readonly property var devices: [...fromUPower, ...hidDevices.filter(d => d.percent !== null)]
+    // Each with a `key`, its name (numbered from the second of a name on).
+    // The lists are made from the keys and read each device by its key: a
+    // ScriptModel of the devices themselves keeps an old reading for a
+    // device that moves (Quickshell 0.3.2).
+    readonly property var keys: devices.map(d => d.key)
+    readonly property var devices: {
+        const seen = {};
+        return [...fromUPower, ...hidDevices.filter(d => d.percent !== null)].map(d => {
+            seen[d.name] = (seen[d.name] ?? 0) + 1;
+            return Object.assign({ key: seen[d.name] > 1 ? `${d.name} ${seen[d.name]}` : d.name }, d);
+        });
+    }
 
     readonly property var fromUPower: UPower.devices.values
         .filter(d => !d.powerSupply && d.isPresent !== false && d.model !== "")
@@ -41,6 +52,10 @@ Singleton {
         case UPowerDeviceType.Tablet: return "\u{F04F7}";
         }
         return "\u{F0079}";
+    }
+
+    function device(key: string): var {
+        return devices.find(d => d.key === key) ?? { key, name: key, icon: "", percent: 0, charging: false };
     }
 
     function isLow(device: var): bool {

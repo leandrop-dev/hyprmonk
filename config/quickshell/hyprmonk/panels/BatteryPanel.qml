@@ -2,6 +2,7 @@
 // name, level and whether it is charging.
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import qs
 import qs.services
 import qs.widgets
@@ -27,13 +28,17 @@ ColumnLayout {
     }
 
     Repeater {
-        model: Battery.devices
+        // ScriptModel keeps a device's row when another comes or goes.
+        model: ScriptModel {
+            values: Battery.keys
+        }
 
         RowLayout {
             id: row
 
-            required property var modelData
-            readonly property bool low: Battery.isLow(modelData)
+            required property string modelData
+            readonly property var device: Battery.device(modelData)
+            readonly property bool low: Battery.isLow(device)
 
             Layout.fillWidth: true
             spacing: 12
@@ -41,7 +46,7 @@ ColumnLayout {
             Text {
                 Layout.preferredWidth: 18
                 horizontalAlignment: Text.AlignHCenter
-                text: row.modelData.icon
+                text: row.device.icon
                 color: Theme.foreground
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSize
@@ -57,7 +62,7 @@ ColumnLayout {
 
                     Text {
                         Layout.fillWidth: true
-                        text: row.modelData.name
+                        text: row.device.name
                         textFormat: Text.PlainText
                         color: Theme.foreground
                         font.family: Theme.font
@@ -66,7 +71,7 @@ ColumnLayout {
                     }
 
                     Text {
-                        visible: row.modelData.charging
+                        visible: row.device.charging
                         text: "\u{F140B} charging"
                         color: Theme.fg(Theme.dimOpacity)
                         font.family: Theme.font
@@ -74,7 +79,7 @@ ColumnLayout {
                     }
 
                     Text {
-                        text: row.modelData.percent + "%"
+                        text: row.device.percent + "%"
                         color: row.low ? Theme.warning : Theme.foreground
                         font.family: Theme.font
                         font.pixelSize: Theme.rowFontSize
@@ -84,7 +89,7 @@ ColumnLayout {
 
                 Meter {
                     Layout.fillWidth: true
-                    value: row.modelData.percent / 100
+                    value: row.device.percent / 100
                     fill: row.low ? Theme.warning : Theme.accent
                 }
             }
