@@ -31,12 +31,30 @@ Scope {
     readonly property var shown: tabs[tab].find(query)
     readonly property var picked: shown[current] ?? null
 
+    // The list can change without a key pressed (the PATH scan finishing,
+    // apps installed): `current` stays inside it. A new model also puts the
+    // view's own index back to 0, so the view is told again (list below).
+    onShownChanged: if (current >= shown.length) current = Math.max(0, shown.length - 1)
+    onCurrentChanged: list.currentIndex = current
+
     onOpenChanged: {
         if (!open) return;
         tab = 0;
         reset();
+        pointer = Qt.point(-1, -1);
         Apps.refreshPrograms();
         search.forceActiveFocus();
+    }
+
+    // Hovering picks only when the pointer really moves: rows that appear or
+    // slide under a still pointer (typing, scrolling, the card opening) are
+    // not picked. `pointer` is where it was last, in the window; (-1, -1)
+    // until it moves after the card opens.
+    property point pointer: Qt.point(-1, -1)
+
+    function hover(at: point, index: int): void {
+        if (pointer.x >= 0 && (at.x !== pointer.x || at.y !== pointer.y)) current = index;
+        pointer = at;
     }
 
     function reset(): void {
@@ -206,7 +224,7 @@ Scope {
                 Layout.fillHeight: true
                 clip: true
                 model: root.shown
-                currentIndex: root.current
+                onModelChanged: currentIndex = root.current
                 boundsBehavior: Flickable.StopAtBounds
                 highlightMoveDuration: 120
                 highlightFollowsCurrentItem: true
@@ -228,7 +246,7 @@ Scope {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onEntered: root.current = row.index
+                        onPositionChanged: mouse => root.hover(mapToItem(null, mouse.x, mouse.y), row.index)
                         onClicked: root.start(row.modelData, false)
                     }
 

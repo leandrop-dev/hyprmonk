@@ -35,7 +35,19 @@ Scope {
         if (!open) return;
         current = 0;
         armed = -1;
+        pointer = Qt.point(-1, -1);
         keys.forceActiveFocus();
+    }
+
+    // Hovering picks only when the pointer really moves: rows that appear or
+    // slide under a still pointer (typing, scrolling, the card opening) are
+    // not picked. `pointer` is where it was last, in the window; (-1, -1)
+    // until it moves after the card opens.
+    property point pointer: Qt.point(-1, -1)
+
+    function hover(at: point, index: int): void {
+        if (pointer.x >= 0 && (at.x !== pointer.x || at.y !== pointer.y)) current = index;
+        pointer = at;
     }
 
     // Moving away disarms.
@@ -121,7 +133,7 @@ Scope {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onEntered: root.current = tile.index
+                        onPositionChanged: mouse => root.hover(mapToItem(null, mouse.x, mouse.y), tile.index)
                         onClicked: root.press(tile.index)
                     }
 

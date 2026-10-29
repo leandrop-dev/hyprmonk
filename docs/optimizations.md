@@ -15,35 +15,23 @@ spectrum redrawn only when it moved and eased at cava's 30 frames a second;
 cava and the running cat still while locked or in game mode; the lyrics
 clock still while paused). What is left:
 
-- **The bar window is far larger than what it draws** (`bar/Bar.qml:28`):
-  the full width and three quarters of the height, so panels can unfold
-  without resizing it. Every animated frame redraws and sends all of it, and
-  Hyprland blurs it again: the running cat alone (6 frames a second when
-  idle) costs about 1.5% of a core. Fix: a window only as tall as the bar
-  for the animated modules, keeping panels opening without a jump.
+- ~~The bar window is far larger than what it draws~~: measured
+  2026-10-29, a bar-height window (growing only while a panel shows)
+  changed nothing for the shell, Hyprland or the GPU, within noise, so the
+  tall window stays. The running cat's frames still cost the shell about
+  1.5% of a core; that is Qt's per-frame work, not the window's size.
 - **The player's position is asked for twice a second** while both the
   media drawer (`bar/Media.qml:343`) and the lyrics (`services/Lyrics.qml`)
   run: ask in one place.
 
 ## 2. The wrong item picked
 
-- **Hover moves the selection without the mouse moving**
-  (`launcher/Launcher.qml:231`, `quickactions/QuickActions.qml:336`,
-  `keyguide/KeyGuide.qml:247`). Rows select on `onEntered`, which Qt sends
-  whenever a row appears or slides under a still pointer: after typing,
-  while arrowing scrolls the list, on opening. In the launcher Enter can
-  start the row under the pointer, not the top match; in quick actions,
-  after opening Appearance or Spectrum, the option under the pointer is
-  previewed. Fix: move the selection on hover only once the pointer has
-  really moved.
-- **The launcher's highlight can differ from what Enter starts**
-  (`launcher/Launcher.qml:209`; the same in `wallpaper/Picker.qml:126` and
-  `panels/LyricsView.qml`). A new model resets the list's own
-  `currentIndex` to 0 (QTBUG-48633) while `current` stays; and `current` is
-  never clamped to a shorter list. Happens when the list changes on its own:
-  the PATH scan finishing after arrowing down in Commands, `~/.ssh/config`
-  or the installed apps changing. Fix: when the list changes, clamp
-  `current` and give it to the view again. To check.
+Done 2026-10-29: hovering picks a row only when the pointer really moves
+(the launcher, quick actions, the key guide, the power menu), and the
+launcher's list is told its index again whenever its model changes, with
+`current` kept inside a shorter list. Still in the same pattern, not yet
+changed: `wallpaper/Picker.qml:126` (mostly hidden by its explicit
+scrolling) and `panels/LyricsView.qml` (until the next line).
 
 ## 3. Notifications and outside text
 
