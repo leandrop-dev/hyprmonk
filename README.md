@@ -109,9 +109,6 @@ cargo clippy --all-targets -- -D warnings
   where they come from is still to choose: local, Google or CalDAV.
 - Screenshots: the notification's preview of a copied screenshot shows a
   grey picture instead of the shot.
-- OSD, to look at once things are stable: Caps Lock showed only on the
-  first press, not on later ones (a likely cause is in
-  [docs/optimizations.md](docs/optimizations.md)).
 - A clean install, still to do: run it on a fresh Arch with no desktop (a
   VM) and fix what shows up. `packages/pacman.txt` was checked against
   everything the shell, the config and the units run; what remains open:

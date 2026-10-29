@@ -87,8 +87,11 @@ bind(mod .. " + ALT + L",   hl.dsp.exec_cmd("qs -c hyprmonk ipc call lock lock")
 bind(mod .. " + SHIFT + E", hl.dsp.exec_cmd("qs -c hyprmonk ipc call overlays toggle power"), "Power menu")
 
 -- Caps and Num Lock keep working; the OSD reads the new state. Not shortcuts
--- (non-consuming), so the key guide leaves them out.
-local locks = { non_consuming = true, locked = true }
+-- (non-consuming), so the key guide leaves them out. On release: a lock turns
+-- on when its key goes down but off only when it comes up (XKB), so a read on
+-- the press would still find it on. Ignoring modifiers, as the lock is one by
+-- then and a release bind without it never fires.
+local locks = { non_consuming = true, locked = true, release = true, ignore_mods = true }
 bind("Caps_Lock", hl.dsp.exec_cmd("qs -c hyprmonk ipc call osd locks"), "Caps Lock", locks)
 bind("Num_Lock",  hl.dsp.exec_cmd("qs -c hyprmonk ipc call osd locks"), "Num Lock",  locks)
 

@@ -44,12 +44,20 @@ messages, the launcher's apps) shows as plain text: set on `BarText`,
 
 ## 4. Caps Lock
 
-- **A second read is lost while one runs** (`osd/Osd.qml:107,129,195`,
-  also `services/Keyboard.qml:42`). `devices.running = true` does nothing
-  while `hyprctl devices` still runs, so a quick second press (or a burst
-  of layout events) is missed, or the OSD shows the earlier state. Likely
-  the roadmap's "Caps Lock only on the first press". Fix: a pending flag,
-  run again from `onExited`, as `services/Wallpaper.qml` does. To check.
+Done 2026-10-29, and the cause was not the one guessed here. Logging each
+read against Hyprland's own state showed no read ever overlapping another;
+instead every read after the first said "on". A lock turns on when its key
+goes down but off only when it comes up (XKB), and the bind ran on the
+press, so turning it off was never seen, and the next "on" matched what the
+shell already had. The binds now run on release (`config/hypr/binds.lua`),
+with `ignore_mods`: by then the lock is a held modifier, and a release bind
+without it never fires (tested: plain release, keycode release and release
+with `locked` or `non_consuming` all stayed silent). Num Lock has the same
+bind but no key on this keyboard to test it.
+
+- The second read lost while one runs (`devices.running = true` doing
+  nothing while `hyprctl devices` still runs): not seen in 30 presses,
+  quick ones included. Left as it is.
 
 ## 5. Overlay polish
 
