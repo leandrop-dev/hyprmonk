@@ -42,7 +42,15 @@ RowLayout {
                 // text colour (as Plasma does; drawn in KDE's dark text,
                 // it would vanish on the bar): only its outline is kept.
                 Item {
-                    readonly property bool symbolic: icon.source.toString().includes("-symbolic")
+                    id: picture
+
+                    // The app's icon could not be drawn: a file that did not
+                    // load, or Quickshell's stand-in for one it could not
+                    // make (no such icon in the theme, or none sent), a
+                    // black and purple checkerboard read from its corners.
+                    property bool checkerboard: false
+                    readonly property bool missing: icon.status === Image.Error || checkerboard
+                    readonly property bool symbolic: !missing && icon.source.toString().includes("-symbolic")
 
                     implicitWidth: 16
                     implicitHeight: 16
@@ -51,13 +59,57 @@ RowLayout {
                         id: icon
                         anchors.fill: parent
                         source: Tray.iconSource(mod.modelData)
-                        visible: !parent.symbolic
-                        layer.enabled: parent.symbolic
+                        visible: !picture.missing && !picture.symbolic
+                        layer.enabled: picture.symbolic
+
+                        onStatusChanged: {
+                            picture.checkerboard = false;
+                            if (status === Image.Ready) corners.read(source);
+                        }
+                    }
+
+                    Canvas {
+                        id: corners
+                        width: 4
+                        height: 4
+                        opacity: 0
+
+                        property url url
+
+                        function read(source: url): void {
+                            if (url.toString() !== "") unloadImage(url);
+                            url = source;
+                            if (isImageLoaded(url)) requestPaint();
+                            else loadImage(url);
+                        }
+
+                        onImageLoaded: requestPaint()
+
+                        onPaint: {
+                            if (!isImageLoaded(url)) return;
+                            const ctx = getContext("2d");
+                            ctx.clearRect(0, 0, width, height);
+                            ctx.drawImage(url, 0, 0, width, height);
+                            const data = ctx.getImageData(0, 0, width, height).data;
+                            const near = (x, y, colour) => {
+                                const at = (y * width + x) * 4;
+                                return data[at + 3] > 247 && colour.every((value, i) => Math.abs(data[at + i] - value) < 8);
+                            };
+                            const black = [0, 0, 0], purple = [217, 0, 216];
+                            picture.checkerboard = near(0, 0, black) && near(3, 0, purple)
+                                && near(0, 3, purple) && near(3, 3, black);
+                        }
+                    }
+
+                    IconImage {
+                        anchors.fill: parent
+                        visible: picture.missing
+                        source: picture.missing ? Tray.standIn(mod.modelData) : ""
                     }
 
                     Rectangle {
                         anchors.fill: parent
-                        visible: parent.symbolic
+                        visible: picture.symbolic
                         color: Theme.foreground
                         layer.enabled: true
                         layer.effect: MultiEffect {

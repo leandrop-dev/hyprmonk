@@ -115,8 +115,13 @@ first device that fails (one mouse today), `pictures_folder` without
   app's menu and another opens the submenu; an entry the app removes
   (its menu rebuilt) takes the panel back to what is left. Checked with a
   test tray icon, before and after.
-- **Tray icons that fail to load** (`bar/TrayIcons.qml:39`) leave a blank
-  gap. Fix: fall back to the icon theme or a glyph.
+- ~~Tray icons that fail to load~~ (done 2026-10-29): an icon the theme
+  does not have, or an app that sends none, drew Quickshell's black and
+  purple checkerboard, not a gap. The bar reads the corners of what loaded
+  (a 4 px Canvas, through its own loader: drawing the Image item gave
+  nothing) and shows the app's desktop entry icon in its place, or the
+  theme's generic one; a file that fails to load does the same. Checked
+  with two test tray icons that send no icon.
 - ~~Lyrics~~ (done 2026-10-29): the position is read once when the player
   changes; a request that takes over 15 s is aborted and counts as an
   error (asked again in 30 s), and a new one aborts the one before;

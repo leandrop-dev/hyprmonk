@@ -62,6 +62,13 @@ Singleton {
         return "file://" + icon.slice(query + 6) + "/" + name.slice(name.lastIndexOf("/") + 1);
     }
 
+    // In place of an app's icon that could not be drawn: its desktop entry's,
+    // or the theme's generic one.
+    function standIn(item: SystemTrayItem): string {
+        const entry = DesktopEntries.heuristicLookup(item?.id ?? "") ?? DesktopEntries.heuristicLookup(nameOf(item));
+        return Quickshell.iconPath(entry?.icon ?? "", "application-x-executable");
+    }
+
     function nameOf(item: SystemTrayItem): string {
         return item?.tooltipTitle || item?.title || item?.id || "";
     }
