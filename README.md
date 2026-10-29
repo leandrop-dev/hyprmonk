@@ -56,6 +56,7 @@ Super+W; its colours become the accent everywhere (matugen).
 | `crates/hyprmonk/` | The `hyprmonk` CLI |
 | `udev/` | Access rules for the devices `hyprmonk` reads |
 | `packages/pacman.txt` | What `install.sh check` expects |
+| `docs/` | Work planned in detail (`optimizations.md`) |
 
 Generated files never land in the repo: matugen writes to
 `~/.local/state/hyprmonk/theme/`, and per-machine Hyprland additions go in
@@ -85,6 +86,8 @@ cargo clippy --all-targets -- -D warnings
 
 ## Roadmap
 
+- Optimizations from a review of the crate and the shell, in
+  [docs/optimizations.md](docs/optimizations.md): the bar's idle CPU first.
 - Quick actions still to come from HyprFlow: the screens (mirror, only the
   main one; need a second screen to test).
 - Appearance: from HyprFlow, a panel to tweak a tone (card opacity, blur, text
@@ -99,7 +102,8 @@ cargo clippy --all-targets -- -D warnings
 - Screenshots: the notification's preview of a copied screenshot shows a
   grey picture instead of the shot.
 - OSD, to look at once things are stable: Caps Lock showed only on the
-  first press, not on later ones.
+  first press, not on later ones (a likely cause is in
+  [docs/optimizations.md](docs/optimizations.md)).
 - A clean install, still to do: run it on a fresh Arch with no desktop (a
   VM) and fix what shows up. `packages/pacman.txt` was checked against
   everything the shell, the config and the units run; what remains open:
