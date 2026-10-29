@@ -9,7 +9,7 @@ usage() {
     cat <<EOF
 usage: install.sh [step...]
 
-With no step: packages link folders cursor wallpapers bin services.
+With no step: packages link folders cursor icons wallpapers bin services.
 
 steps:
   check      list packages from packages/pacman.txt that are not installed
@@ -17,6 +17,7 @@ steps:
   link       symlink the configs into ~/.config (existing ones are moved to *.bak-DATE)
   folders    create ~/Pictures/Wallpapers, where the wallpaper picker looks
   cursor     download the cursor theme (Bibata) to ~/.local/share/icons
+  icons      download the icon themes (Cosmic-Noir) to ~/.local/share/icons
   wallpapers download the cosmic-noir wallpapers, and pick one if none is set
   bin        build hyprmonk and install it to ~/.local/bin
   services   enable the systemd user units (they only start under Hyprland)
@@ -107,6 +108,41 @@ step_cursor() {
     tar -xf "$archive" -C "$icons"
     rm -f "$archive"
     echo "   installed ~/.local/share/icons/$CURSOR_THEME"
+}
+
+# The icons: Cosmic-Noir from cosmic-icon-themes (GPL-3.0, from the Kanagawa
+# pack), not in the official repos, so its release archives, pinned by
+# checksum. All three folder colours: Dark for most tones, Orange (#f25623)
+# for Noir, Sage kept to pick.
+ICONS_URL="https://github.com/atraxsrc/cosmic-icon-themes/releases/download/v1.2.0"
+ICONS=(
+    "Cosmic-Noir-Dark:63471526d117c06fbdb1d23af4f93d47015a56e6cb49731123b201bb2edde52b"
+    "Cosmic-Noir-Orange:12195bc0ed208d6f791113592aa774e2fe13f4a453798cc685c24fe5f217f077"
+    "Cosmic-Noir-Sage:cbe2973f4db31cd16126a5ebdacda194bbb1de932ff23d5e51d31f35134eecd8"
+)
+
+step_icons() {
+    say "Installing the icons (Cosmic-Noir)"
+    local icons="$HOME/.local/share/icons" entry name sha archive
+    mkdir -p "$icons"
+    for entry in "${ICONS[@]}"; do
+        name=${entry%%:*}
+        sha=${entry#*:}
+        if [[ -f $icons/$name/index.theme ]]; then
+            echo "   ok       ~/.local/share/icons/$name"
+            continue
+        fi
+        archive=$(mktemp --suffix=.tar.xz)
+        curl -fsSL -o "$archive" "$ICONS_URL/$name.tar.xz"
+        if ! echo "$sha  $archive" | sha256sum --check --quiet -; then
+            rm -f "$archive"
+            echo "   $name does not match its checksum; not installed" >&2
+            return 1
+        fi
+        tar -xf "$archive" -C "$icons"
+        rm -f "$archive"
+        echo "   installed ~/.local/share/icons/$name"
+    done
 }
 
 # Wallpapers from cosmic-noir-theme (MIT), at a fixed commit, into the
@@ -237,11 +273,11 @@ step_plugins() {
 
 main() {
     local steps=("$@")
-    [[ ${#steps[@]} -eq 0 ]] && steps=(packages link folders cursor wallpapers bin services)
+    [[ ${#steps[@]} -eq 0 ]] && steps=(packages link folders cursor icons wallpapers bin services)
     local step
     for step in "${steps[@]}"; do
         case $step in
-            check | packages | link | folders | cursor | wallpapers | bin | services | udev | plugins) "step_$step" ;;
+            check | packages | link | folders | cursor | icons | wallpapers | bin | services | udev | plugins) "step_$step" ;;
             -h | --help | help) usage ;;
             *)
                 usage >&2

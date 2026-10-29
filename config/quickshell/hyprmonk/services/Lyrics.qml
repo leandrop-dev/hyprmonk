@@ -36,7 +36,8 @@ Singleton {
     property string status: "idle"
     property var lines: []   // synced: [{time, text}]; plain: [{time: -1, text}]
     readonly property int index: status === "synced" ? lineAt(position) : -1
-    readonly property string line: index >= 0 ? lines[index].text : ""
+    // `lines` and `index` update one after the other: guard the moment between.
+    readonly property string line: index >= 0 ? (lines[index]?.text ?? "") : ""
 
     // The track as asked for, and what came back for each one asked before.
     readonly property var query: {
@@ -48,6 +49,9 @@ Singleton {
 
     onKeyChanged: lookUp()
     onNeededChanged: if (needed && status === "idle") lookUp()
+    // Another player: its position, once, or a paused one would show the
+    // last player's line.
+    onPlayerChanged: player?.positionChanged()
 
     // Browsers send YouTube-style titles: "Artist - Title (Official Video)"
     // with no artist, or the channel ("Artist - Topic") as the artist. Featured
@@ -100,12 +104,21 @@ Singleton {
     }
 
     // done(body, failed): body null when not found (404); failed when the
-    // server could not answer.
+    // server could not answer, or took longer than `timeout` (aborted then).
+    // A new request aborts the one before: its track is no longer wanted.
+    property var pending: null
+
     function request(endpoint: string, params: var, done: var): void {
         const search = Object.keys(params).map(k => k + "=" + encodeURIComponent(params[k])).join("&");
+        pending?.abort();
         const xhr = new XMLHttpRequest();
+        pending = xhr;
+        timeout.restart();
         xhr.onreadystatechange = () => {
             if (xhr.readyState !== XMLHttpRequest.DONE) return;
+            if (pending !== xhr) return;  // aborted: replaced or timed out
+            pending = null;
+            timeout.stop();
             if (xhr.status === 404) return done(null, false);
             let body = null;
             try {
@@ -130,6 +143,17 @@ Singleton {
         status = "error";
         lines = [];
         retry.restart();
+    }
+
+    Timer {
+        id: timeout
+        interval: 15000
+        onTriggered: {
+            const xhr = root.pending;
+            root.pending = null;
+            xhr?.abort();
+            root.fail(root.key);
+        }
     }
 
     Timer {

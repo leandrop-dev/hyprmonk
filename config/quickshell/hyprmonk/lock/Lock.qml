@@ -16,7 +16,6 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Services.Pam
 import Quickshell.Wayland
-import qs
 import qs.services
 
 Scope {

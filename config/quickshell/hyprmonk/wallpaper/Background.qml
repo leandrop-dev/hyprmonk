@@ -30,7 +30,8 @@ Variants {
         WlrLayershell.layer: WlrLayer.Background
 
         // The new picture loads on top while the last stays below it, until
-        // it has faded in.
+        // it has faded in; then the last one is let go (a screen-sized
+        // picture held for nothing).
         onSourceChanged: {
             below.source = above.source;
             above.opacity = 0;
@@ -60,6 +61,7 @@ Variants {
                 to: 1
                 duration: 400
                 easing.type: Easing.OutCubic
+                onFinished: below.source = ""
             }
         }
     }

@@ -23,7 +23,7 @@ comes from the official repos:
 sudo pacman -S --needed git
 git clone https://github.com/leandrop-dev/hyprmonk.git
 cd hyprmonk
-./install.sh            # packages, configs, folders, cursor, wallpapers, hyprmonk, the shell
+./install.sh            # packages, configs, folders, cursor, icons, wallpapers, hyprmonk, the shell
 ./install.sh udev       # once: lets hyprmonk read the mouse battery (sudo)
 ```
 
@@ -143,9 +143,11 @@ cargo clippy --all-targets -- -D warnings
     older than two months and in the official repos.
   - Images: Loupe (sandboxed decoders), what Open on a screenshot starts.
   - Icons: [Cosmic-Noir](https://github.com/atraxsrc/cosmic-icon-themes)
-    (GPL-3.0, from Kanagawa), downloaded by the installer with its SHA256
-    checked: all three variants, Dark (grey folders) by default and Orange
-    (Noir's `#F25623`) while the Noir tone is picked.
+    (GPL-3.0, from Kanagawa): `install.sh icons` downloads all three
+    variants (pinned by SHA256). Still to do: apply them (with the GTK
+    settings), Dark (grey folders) by default and Orange (Noir's `#F25623`)
+    while the Noir tone is picked. They inherit Yaru, which Arch does not
+    ship: icons missing from the pack fall back to hicolor only.
 - The terminal in the theme: kitty's 16 colours from cosmic-noir's
   terminal palette (`cosmic-term/Noir-term.ron`), so ls, btop and the rest
   look like it; its background, text, cursor and selection follow the
@@ -174,6 +176,9 @@ cargo clippy --all-targets -- -D warnings
   panel shows them.
 - The cursor: [Bibata](https://github.com/ful1e5/Bibata_Cursor) Modern Ice
   (GPL-3.0), downloaded by the installer.
+- The icons: [Cosmic-Noir](https://github.com/atraxsrc/cosmic-icon-themes)
+  by atraxsrc (GPL-3.0), from Fausto Korpsvart's Kanagawa pack (itself from
+  Suru++ and Papirus), downloaded by the installer.
 
 ## License
 

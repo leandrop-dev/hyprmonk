@@ -1,7 +1,6 @@
 // The default output's volume. Click: the sound panel; right click: mute;
 // scroll: change it.
 import QtQuick
-import qs
 import qs.services
 
 Module {

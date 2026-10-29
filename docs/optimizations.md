@@ -90,32 +90,32 @@ first device that fails (one mouse today), `pictures_folder` without
   created; every tray icon (`bar/TrayIcons.qml:16`) is rebuilt, tooltip and
   all, when one changes state; batteries; the notification centre's groups
   can jump while it is open. Fix: `ScriptModel`, as `Popups.qml` uses.
-- **The Commands tab sorts every program on PATH per keystroke**
-  (`services/Apps.qml:81-89`): about 3,600 objects built and sorted. Fix:
-  build them once when the scan arrives (already sorted by name). Time it
-  first.
+- ~~The Commands tab sorts every program on PATH per keystroke~~: timed
+  2026-10-29 with 3,598 programs: about 2 ms a keystroke, 13 ms when the
+  tab opens with nothing typed (one frame). Left as it is.
 - **Tray submenus that change while open** (`services/Tray.qml:20`,
   `panels/TrayMenu.qml:21`): the stored entry dies and the panel shows an
   empty submenu. Fix: one menu opener per level, drop dead entries. To
   check.
 - **Tray icons that fail to load** (`bar/TrayIcons.qml:39`) leave a blank
   gap. Fix: fall back to the icon theme or a glyph.
-- **Lyrics**: after switching to a paused player the old position is kept
-  (read it once on a player change); a stalled LRCLIB request never times
-  out (abort after 15 s, as an error); `line` can read past the end of a
-  shorter list for a moment (`lines[index]?.text`).
+- ~~Lyrics~~ (done 2026-10-29): the position is read once when the player
+  changes; a request that takes over 15 s is aborted and counts as an
+  error (asked again in 30 s), and a new one aborts the one before;
+  `line` is guarded while `lines` and `index` update.
 - **The player's length after a track change** (`services/Player.qml:135`)
   may keep the previous track's length when the title arrives first. To
   check.
 - **The media panel may be about 7 px short** (`panels/MediaPanel.qml:22`)
   with an artist line and a seek bar. To check on screen.
-- **The previous wallpaper stays in memory** (`wallpaper/Background.qml:34-47`)
-  under the new one. Fix: clear it once the fade ends.
+- ~~The previous wallpaper stays in memory~~ (done 2026-10-29): let go once
+  the new one has faded in.
 - **The media drawer's hover** (`bar/Bar.qml:85`) covers only the modules
   row, not the card's edge.
 - **The lock screen with several screens** (`lock/LockSurface.qml:164`):
   if the screen that has the password field goes away, none does.
-- Lint: unused imports in `bar/Volume.qml:4` and `lock/Lock.qml:19`.
+- ~~Lint: unused imports in `bar/Volume.qml:4` and `lock/Lock.qml:19`~~
+  (removed 2026-10-29).
 
 Checked and clean: no binding loops, no objects created and lost, every
 `Connections` uses `function onFoo()`, no deprecated effect imports,
