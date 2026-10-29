@@ -9,7 +9,7 @@ usage() {
     cat <<EOF
 usage: install.sh [step...]
 
-With no step: packages aur link folders apps cursor wallpapers bin services.
+With no step: packages aur link folders apps cursor wallpapers bin services login.
 
 steps:
   check      list packages from packages/pacman.txt and aur.txt that are not installed
@@ -23,6 +23,8 @@ steps:
   bin        build hyprmonk and install it to ~/.local/bin
   services   enable the systemd user units (they only start under Hyprland)
   udev       install the udev rule for device batteries (uses sudo)
+  login      the login screen: SDDM with sddm-astronaut-theme, enabled in place of
+             the current display manager (uses sudo; from the next boot)
   plugins    install and enable the hyprpm plugins (compiles; run inside Hyprland)
 EOF
 }
@@ -246,6 +248,64 @@ step_udev() {
     sudo udevadm trigger --subsystem-match=hidraw --action=change
 }
 
+# The login screen: SDDM with sddm-astronaut-theme (GPL-3.0) at a fixed
+# commit, in its astronaut look. SDDM replaces whichever display manager is
+# enabled, from the next boot.
+LOGIN_THEME="sddm-astronaut-theme"
+LOGIN_COMMIT="abb3163c724935af888ba5ea9ac0c4f22afd8048"
+LOGIN_URL="https://github.com/Keyitdev/sddm-astronaut-theme/archive/$LOGIN_COMMIT.tar.gz"
+LOGIN_SHA256="3e7ccde7158b336bb7ea6c69a18cefe27a9c82d6c04c4bef03b5b1519d6ae11c"
+
+step_login() {
+    say "Setting up the login screen (sudo)"
+    if ! pacman -Q sddm > /dev/null; then
+        echo "   run the packages step first" >&2
+        return 1
+    fi
+    local theme="/usr/share/sddm/themes/$LOGIN_THEME" fonts="/usr/share/fonts/$LOGIN_THEME"
+    if [[ -f $theme/.hyprmonk-commit && $(< "$theme/.hyprmonk-commit") == "$LOGIN_COMMIT" ]]; then
+        echo "   ok       $theme"
+    else
+        local tmp
+        tmp=$(mktemp -d)
+        curl -fsSL -o "$tmp/theme.tar.gz" "$LOGIN_URL"
+        if ! echo "$LOGIN_SHA256  $tmp/theme.tar.gz" | sha256sum --check --quiet -; then
+            rm -rf "$tmp"
+            echo "   the download does not match its checksum; nothing installed" >&2
+            return 1
+        fi
+        mkdir "$tmp/theme"
+        tar -xzf "$tmp/theme.tar.gz" -C "$tmp/theme" --strip-components=1
+        echo "$LOGIN_COMMIT" > "$tmp/theme/.hyprmonk-commit"
+        sudo rm -rf "$theme" "$fonts"
+        sudo mkdir -p "$(dirname "$theme")" "$fonts"
+        sudo cp -r "$tmp/theme" "$theme"
+        sudo cp -r "$theme/Fonts/." "$fonts"
+        sudo chmod -R u=rwX,go=rX "$theme" "$fonts"
+        sudo fc-cache "$fonts"
+        rm -rf "$tmp"
+        echo "   installed $theme"
+    fi
+
+    sudo mkdir -p /etc/sddm.conf.d
+    printf '[General]\nInputMethod=qtvirtualkeyboard\n\n[Theme]\nCurrent=%s\n' "$LOGIN_THEME" \
+        | sudo tee /etc/sddm.conf.d/hyprmonk.conf > /dev/null
+    echo "   set      /etc/sddm.conf.d/hyprmonk.conf"
+
+    local link=/etc/systemd/system/display-manager.service current=""
+    [[ -L $link ]] && current=$(basename "$(readlink -f "$link")")
+    if [[ $current == sddm.service ]]; then
+        echo "   ok       sddm.service"
+        return
+    fi
+    if [[ -n $current ]]; then
+        sudo systemctl disable "$current"
+        echo "   disabled $current (to go back: systemctl disable sddm, enable $current)"
+    fi
+    sudo systemctl enable sddm.service
+    echo "   enabled  sddm.service, the login screen from the next boot"
+}
+
 # name -> repository
 PLUGINS=(
     "hymission:https://github.com/gfhdhytghd/hymission"
@@ -287,11 +347,11 @@ step_plugins() {
 
 main() {
     local steps=("$@")
-    [[ ${#steps[@]} -eq 0 ]] && steps=(packages aur link folders apps cursor wallpapers bin services)
+    [[ ${#steps[@]} -eq 0 ]] && steps=(packages aur link folders apps cursor wallpapers bin services login)
     local step
     for step in "${steps[@]}"; do
         case $step in
-            check | packages | aur | link | folders | apps | cursor | wallpapers | bin | services | udev | plugins) "step_$step" ;;
+            check | packages | aur | link | folders | apps | cursor | wallpapers | bin | services | udev | login | plugins) "step_$step" ;;
             -h | --help | help) usage ;;
             *)
                 usage >&2

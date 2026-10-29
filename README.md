@@ -25,13 +25,13 @@ built once from `paru-bin`):
 sudo pacman -S --needed git
 git clone https://github.com/leandrop-dev/hyprmonk.git
 cd hyprmonk
-./install.sh            # packages, AUR packages, configs, folders, default apps, cursor, wallpapers, hyprmonk, the shell
+./install.sh            # packages, AUR packages, configs, folders, default apps, cursor, wallpapers, hyprmonk, the shell, the login screen
 ./install.sh udev       # once: lets hyprmonk read the mouse battery (sudo)
 ```
 
-Then start Hyprland: from a login screen pick **Hyprland (uwsm-managed)**;
-on a system without one, log in on the text console and run
-`uwsm start hyprland.desktop`. Then, from inside Hyprland:
+Then reboot: the login screen is SDDM (in place of the display manager that
+was enabled; to go back, `sudo systemctl disable sddm` and enable the other).
+Pick **Hyprland (uwsm-managed)** there. Then, from inside Hyprland:
 
 ```bash
 ./install.sh plugins   # hymission, the overview (compiles)
@@ -111,14 +111,12 @@ cargo clippy --all-targets -- -D warnings
 - A clean install, still to do: run it on a fresh Arch with no desktop (a
   VM) and fix what shows up. `packages/pacman.txt` was checked against
   everything the shell, the config and the units run; what remains open:
-  - The login screen: SDDM with the
+  - The login screen: done, SDDM (on X11, as Arch ships it) with the
     [sddm-astronaut-theme](https://github.com/Keyitdev/sddm-astronaut-theme)
-    (GPL-3.0), astronaut first. It needs `sddm qt6-svg qt6-virtualkeyboard
-    qt6-multimedia-ffmpeg`; the installer clones the theme into
-    `/usr/share/sddm/themes`, copies its fonts and sets it in
-    `/etc/sddm.conf.d/`. This machine runs Plasma's login today (disable
-    `plasmalogin`, enable `sddm`). KWallet unlocks at login only if SDDM's
-    PAM file has `pam_kwallet5.so`: to check once installed. Later, a
+    (GPL-3.0) in its astronaut look (`install.sh login`: the theme at a
+    fixed commit into `/usr/share/sddm/themes`, its fonts, the settings in
+    `/etc/sddm.conf.d/hyprmonk.conf`, SDDM enabled in place of the display
+    manager before it). SDDM's PAM file unlocks KWallet. Later, a
     picker for its ten themes: `hyprmonk sddm-theme NAME` changes
     `ConfigFile=` in the theme's `metadata.desktop` through pkexec (the
     shell's polkit agent asks), listed in a card or quick action.
@@ -177,6 +175,8 @@ cargo clippy --all-targets -- -D warnings
   (GPL-3.0), downloaded by the installer.
 - The icons: [Yaru](https://github.com/ubuntu/yaru) by the Ubuntu community
   (CC BY-SA 4.0 and GPL-3.0), installed from the AUR.
+- The login screen: [sddm-astronaut-theme](https://github.com/Keyitdev/sddm-astronaut-theme)
+  by Keyitdev (GPL-3.0), downloaded by the installer.
 
 ## License
 
