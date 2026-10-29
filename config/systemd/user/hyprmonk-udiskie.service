@@ -1,0 +1,16 @@
+[Unit]
+Description=hyprmonk drives: mount USB drives as they are plugged in (udiskie)
+Documentation=https://github.com/leandrop-dev/hyprmonk
+PartOf=graphical-session.target
+After=graphical-session.target hyprmonk-shell.service
+# Plasma reaches graphical-session.target too; only start under Hyprland.
+ConditionEnvironment=XDG_CURRENT_DESKTOP=Hyprland
+
+[Service]
+# No tray icon; its notifications show in the shell.
+ExecStart=/usr/bin/udiskie --automount --notify --no-tray
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

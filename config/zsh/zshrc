@@ -1,0 +1,72 @@
+# hyprmonk's zsh, linked to ~/.zshrc by `install.sh shell`: the starship
+# prompt, zoxide behind cd, fzf, suggestions, highlighting and history search,
+# in the tone's colours (written by the shell, ThemeOutputs.qml). Your own
+# additions go in ~/.config/zsh/local.zsh, read last; this file is the repo's.
+
+[[ -o interactive ]] || return
+
+# History, shared between terminals as it is written
+HISTFILE=${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history
+HISTSIZE=50000
+SAVEHIST=50000
+mkdir -p "${HISTFILE:h}"
+setopt share_history extended_history hist_ignore_all_dups hist_ignore_space hist_reduce_blanks
+setopt auto_cd interactive_comments no_beep
+
+bindkey -e
+bindkey '^[[1;5C' forward-word   # Ctrl+Right
+bindkey '^[[1;5D' backward-word  # Ctrl+Left
+bindkey '^[[3~' delete-char      # Delete
+bindkey '^[[H' beginning-of-line # Home
+bindkey '^[[F' end-of-line       # End
+
+# Completion: a menu to move through, case ignored
+autoload -Uz compinit
+mkdir -p "${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
+compinit -d "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump"
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+
+# The prompt reads the tone's palette from the shell's copy of
+# config/starship/starship.toml; before the shell has written it, starship's
+# own look.
+_hyprmonk_theme=${XDG_STATE_HOME:-$HOME/.local/state}/hyprmonk/theme
+[[ -r $_hyprmonk_theme/starship.toml ]] && export STARSHIP_CONFIG=$_hyprmonk_theme/starship.toml
+eval "$(starship init zsh)"
+eval "$(zoxide init zsh --cmd cd)"
+source <(fzf --zsh)
+
+# Highlighting before history search, as history search asks.
+_hyprmonk_plugins=/usr/share/zsh/plugins
+source $_hyprmonk_plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $_hyprmonk_plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $_hyprmonk_plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+unset _hyprmonk_plugins
+
+# Suggestion and highlight colours in the tone: read again before a prompt
+# once the shell has written new ones, so open terminals follow a pick.
+_hyprmonk_tone=$_hyprmonk_theme/zsh-tone.zsh
+_hyprmonk_tone_read=0
+zmodload -F zsh/stat b:zstat
+_hyprmonk_tone_update() {
+    local -a mtime
+    [[ -r $_hyprmonk_tone ]] || return
+    zstat -A mtime +mtime -- $_hyprmonk_tone
+    (( mtime[1] == _hyprmonk_tone_read )) && return
+    _hyprmonk_tone_read=$mtime[1]
+    source $_hyprmonk_tone
+}
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd _hyprmonk_tone_update
+_hyprmonk_tone_update
+unset _hyprmonk_theme
+
+[[ -r ${XDG_CONFIG_HOME:-$HOME/.config}/zsh/local.zsh ]] && source ${XDG_CONFIG_HOME:-$HOME/.config}/zsh/local.zsh
+
+command -v fastfetch > /dev/null && fastfetch

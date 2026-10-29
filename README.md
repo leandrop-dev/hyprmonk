@@ -16,16 +16,17 @@ polkit agent, the Hyprland config and the helpers. More panels come next
 
 ## Install
 
-On Arch (or an Arch-based distro) with or without a desktop. Packages come
-from the official repos, except the icons (Yaru) and qt6ct-kde, from the AUR
-through paru, which the installer gets first (from the repos on CachyOS, else
-built once from `paru-bin`):
+On CachyOS (the main target) or Arch, with or without a desktop. Packages
+come from the official repos; the rest (`packages/aur.txt`: the icons,
+qt6ct-kde, Zen, LocalSend, a Portuguese dictionary) through paru, from
+CachyOS's own repo where it has them, else the AUR. The installer gets paru
+first (from the repos on CachyOS, else built once from `paru-bin`):
 
 ```bash
 sudo pacman -S --needed git
 git clone https://github.com/leandrop-dev/hyprmonk.git
 cd hyprmonk
-./install.sh            # packages, AUR packages, configs, folders, default apps, cursor, wallpapers, hyprmonk, the shell, the login screen
+./install.sh            # packages, AUR packages, configs, folders, default apps, cursor, wallpapers, hyprmonk, the shell, system services, zsh, the login screen
 ./install.sh udev       # once: lets hyprmonk read the mouse battery (sudo)
 ```
 
@@ -41,7 +42,16 @@ the lock screen in the tone's colours. Then, from inside Hyprland:
 
 `install.sh` symlinks the configs, so the repo is the live config: edit either
 side and both change. Anything already in the way is moved to `*.bak-DATE`.
-Run `./install.sh help` for each step.
+Run `./install.sh help` for each step. The `shell` step makes zsh your login
+shell (it asks your password) and links `~/.zshrc`; your own additions go in
+`~/.config/zsh/local.zsh`.
+
+What it brings besides the desktop: Zen (browser), kitty, Nautilus, Loupe,
+mpv, Papers, Zed, Calculator, btop and Resources, KDE Partition Manager and
+Filelight, LocalSend; NetworkManager, Bluetooth, printing, GNOME Keyring
+(with its SSH agent), clipboard history, USB drives mounted as they are
+plugged in, Flatpak and firmware updates. The list and why each:
+`packages/pacman.txt` and `packages/aur.txt`.
 
 Wallpapers come from `~/Pictures/Wallpapers` (another folder: set `folder` in
 `~/.local/state/hyprmonk/wallpaper.json`). The installer downloads the
@@ -55,11 +65,13 @@ Super+W; its colours become the accent everywhere (matugen).
 | `config/hypr/` | Hyprland (Lua): `hyprland.lua` loads `look`, `input`, `binds`, `rules`, `plugins`, `gamemode`; `hypridle.conf` for idle |
 | `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `Theme.qml`, `assets/`, `bar/`, `keyguide/`, `lock/`, `notifications/`, `osd/`, `panels/`, `polkit/`, `power/`, `quickactions/`, `services/`, `wallpaper/`, `widgets/` |
 | `config/matugen/` | Templates for Hyprland, the shell and kitty |
-| `config/uwsm/env` | Session environment (NVIDIA, cursor, toolkits) |
-| `config/systemd/user/` | The shell's and hypridle's units; they only start under Hyprland |
+| `config/zsh/zshrc` | zsh (`~/.zshrc`): starship, zoxide, fzf, suggestions, highlighting, history search |
+| `config/starship/` | The prompt; the shell writes a copy in the tone's colours |
+| `config/uwsm/env` | Session environment (NVIDIA, cursor, toolkits, SSH agent) |
+| `config/systemd/user/` | The shell's, hypridle's, udiskie's and the clipboard history's units; they only start under Hyprland |
 | `crates/hyprmonk/` | The `hyprmonk` CLI |
 | `udev/` | Access rules for the devices `hyprmonk` reads |
-| `packages/pacman.txt` | What `install.sh check` expects |
+| `packages/` | What `install.sh check` expects: `pacman.txt` from the official repos, `aur.txt` through paru |
 | `docs/` | Work planned in detail (`optimizations.md`) |
 
 Generated files never land in the repo: matugen writes to
@@ -110,15 +122,15 @@ cargo clippy --all-targets -- -D warnings
   where they come from is still to choose: local, Google or CalDAV.
 - Screenshots: the notification's preview of a copied screenshot shows a
   grey picture instead of the shot.
-- A clean install, still to do: run it on a fresh Arch with no desktop (a
-  VM) and fix what shows up. `packages/pacman.txt` was checked against
+- A clean install, still to do: run it on a fresh CachyOS with no desktop
+  (a VM) and fix what shows up. `packages/pacman.txt` was checked against
   everything the shell, the config and the units run; what remains open:
   - The login screen: done, SDDM (on X11, as Arch ships it) with the
     [sddm-astronaut-theme](https://github.com/Keyitdev/sddm-astronaut-theme)
     (GPL-3.0) in its astronaut look (`install.sh login`: the theme at a
     fixed commit into `/usr/share/sddm/themes`, its fonts, the settings in
     `/etc/sddm.conf.d/hyprmonk.conf`, SDDM enabled in place of the display
-    manager before it). SDDM's PAM file unlocks KWallet. Its looks:
+    manager before it). SDDM's PAM file unlocks GNOME Keyring. Its looks:
     done, quick actions > Login look, the theme's ten and Desktop. The
     theme reads the look `/var/lib/hyprmonk-login/current.conf` links to,
     a folder the installer gives the user, so picking needs no password;
@@ -142,7 +154,12 @@ cargo clippy --all-targets -- -D warnings
   Uninstall, Check, Quit), installing gum first when it is missing (on Arch
   it is in `extra`). Update pulls and re-runs what changed; Uninstall
   removes the links (restoring the `*.bak-DATE` copies) and the units.
-- What a fresh install brings besides the shell:
+- What a fresh install brings besides the shell: decided, the list under
+  [Install](#install). Still to build for it: Wi-Fi and Bluetooth panels in
+  the shell (Quickshell's `Networking` and `Bluetooth`; `nmtui` and
+  `bluetoothctl` until then), clipboard history in the launcher, and
+  screen recording (gpu-screen-recorder) from quick actions, a key and a
+  dot on the bar. Earlier notes:
   - Files: done, Nautilus (GTK 4, sandboxed thumbnailers, `FileManager1`
     for Show in folder), on Super+E and for folders (`install.sh apps`).
     [Strata](https://github.com/lgse/strata) to look at again once it is
@@ -166,7 +183,9 @@ cargo clippy --all-targets -- -D warnings
 
 ## Credits
 
-- Ideas from [HyprFlow-Arch](https://github.com/AlejandroMinor/HyprFlow-Arch).
+- Ideas from [HyprFlow-Arch](https://github.com/AlejandroMinor/HyprFlow-Arch),
+  and the zsh setup's from [Ryoku](https://github.com/Ryoku-dev/ryoku) (no
+  code taken from either).
 - The Rival 3 Wireless battery protocol from [rivalcfg](https://github.com/flozz/rivalcfg).
 - The running cat's font from [runcat-text](https://github.com/AlejandroMinor/runcat-text)
   (BSD-2-Clause, its licence in `config/quickshell/hyprmonk/assets/runcat/`).

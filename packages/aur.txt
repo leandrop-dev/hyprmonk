@@ -1,5 +1,9 @@
-# What the official repos do not have, from the AUR through paru
-# (install.sh aur). One package per line; # starts a comment.
+# What the official Arch repos do not have, through paru (install.sh aur):
+# from the AUR, or from CachyOS's own repo where it has the package. One
+# package per line; # starts a comment.
 
 yaru-icon-theme   # the icons; each tone picks one of its colours
 qt6ct-kde   # Qt apps in the tone: qt6ct, patched so KDE apps take its colour scheme
+zen-browser-bin   # the browser (CachyOS: its own repo)
+localsend   # sharing files with nearby devices (CachyOS: its own repo; on Arch it builds)
+hunspell-pt_pt   # spell checking in Portuguese (Portugal)

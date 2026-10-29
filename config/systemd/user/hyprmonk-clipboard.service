@@ -1,0 +1,15 @@
+[Unit]
+Description=hyprmonk clipboard history: keeps what is copied (cliphist)
+Documentation=https://github.com/leandrop-dev/hyprmonk
+PartOf=graphical-session.target
+After=graphical-session.target
+# Plasma reaches graphical-session.target too; only start under Hyprland.
+ConditionEnvironment=XDG_CURRENT_DESKTOP=Hyprland
+
+[Service]
+ExecStart=/usr/bin/wl-paste --watch /usr/bin/cliphist store
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

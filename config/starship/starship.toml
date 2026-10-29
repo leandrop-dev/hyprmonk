@@ -1,0 +1,39 @@
+# hyprmonk's prompt. Not read from here: the shell (ThemeOutputs.qml) writes
+# a copy with the tone's palette added at the end to
+# ~/.local/state/hyprmonk/theme/starship.toml, which zsh points starship at.
+# The colours below are that palette's names: accent, text, muted, positive,
+# warning.
+palette = "hyprmonk"
+add_newline = true
+
+# The folder, git, how long the last command took; then the prompt sign.
+format = "$directory$git_branch$git_state$git_status$cmd_duration$line_break$character"
+
+[directory]
+style = "bold text"
+truncation_length = 3
+truncate_to_repo = true
+read_only = " 󰌾"
+read_only_style = "warning"
+
+[git_branch]
+format = "[on](muted) [$symbol$branch]($style) "
+symbol = " "
+style = "accent"
+
+[git_state]
+style = "warning"
+
+[git_status]
+format = "([$all_status$ahead_behind]($style) )"
+style = "muted"
+
+[cmd_duration]
+min_time = 2000
+format = "[took $duration]($style) "
+style = "muted"
+
+[character]
+success_symbol = "[❯](accent)"
+error_symbol = "[❯](warning)"
+vimcmd_symbol = "[❮](positive)"

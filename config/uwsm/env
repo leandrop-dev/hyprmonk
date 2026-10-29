@@ -20,6 +20,10 @@ export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 export QT_QPA_PLATFORMTHEME=qt6ct
 export ELECTRON_OZONE_PLATFORM_HINT=auto
 
+# SSH keys through GNOME Keyring's agent (gcr-ssh-agent.socket, install.sh
+# services)
+export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gcr/ssh"
+
 # Icons in the shell: Yaru (packages/aur.txt). Read once at its start, so it
 # does not follow the tone as GTK apps do (Theme.qml); dark, Yaru's orange.
 export QS_ICON_THEME=Yaru-dark

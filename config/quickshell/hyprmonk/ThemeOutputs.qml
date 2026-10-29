@@ -1,6 +1,6 @@
 // The saved Appearance tone outside the shell: GTK and Qt apps (theme,
-// colours and icons), Hyprland's window borders, kitty and the login
-// screen's Desktop look. A tone with its own accent
+// colours and icons), Hyprland's window borders, kitty, zsh's prompt and
+// highlighting, and the login screen's Desktop look. A tone with its own accent
 // writes its colours over the wallpaper's (which matugen writes); one without
 // writes nothing over them. Only the saved tone counts, so a preview does not
 // repaint every app.
@@ -233,6 +233,38 @@ Scope {
         ].join("\n");
     }
 
+    // zsh (config/zsh/zshrc): starship's prompt, the repo's starship.toml
+    // with the tone's palette added (the colours it names), and the
+    // suggestion and highlight colours. Both read as a terminal opens.
+    property string starshipTemplate: ""
+    readonly property string starship: {
+        if (!starshipTemplate) return "";
+        const p = qtPalette;
+        const c = value => Qt.color(value).toString();
+        return "# Written by the shell (ThemeOutputs.qml) for the saved tone, from\n"
+            + "# ~/.config/starship/starship.toml. Do not edit.\n"
+            + starshipTemplate
+            + `\n[palettes.hyprmonk]\naccent = "${c(p.accent)}"\ntext = "${c(p.text)}"\nmuted = "${c(p.muted)}"\n`
+            + `positive = "${c(p.positive)}"\nwarning = "${c(p.negative)}"\n`;
+    }
+
+    readonly property string zsh: {
+        const p = qtPalette;
+        const c = value => Qt.color(value).toString();
+        const styles = {
+            command: c(p.accent), builtin: c(p.accent), alias: c(p.accent), function: c(p.accent),
+            "precommand": c(p.accent), "unknown-token": c(p.negative), "reserved-word": c(p.muted),
+            "single-quoted-argument": c(p.positive), "double-quoted-argument": c(p.positive),
+            "dollar-quoted-argument": c(p.positive), comment: c(p.muted), default: c(p.text)
+        };
+        const lines = [
+            "# Written by the shell (ThemeOutputs.qml) for the saved tone. Do not edit.",
+            `ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=${c(p.muted)}'`
+        ];
+        for (const name in styles) lines.push(`ZSH_HIGHLIGHT_STYLES[${name}]='fg=${styles[name]}'`);
+        return lines.join("\n") + "\n";
+    }
+
     // The login screen's Desktop look (services/Login.qml): the astronaut
     // look's settings with the wallpaper, blurred all over and a little
     // darker as on the lock screen, the shell's font and the colours above.
@@ -303,6 +335,8 @@ Scope {
     onGtkChanged: apply.restart()
     onQtConfigChanged: apply.restart()
     onLoginChanged: apply.restart()
+    onStarshipChanged: apply.restart()
+    onZshChanged: apply.restart()
     onLoginReadyChanged: apply.restart()
     onWallpaperChanged: apply.restart()
 
@@ -327,6 +361,8 @@ Scope {
             gtk3.write();
             gtk4.write();
             if (!qtColoursFile.write()) qtConfigFile.write();
+            if (root.starship) starshipTone.write();
+            zshTone.write();
             if (root.login && root.loginReady) loginLook.write();
             if (root.wallpaper) loginPicture.running = true;
         }
@@ -392,6 +428,26 @@ Scope {
         path: root.config + "/qt6ct/qt6ct.conf"
         content: root.qtConfig
         onSaved: qtColoursOld.running = true
+    }
+
+    FileView {
+        path: root.config + "/starship/starship.toml"
+        printErrors: false
+        watchChanges: true
+        onFileChanged: reload()
+        onLoaded: root.starshipTemplate = text()
+    }
+
+    Output {
+        id: starshipTone
+        path: root.dir + "/starship.toml"
+        content: root.starship
+    }
+
+    Output {
+        id: zshTone
+        path: root.dir + "/zsh-tone.zsh"
+        content: root.zsh
     }
 
     FileView {

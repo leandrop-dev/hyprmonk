@@ -9,7 +9,7 @@ usage() {
     cat <<EOF
 usage: install.sh [step...]
 
-With no step: packages aur link folders apps cursor wallpapers bin services login.
+With no step: packages aur link folders apps cursor wallpapers bin services system shell login.
 
 steps:
   check      list packages from packages/pacman.txt and aur.txt that are not installed
@@ -17,11 +17,15 @@ steps:
   aur        install the missing ones from aur.txt with paru (uses sudo; gets paru first)
   link       symlink the configs into ~/.config (existing ones are moved to *.bak-DATE)
   folders    create ~/Pictures/Wallpapers, where the wallpaper picker looks
-  apps       open folders in Nautilus and images in Loupe (xdg-open)
+  apps       what opens what (xdg-open): Zen, Nautilus, Loupe, mpv, Papers, Zed
   cursor     download the cursor theme (Bibata) to ~/.local/share/icons
   wallpapers download the cosmic-noir wallpapers, and pick one if none is set
   bin        build hyprmonk and install it to ~/.local/bin
-  services   enable the systemd user units (they only start under Hyprland)
+  services   enable the systemd user units (they only start under Hyprland), and
+             GNOME Keyring's and its SSH agent's sockets
+  system     enable NetworkManager, Bluetooth, printing and Avahi (uses sudo)
+  shell      zsh as your login shell, its config linked to ~/.zshrc (asks your
+             password)
   udev       install the udev rule for device batteries (uses sudo)
   login      the login screen: SDDM with sddm-astronaut-theme, enabled in place of
              the current display manager (uses sudo; from the next boot); its
@@ -39,6 +43,7 @@ LINKS=(
     "config/matugen:.config/matugen"
     "config/kitty:.config/kitty"
     "config/uwsm:.config/uwsm"
+    "config/starship:.config/starship"
 )
 
 # Every user unit in the repo is linked and enabled; each one checks for
@@ -121,8 +126,12 @@ step_folders() {
 # What xdg-open starts. Without it a folder opens in kitty: kitty-open.desktop
 # claims folders too, and sorts first.
 APPS=(
+    "zen.desktop:x-scheme-handler/http x-scheme-handler/https text/html application/xhtml+xml"
     "org.gnome.Nautilus.desktop:inode/directory"
     "org.gnome.Loupe.desktop:image/png image/jpeg image/webp image/gif image/bmp image/tiff image/svg+xml"
+    "mpv.desktop:video/mp4 video/x-matroska video/webm video/quicktime video/x-msvideo video/mpeg video/ogg audio/mpeg audio/flac audio/ogg audio/x-wav audio/mp4 audio/x-opus+ogg"
+    "org.gnome.Papers.desktop:application/pdf image/vnd.djvu application/vnd.comicbook+zip"
+    "dev.zed.Zed.desktop:text/plain text/markdown application/json application/toml application/x-yaml application/x-shellscript text/x-python text/x-csrc text/x-chdr text/x-c++src text/rust"
 )
 
 step_apps() {
@@ -225,6 +234,19 @@ step_link() {
     for unit in $(units); do
         link_one "$UNITS_DIR/$unit" ".config/systemd/user/$unit"
     done
+    unlink_gone_units
+}
+
+# Units the repo no longer has: their links (and the links enabling them)
+# would point at nothing.
+unlink_gone_units() {
+    local link unit
+    for link in "$HOME/.config/systemd/user"/*.service; do
+        [[ -L $link && $(readlink "$link") == "$REPO/$UNITS_DIR/"* && ! -e $link ]] || continue
+        unit=$(basename "$link")
+        rm -f "$link" "$HOME/.config/systemd/user/graphical-session.target.wants/$unit"
+        echo "   removed  ~/.config/systemd/user/$unit (no longer in the repo)"
+    done
 }
 
 step_bin() {
@@ -236,10 +258,72 @@ step_bin() {
     cargo install --locked --path "$REPO/crates/hyprmonk" --root "$HOME/.local"
 }
 
+# Started when first asked for: secrets (unlocked at login by SDDM's PAM file)
+# and SSH keys (uwsm/env points SSH_AUTH_SOCK at it).
+SOCKETS=(gnome-keyring-daemon.socket gcr-ssh-agent.socket)
+
 step_services() {
     say "Enabling user services"
+    unlink_gone_units
     systemctl --user daemon-reload
-    systemctl --user enable $(units)
+    systemctl --user enable $(units) "${SOCKETS[@]}"
+}
+
+# System services a desktop needs, enabled and started. The network is left
+# alone when another manager runs it: switching would cut the connection.
+step_system() {
+    say "Enabling system services (sudo)"
+    local other
+    if systemctl is-enabled --quiet NetworkManager.service; then
+        echo "   ok       NetworkManager.service"
+    else
+        other=$(systemctl list-unit-files --state=enabled --no-legend systemd-networkd.service iwd.service connman.service | awk '{print $1}' | paste -sd' ')
+        if [[ -n $other ]]; then
+            echo "   skipped  NetworkManager.service: $other runs the network; disable it and enable NetworkManager yourself" >&2
+        else
+            sudo systemctl enable --now NetworkManager.service
+            echo "   enabled  NetworkManager.service"
+        fi
+    fi
+    local unit
+    for unit in bluetooth.service cups.socket avahi-daemon.service; do
+        if systemctl is-enabled --quiet "$unit"; then
+            echo "   ok       $unit"
+        else
+            sudo systemctl enable --now "$unit"
+            echo "   enabled  $unit"
+        fi
+    done
+    # Printers and other .local names: systemd-resolved finds them where it
+    # runs (CachyOS); otherwise nss-mdns does, from nsswitch.conf.
+    if systemctl is-enabled --quiet systemd-resolved.service; then
+        echo "   ok       .local names through systemd-resolved"
+    elif grep -q '^hosts:.*mdns' /etc/nsswitch.conf; then
+        echo "   ok       .local names through nss-mdns"
+    else
+        sudo sed -i 's/^hosts:\(.*\) resolve/hosts:\1 mdns_minimal [NOTFOUND=return] resolve/' /etc/nsswitch.conf
+        if grep -q '^hosts:.*mdns' /etc/nsswitch.conf; then
+            echo "   set      .local names through nss-mdns (/etc/nsswitch.conf)"
+        else
+            echo "   skipped  /etc/nsswitch.conf: its hosts line has no resolve to put mdns_minimal before" >&2
+        fi
+    fi
+}
+
+# zsh with config/zsh/zshrc; local additions go in ~/.config/zsh/local.zsh.
+step_shell() {
+    say "Setting up zsh"
+    link_one "config/zsh/zshrc" ".zshrc"
+    mkdir -p "$HOME/.config/zsh"
+    local zsh current
+    zsh=$(command -v zsh) || { echo "   run the packages step first" >&2; return 1; }
+    current=$(getent passwd "$USER" | cut -d: -f7)
+    if [[ $current == "$zsh" ]]; then
+        echo "   ok       login shell $zsh"
+        return
+    fi
+    chsh -s "$zsh"
+    echo "   set      login shell $zsh (was $current), from the next login"
 }
 
 step_udev() {
@@ -358,11 +442,11 @@ step_plugins() {
 
 main() {
     local steps=("$@")
-    [[ ${#steps[@]} -eq 0 ]] && steps=(packages aur link folders apps cursor wallpapers bin services login)
+    [[ ${#steps[@]} -eq 0 ]] && steps=(packages aur link folders apps cursor wallpapers bin services system shell login)
     local step
     for step in "${steps[@]}"; do
         case $step in
-            check | packages | aur | link | folders | apps | cursor | wallpapers | bin | services | udev | login | plugins) "step_$step" ;;
+            check | packages | aur | link | folders | apps | cursor | wallpapers | bin | services | system | shell | udev | login | plugins) "step_$step" ;;
             -h | --help | help) usage ;;
             *)
                 usage >&2
