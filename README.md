@@ -90,6 +90,12 @@ cargo clippy --all-targets -- -D warnings
   [docs/optimizations.md](docs/optimizations.md): the bar's idle CPU first.
 - Quick actions still to come from HyprFlow: the screens (mirror, only the
   main one; need a second screen to test).
+- Appearance: only the Wallpaper tone takes its colours from the wallpaper.
+  Every other tone brings its own accent and green, as Noir does today
+  (Black, Slate, Espresso and the light ones still take the wallpaper's
+  accent), and the tone's accent reaches everything: the shell, Hyprland's
+  window borders (today always the wallpaper's, even with Noir), kitty and
+  GTK apps. Each tone's accent is to choose, in its own hue.
 - Appearance: from HyprFlow, a panel to tweak a tone (card opacity, blur, text
   colour), and the tone reaching kitty.
 - Lights, parked (not a must-have): the keyboard and mouse in the accent.
