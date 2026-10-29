@@ -2,3 +2,4 @@
 # (install.sh aur). One package per line; # starts a comment.
 
 yaru-icon-theme   # the icons; each tone picks one of its colours
+qt6ct-kde   # Qt apps in the tone: qt6ct, patched so KDE apps take its colour scheme

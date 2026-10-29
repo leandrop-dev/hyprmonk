@@ -17,9 +17,9 @@ polkit agent, the Hyprland config and the helpers. More panels come next
 ## Install
 
 On Arch (or an Arch-based distro) with or without a desktop. Packages come
-from the official repos, except the icons (Yaru), from the AUR through paru,
-which the installer gets first (from the repos on CachyOS, else built once
-from `paru-bin`):
+from the official repos, except the icons (Yaru) and qt6ct-kde, from the AUR
+through paru, which the installer gets first (from the repos on CachyOS, else
+built once from `paru-bin`):
 
 ```bash
 sudo pacman -S --needed git
@@ -96,7 +96,7 @@ cargo clippy --all-targets -- -D warnings
   and the light ones were dropped; more to pick later). Only Wallpaper takes
   its colours from the wallpaper; every other tone brings its own accent and
   green, as Noir does, and the tone's accent reaches everything: the shell,
-  Hyprland's window borders, kitty and GTK apps do (`ThemeOutputs.qml`).
+  Hyprland's window borders, kitty, GTK and Qt apps do (`ThemeOutputs.qml`).
 - Appearance: from HyprFlow, a panel to tweak a tone (card opacity, blur, text
   colour).
 - Lights, parked (not a must-have): the keyboard and mouse in the accent.
@@ -128,9 +128,12 @@ cargo clippy --all-targets -- -D warnings
     colours, the wallpaper's from matugen and a tone's own over them, in
     `~/.config/gtk-{3,4}.0/gtk.css` (written by the shell under Hyprland,
     by Plasma under Plasma); open GTK 4 apps change with the tone, GTK 3
-    ones when opened again. Qt: qt6ct with the Breeze style and a
-    matugen-generated palette, tried on Dolphin and Ark first (KDE apps may
-    want a KDE colour scheme instead).
+    ones when opened again. Qt: done, qt6ct (`qt6ct-kde` from the AUR, so
+    KDE apps take its colours) with Breeze, a KDE colour scheme in the tone
+    (`theme/qt-HASH.colors`) and the tone's Yaru; open Qt apps change
+    colour with the tone 3 s later, their icons when opened again. KDE apps
+    read their icons and style from `~/.config/kdeglobals`, so the shell
+    sets those there too, replacing Plasma's choices.
 - An installer that is pleasant to use: a gum menu (Install, Update,
   Uninstall, Check, Quit), installing gum first when it is missing (on Arch
   it is in `extra`). Update pulls and re-runs what changed; Uninstall
@@ -146,7 +149,7 @@ cargo clippy --all-targets -- -D warnings
     (`yaru-icon-theme` from the AUR, `install.sh aur`). Done for GTK apps:
     Noir takes Yaru's orange, Wallpaper the colour nearest its accent. The
     shell's own icons stay Yaru's orange (`QS_ICON_THEME` is read once);
-    Qt apps follow with the Qt theming.
+    Qt apps take the tone's too.
 - The terminal: done, kitty's 16 colours from cosmic-noir's terminal
   palette (`config/kitty/noir.conf`), its text, background and cursor from
   the tone, reloaded live on a pick. A light tone, if one comes back, needs

@@ -1,5 +1,5 @@
-// The saved Appearance tone outside the shell: GTK apps (theme, colours and
-// icons), Hyprland's window borders and kitty. A tone with its own accent
+// The saved Appearance tone outside the shell: GTK and Qt apps (theme,
+// colours and icons), Hyprland's window borders and kitty. A tone with its own accent
 // writes its colours over the wallpaper's (which matugen writes); one without
 // writes nothing over them. Only the saved tone counts, so a preview does not
 // repaint every app.
@@ -141,10 +141,101 @@ Scope {
         + libadwaitaColours.map(name => `  --${name}-color: @${name.replace(/-/g, "_")}_color;`).join("\n")
         + "\n}\n"
 
+    // Qt apps (qt6ct, QT_QPA_PLATFORMTHEME in uwsm/env): a KDE colour scheme,
+    // theme/qt-HASH.colors, which qt6ct-kde hands KDE apps in place of
+    // Plasma's kdeglobals. From the tone's own colours, or else the
+    // wallpaper's.
+    readonly property var qtPalette: {
+        const w = Theme.wallpaperColours;
+        if (saved.accent) return {
+            window: saved.background, view: Qt.darker(saved.background, 1.3), button: mix(0.09),
+            header: mix(0.05), tooltip: mix(0.09), alternate: mix(0.03), text: saved.foreground, muted: mix(0.6),
+            accent: saved.accent, accentText: saved.background, negative: Theme.warning,
+            positive: saved.positive ?? Theme.positive
+        };
+        return {
+            window: w.surface, view: w.surfaceLowest, button: w.surfaceHigh, header: w.surfaceContainer,
+            tooltip: w.surfaceHighest, alternate: w.surfaceLow, text: w.surfaceText, muted: w.surfaceMuted,
+            accent: w.accent, accentText: w.surface, negative: w.error, positive: Theme.positive
+        };
+    }
+
+    readonly property string qtColours: {
+        const p = qtPalette;
+        const rgb = c => {
+            const q = Qt.color(c);
+            return [q.r, q.g, q.b].map(v => Math.round(v * 255)).join(",");
+        };
+        const neutral = "#e5a50a";  // warnings: no tone has its own yet
+        // One colour set: its background, a second one for alternate rows,
+        // its text; the rest the same for every set.
+        const set = (name, bg, alternate, fg, muted) => [
+            `[Colors:${name}]`,
+            `BackgroundNormal=${rgb(bg)}`,
+            `BackgroundAlternate=${rgb(alternate)}`,
+            `ForegroundNormal=${rgb(fg)}`,
+            `ForegroundInactive=${rgb(muted ?? p.muted)}`,
+            `ForegroundActive=${rgb(p.accent)}`,
+            `ForegroundLink=${rgb(p.accent)}`,
+            `ForegroundVisited=${rgb(p.muted)}`,
+            `ForegroundNegative=${rgb(p.negative)}`,
+            `ForegroundNeutral=${rgb(neutral)}`,
+            `ForegroundPositive=${rgb(p.positive)}`,
+            `DecorationFocus=${rgb(p.accent)}`,
+            `DecorationHover=${rgb(p.accent)}`,
+            ""
+        ].join("\n");
+        return [
+            "# Written by the shell (ThemeOutputs.qml) for the saved tone. Do not edit.",
+            "[General]", "ColorScheme=hyprmonk", "Name=hyprmonk", "",
+            set("Window", p.window, p.alternate, p.text),
+            set("View", p.view, p.alternate, p.text),
+            set("Button", p.button, p.window, p.text),
+            set("Selection", p.accent, Qt.darker(p.accent, 1.2), p.accentText, p.accentText),
+            set("Tooltip", p.tooltip, p.window, p.text),
+            set("Complementary", p.view, p.window, p.text),
+            set("Header", p.header, p.window, p.text),
+            set("Header][Inactive", p.window, p.window, p.text),
+            "[WM]",
+            `activeBackground=${rgb(p.header)}`, `activeForeground=${rgb(p.text)}`, `activeBlend=${rgb(p.text)}`,
+            `inactiveBackground=${rgb(p.window)}`, `inactiveForeground=${rgb(p.muted)}`, `inactiveBlend=${rgb(p.muted)}`,
+            ""
+        ].join("\n");
+    }
+
+    // Named after its colours: KDE apps keep a colour scheme they read by
+    // its path, so new colours need a new path.
+    readonly property string qtColoursPath: {
+        let hash = 5381;
+        for (let i = 0; i < qtColours.length; i++) hash = (hash * 33 + qtColours.charCodeAt(i)) >>> 0;
+        return `${dir}/qt-${hash.toString(16)}.colors`;
+    }
+
+    // qt6ct's settings: Breeze, the colours above, the tone's icons, the
+    // fonts GTK apps have. Running Qt apps read it again 3 s after it
+    // changes, so it is written after the colours.
+    readonly property string qtConfig: {
+        return [
+            "# Written by the shell (ThemeOutputs.qml) for the saved tone. Do not edit.",
+            "[Appearance]",
+            `color_scheme_path=${qtColoursPath}`,
+            "custom_palette=true",
+            `icon_theme=${iconTheme}`,
+            "standard_dialogs=default",
+            "style=Breeze",
+            "",
+            "[Fonts]",
+            "fixed=\"JetBrainsMono Nerd Font,10\"",
+            "general=\"Noto Sans,10\"",
+            ""
+        ].join("\n");
+    }
+
     onIconThemeChanged: apply.restart()
     onHyprlandChanged: apply.restart()
     onKittyChanged: apply.restart()
     onGtkChanged: apply.restart()
+    onQtConfigChanged: apply.restart()
 
     // Waits for the files to be read (and a burst of changes to settle).
     Timer {
@@ -157,14 +248,16 @@ Scope {
     // Written into folders a fresh install may not have yet.
     Process {
         id: folders
-        command: ["mkdir", "-p", root.dir, root.config + "/gtk-3.0", root.config + "/gtk-4.0"]
+        command: ["mkdir", "-p", root.dir, root.config + "/gtk-3.0", root.config + "/gtk-4.0", root.config + "/qt6ct"]
         onExited: {
             gsettings.running = true;
+            kdeglobals.running = true;
             tone.write();
             kittyTone.write();
             gtkTone.write();
             gtk3.write();
             gtk4.write();
+            if (!qtColoursFile.write()) qtConfigFile.write();
         }
     }
 
@@ -172,8 +265,11 @@ Scope {
         property string content
         printErrors: false
 
-        function write(): void {
-            if (text() !== content) setText(content);
+        // Whether it had to be written.
+        function write(): bool {
+            if (text() === content) return false;
+            setText(content);
+            return true;
         }
     }
 
@@ -212,6 +308,27 @@ Scope {
         onSaved: gtkReload.restart()
     }
 
+    Output {
+        id: qtColoursFile
+        path: root.qtColoursPath
+        content: root.qtColours
+        onSaved: qtConfigFile.write()
+    }
+
+    // What running Qt apps watch: after the colours.
+    Output {
+        id: qtConfigFile
+        path: root.config + "/qt6ct/qt6ct.conf"
+        content: root.qtConfig
+        onSaved: qtColoursOld.running = true
+    }
+
+    // Earlier colours, once no setting names them.
+    Process {
+        id: qtColoursOld
+        command: ["find", root.dir, "-maxdepth", "1", "-name", "qt*.colors", "!", "-path", root.qtColoursPath, "-delete"]
+    }
+
     Process {
         id: hyprReload
         command: ["hyprctl", "reload", "config-only"]
@@ -230,6 +347,15 @@ Scope {
         command: ["sh", "-c", 'i=org.gnome.desktop.interface; gsettings set $i gtk-theme "$1" && gsettings set $i color-scheme "$2" && gsettings set $i icon-theme "$3" && gsettings set $i cursor-theme "$4" && gsettings set $i cursor-size "$5"',
             "sh", root.saved.light ? "adw-gtk3" : "adw-gtk3-dark", root.saved.light ? "prefer-light" : "prefer-dark", root.iconTheme,
             Quickshell.env("XCURSOR_THEME") || "Adwaita", Quickshell.env("XCURSOR_SIZE") || "24"]
+    }
+
+    // KDE apps (KIconTheme::initTheme, KStyleManager) take their icons and
+    // style from kdeglobals, not from qt6ct, unless Plasma's platform theme
+    // runs; Plasma's own choices there are replaced. Read as they start.
+    Process {
+        id: kdeglobals
+        command: ["sh", "-c", 'kwriteconfig6 --file kdeglobals --group Icons --key Theme "$1" && kwriteconfig6 --file kdeglobals --group KDE --key widgetStyle Breeze',
+            "sh", root.iconTheme]
     }
 
     // Open GTK4 apps read their CSS again when light or dark changes: to the

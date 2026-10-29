@@ -15,6 +15,9 @@ fi
 # Toolkits on Wayland
 export QT_QPA_PLATFORM="wayland;xcb"
 export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+# Qt apps in the tone: qt6ct reads ~/.config/qt6ct/qt6ct.conf, written by the
+# shell (ThemeOutputs.qml), and reapplies it when it changes
+export QT_QPA_PLATFORMTHEME=qt6ct
 export ELECTRON_OZONE_PLATFORM_HINT=auto
 
 # Icons in the shell: Yaru (packages/aur.txt). Read once at its start, so it

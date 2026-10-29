@@ -18,6 +18,8 @@ noto-fonts   # text in apps and notifications beyond JetBrains Mono
 noto-fonts-emoji
 xdg-user-dirs   # ~/Pictures and the rest, where the wallpapers live
 adw-gtk-theme   # GTK3 apps looking like GTK4 ones, in the tone's colours
+breeze   # Qt apps' style (qt6ct)
+kconfig   # kwriteconfig6: KDE apps' icons and style in kdeglobals
 
 # Apps the binds start, and what opens files
 kitty

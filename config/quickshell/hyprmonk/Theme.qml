@@ -56,6 +56,7 @@ Singleton {
     readonly property color warning: "#ff5f56"
     readonly property color selection: Qt.rgba(0, 0, 0, tone.light ? 0.1 : 0.4)  // the picked row in a list
     readonly property color wallpaperAccent: colors.accent  // whatever the tone (ThemeOutputs.qml)
+    readonly property var wallpaperColours: colors  // matugen's, for apps (ThemeOutputs.qml)
 
     // Foreground at an opacity: secondary text, hover fills, idle items. On
     // a light tone, text (0.3 and up) is lifted so it still reads.
@@ -127,6 +128,15 @@ Singleton {
             property string accent: "#ef8608"
             property string surface: "#1e1a17"
             property string surfaceText: "#f2ede6"  // not onSurface: that reads as a handler
+            // For apps' colour schemes (ThemeOutputs.qml): text a step back, the
+            // surface's levels from the darkest, and errors.
+            property string surfaceMuted: "#d5c3b5"
+            property string surfaceLowest: "#18120d"
+            property string surfaceLow: "#221a15"
+            property string surfaceContainer: "#261e19"
+            property string surfaceHigh: "#312823"
+            property string surfaceHighest: "#3d332d"
+            property string error: "#ffb4ab"
         }
     }
 }
