@@ -3,7 +3,7 @@
 // letters in order, gaps allowed: "gm" finds "Game mode"); the arrows or Tab
 // move, Enter or a click runs one and closes the card; Escape or a click
 // elsewhere closes it. An action with options (the panels' tone, the
-// spectrum's style) opens them in the same card instead; Escape, or
+// spectrum's style, the login screen's look) opens them in the same card instead; Escape, or
 // Backspace with nothing typed, goes back.
 //
 // IPC: qs -c hyprmonk ipc call overlays toggle quickactions
@@ -111,6 +111,15 @@ Scope {
             label: "Random wallpaper"
             available: Wallpaper.files.length > 1
             onRun: Wallpaper.random()
+        },
+        Action {
+            section: "Appearance"
+            icon: "\u{F0342}"
+            label: "Login look"
+            value: Login.label(Login.current)
+            options: Login.labels
+            available: Login.ready
+            onPicked: option => Login.pick(Login.looks[Login.labels.indexOf(option)])
         }
     ]
 
@@ -159,6 +168,7 @@ Scope {
         }
         pointer = Qt.point(-1, -1);
         search.forceActiveFocus();
+        Login.refresh();
     }
 
     // Each open starts from the top of the full list, put back while hidden.

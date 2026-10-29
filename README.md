@@ -9,7 +9,7 @@ drawer (temperature, CPU, memory, disk, network), a live spectrum (cava, in
 seven styles) and synced lyrics, notifications, the OSD, the launcher
 (Super+Space: apps, commands, SSH hosts), quick actions
 (Super+A: game mode, the panels' tone, Noir among them, the spectrum's
-style), the power menu (Super+Shift+E), the key guide (Super+K), the lock
+style, the login screen's look), the power menu (Super+Shift+E), the key guide (Super+K), the lock
 screen (Super+Alt+L, and on idle), screenshots (Print, then R, W or S), the
 polkit agent, the Hyprland config and the helpers. More panels come next
 (see [Roadmap](#roadmap)), all in Quickshell.
@@ -31,7 +31,9 @@ cd hyprmonk
 
 Then reboot: the login screen is SDDM (in place of the display manager that
 was enabled; to go back, `sudo systemctl disable sddm` and enable the other).
-Pick **Hyprland (uwsm-managed)** there. Then, from inside Hyprland:
+Pick **Hyprland (uwsm-managed)** there. Its look is picked in quick actions
+(Login look): one of the theme's, or Desktop, the wallpaper blurred as on
+the lock screen in the tone's colours. Then, from inside Hyprland:
 
 ```bash
 ./install.sh plugins   # hymission, the overview (compiles)
@@ -116,10 +118,14 @@ cargo clippy --all-targets -- -D warnings
     (GPL-3.0) in its astronaut look (`install.sh login`: the theme at a
     fixed commit into `/usr/share/sddm/themes`, its fonts, the settings in
     `/etc/sddm.conf.d/hyprmonk.conf`, SDDM enabled in place of the display
-    manager before it). SDDM's PAM file unlocks KWallet. Later, a
-    picker for its ten themes: `hyprmonk sddm-theme NAME` changes
-    `ConfigFile=` in the theme's `metadata.desktop` through pkexec (the
-    shell's polkit agent asks), listed in a card or quick action.
+    manager before it). SDDM's PAM file unlocks KWallet. Its looks:
+    done, quick actions > Login look, the theme's ten and Desktop. The
+    theme reads the look `/var/lib/hyprmonk-login/current.conf` links to,
+    a folder the installer gives the user, so picking needs no password;
+    the shell writes Desktop there (the astronaut look's settings with a
+    copy of the wallpaper, blurred all over, the shell's font and the
+    saved tone's colours, `ThemeOutputs.qml`). Later, maybe, a look of
+    our own made like the lock screen.
   - The GPU driver: hyprmonk does not install one (NVIDIA needs its own
     packages; `uwsm/env` sets the NVIDIA variables only when it is loaded).
   - How apps look outside Plasma. GTK: done, adw-gtk3 and GTK's named

@@ -1,5 +1,6 @@
 // The saved Appearance tone outside the shell: GTK and Qt apps (theme,
-// colours and icons), Hyprland's window borders and kitty. A tone with its own accent
+// colours and icons), Hyprland's window borders, kitty and the login
+// screen's Desktop look. A tone with its own accent
 // writes its colours over the wallpaper's (which matugen writes); one without
 // writes nothing over them. Only the saved tone counts, so a preview does not
 // repaint every app.
@@ -12,6 +13,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs
+import qs.services
 
 Scope {
     id: root
@@ -231,11 +233,78 @@ Scope {
         ].join("\n");
     }
 
+    // The login screen's Desktop look (services/Login.qml): the astronaut
+    // look's settings with the wallpaper, blurred all over and a little
+    // darker as on the lock screen, the shell's font and the colours above.
+    // A copy of the wallpaper goes with it: SDDM cannot read the home
+    // folder. Nothing until `install.sh login` has made the folder (a save
+    // that fails keeps its text as the file's, so a later one would not
+    // write); then written, once Login has seen it (again as quick actions
+    // open).
+    readonly property bool loginReady: Login.ready
+    readonly property string wallpaper: Wallpaper.path
+    readonly property string loginWallpaper: wallpaper ? `${Login.dir}/wallpaper.${wallpaper.split(".").pop().toLowerCase()}` : ""
+    property string loginTemplate: ""
+
+    readonly property string login: {
+        if (!loginTemplate) return "";
+        const p = qtPalette;
+        const c = value => Qt.color(value).toString();
+        const settings = {
+            Font: Theme.font,
+            Background: loginWallpaper,
+            DimBackground: "0.12",
+            DimBackgroundColor: c(p.view),
+            PartialBlur: "false",
+            FullBlur: "true",
+            Blur: "1.0",
+            BlurMax: "48",
+            HaveFormBackground: "false",
+            HeaderTextColor: c(p.text),
+            DateTextColor: c(p.text),
+            TimeTextColor: c(p.text),
+            FormBackgroundColor: c(p.window),
+            BackgroundColor: c(p.window),
+            LoginFieldBackgroundColor: c(p.window),
+            PasswordFieldBackgroundColor: c(p.window),
+            LoginFieldTextColor: c(p.text),
+            PasswordFieldTextColor: c(p.text),
+            UserIconColor: c(p.text),
+            PasswordIconColor: c(p.text),
+            PlaceholderTextColor: c(p.muted),
+            WarningColor: c(p.negative),
+            LoginButtonTextColor: c(p.text),
+            LoginButtonBackgroundColor: c(p.accent),
+            SystemButtonsIconsColor: c(p.text),
+            SessionButtonTextColor: c(p.text),
+            VirtualKeyboardButtonTextColor: c(p.text),
+            DropdownTextColor: c(p.text),
+            DropdownSelectedBackgroundColor: c(p.button),
+            DropdownBackgroundColor: c(p.window),
+            HighlightTextColor: c(p.accentText),
+            HighlightBackgroundColor: c(p.accent),
+            HighlightBorderColor: c(p.accent),
+            HoverUserIconColor: c(p.accent),
+            HoverPasswordIconColor: c(p.accent),
+            HoverSystemButtonsIconsColor: c(p.accent),
+            HoverSessionButtonTextColor: c(p.accent),
+            HoverVirtualKeyboardButtonTextColor: c(p.accent)
+        };
+        const lines = loginTemplate.split("\n").map(line => {
+            const key = line.split("=")[0];
+            return line.includes("=") && key in settings ? `${key}="${settings[key]}"` : line;
+        });
+        return "# Written by the shell (ThemeOutputs.qml) for the saved tone. Do not edit.\n" + lines.join("\n");
+    }
+
     onIconThemeChanged: apply.restart()
     onHyprlandChanged: apply.restart()
     onKittyChanged: apply.restart()
     onGtkChanged: apply.restart()
     onQtConfigChanged: apply.restart()
+    onLoginChanged: apply.restart()
+    onLoginReadyChanged: apply.restart()
+    onWallpaperChanged: apply.restart()
 
     // Waits for the files to be read (and a burst of changes to settle).
     Timer {
@@ -258,6 +327,8 @@ Scope {
             gtk3.write();
             gtk4.write();
             if (!qtColoursFile.write()) qtConfigFile.write();
+            if (root.login && root.loginReady) loginLook.write();
+            if (root.wallpaper) loginPicture.running = true;
         }
     }
 
@@ -321,6 +392,26 @@ Scope {
         path: root.config + "/qt6ct/qt6ct.conf"
         content: root.qtConfig
         onSaved: qtColoursOld.running = true
+    }
+
+    FileView {
+        path: Login.theme + "/Themes/astronaut.conf"
+        printErrors: false
+        onLoaded: root.loginTemplate = text()
+    }
+
+    Output {
+        id: loginLook
+        path: Login.dir + "/desktop.conf"
+        content: root.login
+    }
+
+    // Only when it differs; the copies of other pictures (another type)
+    // go.
+    Process {
+        id: loginPicture
+        command: ["sh", "-c", '[ -d "$2" ] || exit 0; cmp -s "$1" "$3" && exit 0; rm -f "$2"/wallpaper.*; cp "$1" "$3"',
+            "sh", root.wallpaper, Login.dir, root.loginWallpaper]
     }
 
     // Earlier colours, once no setting names them.

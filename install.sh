@@ -24,7 +24,8 @@ steps:
   services   enable the systemd user units (they only start under Hyprland)
   udev       install the udev rule for device batteries (uses sudo)
   login      the login screen: SDDM with sddm-astronaut-theme, enabled in place of
-             the current display manager (uses sudo; from the next boot)
+             the current display manager (uses sudo; from the next boot); its
+             look is picked in quick actions
   plugins    install and enable the hyprpm plugins (compiles; run inside Hyprland)
 EOF
 }
@@ -249,9 +250,10 @@ step_udev() {
 }
 
 # The login screen: SDDM with sddm-astronaut-theme (GPL-3.0) at a fixed
-# commit, in its astronaut look. SDDM replaces whichever display manager is
-# enabled, from the next boot.
+# commit, in its astronaut look until another is picked. SDDM replaces
+# whichever display manager is enabled, from the next boot.
 LOGIN_THEME="sddm-astronaut-theme"
+LOGIN_LOOKS="/var/lib/hyprmonk-login"
 LOGIN_COMMIT="abb3163c724935af888ba5ea9ac0c4f22afd8048"
 LOGIN_URL="https://github.com/Keyitdev/sddm-astronaut-theme/archive/$LOGIN_COMMIT.tar.gz"
 LOGIN_SHA256="3e7ccde7158b336bb7ea6c69a18cefe27a9c82d6c04c4bef03b5b1519d6ae11c"
@@ -286,6 +288,15 @@ step_login() {
         rm -rf "$tmp"
         echo "   installed $theme"
     fi
+
+    # The look the theme reads is the one $LOGIN_LOOKS/current.conf links
+    # to, in a folder of the user's: the shell picks one there (quick
+    # actions > Login look) and writes the Desktop look, with no sudo.
+    sudo install -d -o "$USER" -g "$(id -gn)" -m 755 "$LOGIN_LOOKS"
+    [[ -L $LOGIN_LOOKS/current.conf ]] || ln -s "$theme/Themes/astronaut.conf" "$LOGIN_LOOKS/current.conf"
+    sudo ln -sfn "$LOGIN_LOOKS/current.conf" "$theme/Themes/hyprmonk-current.conf"
+    sudo sed -i 's|^ConfigFile=.*|ConfigFile=Themes/hyprmonk-current.conf|' "$theme/metadata.desktop"
+    echo "   set      $LOGIN_LOOKS (the look: $(basename "$(readlink "$LOGIN_LOOKS/current.conf")" .conf))"
 
     sudo mkdir -p /etc/sddm.conf.d
     printf '[General]\nInputMethod=qtvirtualkeyboard\n\n[Theme]\nCurrent=%s\n' "$LOGIN_THEME" \
