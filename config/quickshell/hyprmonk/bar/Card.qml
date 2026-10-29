@@ -16,6 +16,10 @@ Rectangle {
     // The least the card widens to while a panel is open.
     property int panelWidth: Theme.barPanelWidth
 
+    // The pointer is over the card: its edge and an open panel too, not only
+    // its modules (a handler given to the card would land in its row).
+    readonly property alias hovered: hover.hovered
+
     // The panel being shown; kept while it folds away after `panel` clears.
     property Component shown: null
     property real openness: panel ? 1 : 0
@@ -37,6 +41,10 @@ Rectangle {
     border.width: 1
     border.color: Theme.rim
     clip: true
+
+    HoverHandler {
+        id: hover
+    }
 
     RowLayout {
         id: row

@@ -78,25 +78,23 @@ PanelWindow {
         // (folding a moment after the pointer leaves), while its panel is
         // open, or while it sings lyrics "In bar".
         readonly property bool mediaOpen: bar.panelOpen && Panels.open === "media"
-        property bool hovered: false
+        property bool pointerNear: false
         readonly property bool singing: Lyrics.inBar && Lyrics.line !== "" && (Player.current?.isPlaying ?? false)
-        readonly property bool showMedia: Player.current !== null && (hovered || mediaOpen || singing)
+        readonly property bool showMedia: Player.current !== null && (pointerNear || mediaOpen || singing)
 
-        HoverHandler {
-            onHoveredChanged: {
-                if (hovered) {
-                    fold.stop();
-                    centreCard.hovered = true;
-                } else {
-                    fold.restart();
-                }
+        onHoveredChanged: {
+            if (hovered) {
+                fold.stop();
+                pointerNear = true;
+            } else {
+                fold.restart();
             }
         }
 
         Timer {
             id: fold
             interval: 400
-            onTriggered: centreCard.hovered = false
+            onTriggered: centreCard.pointerNear = false
         }
 
         Spectrum { active: centreCard.mediaOpen }

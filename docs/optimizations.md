@@ -140,12 +140,16 @@ first device that fails (one mouse today), `pictures_folder` without
   the folder changed and lyrics arriving mid-song held the first line in
   the middle until the next. Both set it again when the model changes, as
   the launcher does; the picker keeps `current` inside a shorter list.
-- **The media panel may be about 7 px short** (`panels/MediaPanel.qml:22`)
-  with an artist line and a seek bar. To check on screen.
+- ~~The media panel may be about 7 px short~~ (checked 2026-10-29): with
+  an artist line and a seek bar its column needs 130 px of the 140 it gets
+  (logged on screen); every line elides, so nothing makes it taller.
 - ~~The previous wallpaper stays in memory~~ (done 2026-10-29): let go once
   the new one has faded in.
-- **The media drawer's hover** (`bar/Bar.qml:85`) covers only the modules
-  row, not the card's edge.
+- ~~The media drawer's hover~~ (done 2026-10-29): the HoverHandler given to
+  the centre card landed in its modules row (the card's default property),
+  so the card's edge counted as outside. `Card` has its own handler now and
+  says `hovered`; the drawer opens from the edge (checked by moving the
+  pointer there, before and after).
 - **The lock screen with several screens** (`lock/LockSurface.qml:164`):
   if the screen that has the password field goes away, none does.
 - ~~Lint: unused imports in `bar/Volume.qml:4` and `lock/Lock.qml:19`~~
