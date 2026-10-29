@@ -138,18 +138,8 @@ Scope {
         return true;
     }
 
-    // A heading goes before the first row of each section.
-    function startsSection(list: var, index: int): bool {
-        return index === 0 || list[index].section !== list[index - 1].section;
-    }
-
     readonly property int rowHeight: 42
     readonly property int headingHeight: 26
-
-    function listHeight(list: var): int {
-        if (list.length === 0) return rowHeight;
-        return list.reduce((sum, _, i) => sum + rowHeight + (startsSection(list, i) ? headingHeight : 0), 0);
-    }
 
     function clearSearch(): void {
         search.text = "";
@@ -274,147 +264,92 @@ Scope {
             }
         }
 
-        Flickable {
+        SectionList {
             id: list
-
-            // The picked row, from the top of the list.
-            readonly property Item row: rows.count > root.current ? rows.itemAt(root.current).row : null
-            readonly property real rowY: row ? row.parent.y + row.y : 0
-            readonly property real entryY: row ? row.parent.y : 0  // with its heading
 
             x: 12
             y: window.top
             width: window.cardWidth - 24
             height: Math.min(contentHeight, window.listMax)
-            contentHeight: root.listHeight(root.shown)
             interactive: contentHeight > height
-            boundsBehavior: Flickable.StopAtBounds
-            clip: true
+            model: root.shown
+            current: root.current
+            rowHeight: root.rowHeight
+            headingHeight: root.headingHeight
 
-            // Keep the picked row in view, and its heading when going up.
-            onRowYChanged: {
-                if (entryY < contentY) contentY = entryY;
-                else if (rowY + root.rowHeight > contentY + height) contentY = rowY + root.rowHeight - height;
+            heading: SectionLabel {
+                required property var modelData
+
+                leftPadding: 12
+                bottomPadding: 6
+                verticalAlignment: Text.AlignBottom
+                text: modelData.section
+                font.pixelSize: 10
+                font.capitalization: Font.MixedCase
             }
 
-            // The picked row; slides to the next one.
-            Rectangle {
-                visible: list.row !== null
-                y: list.rowY
-                width: list.width
-                height: root.rowHeight
-                radius: 10
-                color: Theme.selection
+            delegate: Item {
+                id: row
 
-                Behavior on y {
-                    NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
+                required property var modelData
+                required property int index
+                readonly property bool picked: index === root.current
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onPositionChanged: mouse => root.hover(mapToItem(null, mouse.x, mouse.y), row.index)
+                    onClicked: root.run(row.modelData)
                 }
-            }
 
-            Column {
-                width: list.width
+                Text {
+                    id: glyph
 
-                Repeater {
-                    id: rows
+                    x: 12
+                    width: 22
+                    anchors.verticalCenter: parent.verticalCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    text: row.modelData.icon
+                    color: row.modelData.on === true || row.modelData.chosen === true
+                        ? Theme.accent : Theme.foreground
+                    font.family: Theme.font
+                    font.pixelSize: 18
+                    scale: row.picked ? 1.15 : 1
 
-                    model: root.shown
-
-                    Column {
-                        id: entry
-
-                        required property var modelData
-                        required property int index
-                        readonly property bool picked: index === root.current
-                        readonly property alias row: row
-
-                        width: list.width
-
-                        SectionLabel {
-                            visible: root.startsSection(root.shown, entry.index)
-                            height: root.headingHeight
-                            leftPadding: 12
-                            bottomPadding: 6
-                            verticalAlignment: Text.AlignBottom
-                            text: entry.modelData.section
-                            font.pixelSize: 10
-                            font.capitalization: Font.MixedCase
-                        }
-
-                        Item {
-                            id: row
-
-                            width: list.width
-                            height: root.rowHeight
-
-                            MouseArea {
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onPositionChanged: mouse => root.hover(mapToItem(null, mouse.x, mouse.y), entry.index)
-                                onClicked: root.run(entry.modelData)
-                            }
-
-                            Text {
-                                id: glyph
-
-                                x: 12
-                                width: 22
-                                anchors.verticalCenter: parent.verticalCenter
-                                horizontalAlignment: Text.AlignHCenter
-                                text: entry.modelData.icon
-                                color: entry.modelData.on === true || entry.modelData.chosen === true
-                                    ? Theme.accent : Theme.foreground
-                                font.family: Theme.font
-                                font.pixelSize: 18
-                                scale: entry.picked ? 1.15 : 1
-
-                                Behavior on scale {
-                                    NumberAnimation { duration: 120 }
-                                }
-                            }
-
-                            Text {
-                                anchors.left: glyph.right
-                                anchors.leftMargin: 12
-                                anchors.right: pill.visible ? pill.left : parent.right
-                                anchors.rightMargin: 12
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: entry.modelData.label
-                                textFormat: Text.PlainText
-                                color: Theme.foreground
-                                font.family: Theme.font
-                                font.pixelSize: Theme.fontSize
-                                elide: Text.ElideRight
-                            }
-
-                            Chip {
-                                id: pill
-
-                                readonly property bool isSwitch: entry.modelData.on !== undefined
-
-                                anchors.right: parent.right
-                                anchors.rightMargin: 12
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: Math.min(implicitWidth, 160)
-                                visible: isSwitch || entry.modelData.value !== ""
-                                text: isSwitch ? (entry.modelData.on ? "on" : "off") : entry.modelData.value
-                                on: entry.modelData.on
-                                onClicked: root.run(entry.modelData)
-                            }
-                        }
+                    Behavior on scale {
+                        NumberAnimation { duration: 120 }
                     }
                 }
-            }
 
-            Text {
-                visible: root.shown.length === 0
-                x: 12
-                height: root.rowHeight
-                verticalAlignment: Text.AlignVCenter
-                text: "Nothing matches"
-                color: Theme.fg(Theme.dimOpacity)
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSize
+                Text {
+                    anchors.left: glyph.right
+                    anchors.leftMargin: 12
+                    anchors.right: pill.visible ? pill.left : parent.right
+                    anchors.rightMargin: 12
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: row.modelData.label
+                    textFormat: Text.PlainText
+                    color: Theme.foreground
+                    font.family: Theme.font
+                    font.pixelSize: Theme.fontSize
+                    elide: Text.ElideRight
+                }
+
+                Chip {
+                    id: pill
+
+                    readonly property bool isSwitch: row.modelData.on !== undefined
+
+                    anchors.right: parent.right
+                    anchors.rightMargin: 12
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: Math.min(implicitWidth, 160)
+                    visible: isSwitch || row.modelData.value !== ""
+                    text: isSwitch ? (row.modelData.on ? "on" : "off") : row.modelData.value
+                    on: row.modelData.on
+                    onClicked: root.run(row.modelData)
+                }
             }
         }
     }

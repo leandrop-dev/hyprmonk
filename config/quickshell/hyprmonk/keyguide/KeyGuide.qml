@@ -29,15 +29,6 @@ Scope {
     readonly property int headingHeight: 28
     readonly property int keysWidth: 240
 
-    function startsSection(list: var, index: int): bool {
-        return index === 0 || list[index].section !== list[index - 1].section;
-    }
-
-    function listHeight(list: var): int {
-        if (list.length === 0) return rowHeight;
-        return list.reduce((sum, _, i) => sum + rowHeight + (startsSection(list, i) ? headingHeight : 0), 0);
-    }
-
     // Modifiers in the usual order, from Hyprland's mask.
     function modifiers(mask: int): var {
         return [[64, "Super"], [4, "Ctrl"], [8, "Alt"], [1, "Shift"]]
@@ -142,7 +133,7 @@ Scope {
         open: root.open
         cardWidth: 900
         // Sized for every row, so filtering does not resize it.
-        cardHeight: top + Math.min(root.listHeight(root.rows), listMax) + 12
+        cardHeight: top + Math.min(list.measure(root.rows).height, listMax) + 12
         windowHeight: top + listMax + 12 + margin * 2
         onDismissed: Overlays.close()
         onFolded: root.reset()
@@ -194,124 +185,74 @@ Scope {
             }
         }
 
-        Flickable {
+        SectionList {
             id: list
-
-            readonly property Item row: entries.count > root.current ? entries.itemAt(root.current).row : null
-            readonly property real rowY: row ? row.parent.y + row.y : 0
-            readonly property real entryY: row ? row.parent.y : 0  // with its heading
 
             x: 12
             y: window.top
             width: window.cardWidth - 24
             height: window.cardHeight - window.top - 12
-            contentHeight: root.listHeight(root.shown)
-            boundsBehavior: Flickable.StopAtBounds
-            clip: true
+            model: root.shown
+            current: root.current
+            rowHeight: root.rowHeight
+            headingHeight: root.headingHeight
+            highlightRadius: 8
+            emptyFontSize: Theme.rowFontSize
 
-            onRowYChanged: {
-                if (entryY < contentY) contentY = entryY;
-                else if (rowY + root.rowHeight > contentY + height) contentY = rowY + root.rowHeight - height;
+            heading: SectionLabel {
+                required property var modelData
+
+                leftPadding: 8
+                bottomPadding: 6
+                verticalAlignment: Text.AlignBottom
+                text: modelData.section
+                font.bold: true
             }
 
-            Rectangle {
-                visible: list.row !== null
-                y: list.rowY
-                width: list.width
-                height: root.rowHeight
-                radius: 8
-                color: Theme.selection
+            delegate: Item {
+                id: row
 
-                Behavior on y {
-                    NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
+                required property var modelData
+                required property int index
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onPositionChanged: mouse => root.hover(mapToItem(null, mouse.x, mouse.y), row.index)
                 }
-            }
 
-            Column {
-                width: list.width
+                Rectangle {
+                    x: 12
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: Math.min(keys.implicitWidth + 12, root.keysWidth - 12)
+                    height: 22
+                    radius: 6
+                    color: Theme.fg(0.08)
 
-                Repeater {
-                    id: entries
-
-                    model: root.shown
-
-                    Column {
-                        id: entry
-
-                        required property var modelData
-                        required property int index
-                        readonly property alias row: row
-
-                        width: list.width
-
-                        SectionLabel {
-                            visible: root.startsSection(root.shown, entry.index)
-                            height: root.headingHeight
-                            leftPadding: 8
-                            bottomPadding: 6
-                            verticalAlignment: Text.AlignBottom
-                            text: entry.modelData.section
-                            font.bold: true
-                        }
-
-                        Item {
-                            id: row
-
-                            width: list.width
-                            height: root.rowHeight
-
-                            MouseArea {
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                onPositionChanged: mouse => root.hover(mapToItem(null, mouse.x, mouse.y), entry.index)
-                            }
-
-                            Rectangle {
-                                x: 12
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: Math.min(keys.implicitWidth + 12, root.keysWidth - 12)
-                                height: 22
-                                radius: 6
-                                color: Theme.fg(0.08)
-
-                                Text {
-                                    id: keys
-                                    anchors.centerIn: parent
-                                    width: Math.min(implicitWidth, parent.width - 12)
-                                    elide: Text.ElideRight
-                                    text: entry.modelData.keys
-                                    color: Theme.foreground
-                                    font.family: Theme.font
-                                    font.pixelSize: Theme.smallFontSize
-                                    font.weight: Font.DemiBold
-                                }
-                            }
-
-                            Text {
-                                x: root.keysWidth + 12
-                                width: parent.width - x - 12
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: entry.modelData.description
-                                textFormat: Text.PlainText
-                                color: Theme.foreground
-                                font.family: Theme.font
-                                font.pixelSize: Theme.rowFontSize
-                                elide: Text.ElideRight
-                            }
-                        }
+                    Text {
+                        id: keys
+                        anchors.centerIn: parent
+                        width: Math.min(implicitWidth, parent.width - 12)
+                        elide: Text.ElideRight
+                        text: row.modelData.keys
+                        color: Theme.foreground
+                        font.family: Theme.font
+                        font.pixelSize: Theme.smallFontSize
+                        font.weight: Font.DemiBold
                     }
                 }
-            }
 
-            Text {
-                visible: root.shown.length === 0
-                x: 12
-                height: root.rowHeight
-                verticalAlignment: Text.AlignVCenter
-                text: "Nothing matches"
-                color: Theme.fg(Theme.dimOpacity)
-                font.family: Theme.font
-                font.pixelSize: Theme.rowFontSize
+                Text {
+                    x: root.keysWidth + 12
+                    width: parent.width - x - 12
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: row.modelData.description
+                    textFormat: Text.PlainText
+                    color: Theme.foreground
+                    font.family: Theme.font
+                    font.pixelSize: Theme.rowFontSize
+                    elide: Text.ElideRight
+                }
             }
         }
     }

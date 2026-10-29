@@ -61,8 +61,10 @@ bind but no key on this keyboard to test it.
 
 ## 5. Overlay polish
 
-Done 2026-10-29, as below, except the shared widget for the two sectioned
-lists (left: two copies, still small). Moving up shows the entry's heading;
+Done 2026-10-29, as below; the two sectioned lists are one widget now
+(`widgets/SectionList.qml`: headings, the sliding highlight, keeping the
+picked row in view, laid out from the row and heading heights rather than
+read back from the rows). Moving up shows the entry's heading;
 quick actions, the key guide, the power menu and the launcher reset once
 folded away (Overlay's `folded`), not as they open; a label without a chip
 runs to the row's end; the key guide and the wallpaper picker have a window
