@@ -269,6 +269,7 @@ Scope {
                     Text {
                         Layout.fillWidth: true
                         text: root.title
+                        textFormat: Text.PlainText
                         color: Theme.foreground
                         font.family: Theme.font
                         font.pixelSize: Theme.fontSize
@@ -278,6 +279,7 @@ Scope {
                     Text {
                         Layout.maximumWidth: 180
                         text: root.caption
+                        textFormat: Text.PlainText
                         color: Theme.fg(0.6)
                         font.family: Theme.font
                         font.pixelSize: Theme.bodyFontSize

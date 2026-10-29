@@ -23,6 +23,7 @@ Rectangle {
         width: Math.min(implicitWidth, chip.width - 16)  // a narrowed chip cuts its text
         elide: Text.ElideRight
         text: chip.text
+        textFormat: Text.PlainText
         color: chip.isSwitch && chip.on ? Theme.background : Theme.foreground
         font.family: Theme.font
         font.pixelSize: Theme.smallFontSize

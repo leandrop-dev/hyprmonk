@@ -116,6 +116,7 @@ Rectangle {
                 Text {
                     Layout.fillWidth: true
                     text: [card.showApp ? card.notification.appName : "", Notifications.ago(card.notification)].filter(s => s).join(" · ")
+                    textFormat: Text.PlainText
                     color: Theme.fg(Theme.dimOpacity)
                     font.family: Theme.font
                     font.pixelSize: Theme.smallFontSize
@@ -162,17 +163,21 @@ Rectangle {
             Text {
                 Layout.fillWidth: true
                 visible: text !== ""
-                text: card.notification.body
+                // Senders may use simple markup (bold, italics, links), never
+                // full HTML. Images are dropped: the shell would fetch any
+                // address a sender names. Only web and mail links open.
+                text: (card.notification.body ?? "").replace(/<img\b[^>]*>/gi, "")
                 color: Theme.fg(0.6)
                 linkColor: Theme.accent
                 font.family: Theme.font
                 font.pixelSize: Theme.bodyFontSize
-                // Senders may use simple markup (bold, italics, links), never full HTML.
                 textFormat: Text.StyledText
                 wrapMode: Text.Wrap
                 maximumLineCount: card.popup ? 4 : 8
                 elide: Text.ElideRight
-                onLinkActivated: link => Qt.openUrlExternally(link)
+                onLinkActivated: link => {
+                    if (/^(https?|mailto):/i.test(link)) Qt.openUrlExternally(link);
+                }
             }
 
             Image {

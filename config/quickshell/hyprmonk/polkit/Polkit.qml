@@ -123,6 +123,7 @@ Scope {
                         Text {
                             Layout.fillWidth: true
                             text: window.flow?.actionId ?? ""
+                            textFormat: Text.PlainText
                             color: Theme.fg(Theme.dimOpacity)
                             font.family: Theme.font
                             font.pixelSize: Theme.smallFontSize
@@ -186,6 +187,7 @@ Scope {
                     Layout.fillWidth: true
                     visible: text !== ""
                     text: window.flow?.supplementaryMessage ?? ""
+                    textFormat: Text.PlainText
                     color: window.flow?.supplementaryIsError ? Theme.warning : Theme.fg(Theme.dimOpacity)
                     font.family: Theme.font
                     font.pixelSize: Theme.bodyFontSize

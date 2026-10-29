@@ -158,6 +158,7 @@ Scope {
                         Text {
                             Layout.fillWidth: true
                             text: modelData.description
+                            textFormat: Text.PlainText
                             color: Theme.foreground
                             font.family: Theme.font
                             font.pixelSize: Theme.rowFontSize

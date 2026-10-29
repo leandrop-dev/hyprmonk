@@ -25,6 +25,7 @@ Rectangle {
         width: Math.min(implicitWidth, parent.width - 12)
         horizontalAlignment: Text.AlignHCenter
         text: button.text
+        textFormat: Text.PlainText
         color: Theme.foreground
         font.family: Theme.font
         font.pixelSize: Theme.bodyFontSize

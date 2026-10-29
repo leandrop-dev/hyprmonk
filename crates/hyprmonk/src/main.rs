@@ -21,7 +21,12 @@ commands:
 ";
 
 fn main() -> ExitCode {
-    let args: Vec<String> = std::env::args().skip(1).collect();
+    // Lossy, not `args()`, which panics on an argument that is not UTF-8:
+    // such an argument matches no command and gets the usage text.
+    let args: Vec<String> = std::env::args_os()
+        .skip(1)
+        .map(|arg| arg.to_string_lossy().into_owned())
+        .collect();
     let args: Vec<&str> = args.iter().map(String::as_str).collect();
     match run(&args) {
         Ok(code) => code,

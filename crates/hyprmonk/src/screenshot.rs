@@ -9,6 +9,7 @@
 use std::fmt::Write as _;
 use std::fs;
 use std::io::Write as _;
+use std::os::unix::ffi::OsStrExt as _;
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Output, Stdio};
 use std::str::FromStr;
@@ -162,7 +163,7 @@ fn capture(source: &Source) -> Result<Vec<u8>> {
 fn save(png: &[u8]) -> Result<()> {
     let folder = pictures_folder().join("Screenshots");
     fs::create_dir_all(&folder).with_context(|| format!("creating {}", folder.display()))?;
-    let path = folder.join(format!("Screenshot_{}.png", timestamp()?));
+    let path = folder.join(format!("Screenshot_{}.png", timestamp(FILE_TIME)?));
     let status = run_with_input(
         Command::new("satty")
             .args(["--filename", "-", "--output-filename"])
@@ -197,7 +198,7 @@ fn save(png: &[u8]) -> Result<()> {
             "--type=method_call",
             "/org/freedesktop/FileManager1",
             "org.freedesktop.FileManager1.ShowItems",
-            &format!("array:string:file://{}", path.display()),
+            &format!("array:string:{}", file_url(&path)),
             "string:",
         ])),
         _ => Ok(()),
@@ -224,7 +225,7 @@ fn copy(png: &[u8]) -> Result<()> {
     let runtime = std::env::var_os("XDG_RUNTIME_DIR").context("XDG_RUNTIME_DIR is not set")?;
     let folder = Path::new(&runtime).join("hyprmonk/screenshots");
     fs::create_dir_all(&folder).with_context(|| format!("creating {}", folder.display()))?;
-    let preview = folder.join(format!("{}.png", timestamp()?));
+    let preview = folder.join(format!("{}.png", timestamp(PREVIEW_TIME)?));
     fs::write(&preview, png).with_context(|| format!("writing {}", preview.display()))?;
     notify("Copied to clipboard", "", &preview, &[])?;
     Ok(())
@@ -343,17 +344,48 @@ fn pictures_folder() -> PathBuf {
     )
 }
 
-/// The local time for file names: 2026-10-28_19-04-11.
-fn timestamp() -> Result<String> {
+/// A saved shot's time: 2026-10-28_19-04-11.
+const FILE_TIME: &str = "+%Y-%m-%d_%H-%M-%S";
+
+/// A copied shot's preview, with milliseconds: two copies within a second
+/// must not share a file (the first notification would show the second).
+const PREVIEW_TIME: &str = "+%Y-%m-%d_%H-%M-%S-%3N";
+
+/// The local time in `format`, from `date` (std has no local time).
+fn timestamp(format: &str) -> Result<String> {
     let output = Command::new("date")
-        .arg("+%Y-%m-%d_%H-%M-%S")
+        .arg(format)
         .output()
         .context("running date")?;
-    Ok(String::from_utf8_lossy(&output.stdout).trim().to_owned())
+    if !output.status.success() {
+        bail!("date exited with {}", output.status);
+    }
+    let stamp = String::from_utf8_lossy(&output.stdout).trim().to_owned();
+    if stamp.is_empty() {
+        bail!("date printed nothing");
+    }
+    Ok(stamp)
+}
+
+/// `path` as a `file://` URL: every byte but the unreserved ones and `/` is
+/// percent-encoded (RFC 3986), so spaces, `#` and non-ASCII names survive.
+fn file_url(path: &Path) -> String {
+    let mut url = String::from("file://");
+    for &byte in path.as_os_str().as_bytes() {
+        if byte.is_ascii_alphanumeric() || b"/-._~".contains(&byte) {
+            url.push(char::from(byte));
+        } else {
+            let _ = write!(url, "%{byte:02X}");
+        }
+    }
+    url
 }
 
 /// Runs a command with `input` on its stdin, collecting its stdout when the
-/// command pipes it.
+/// command pipes it. All of the input is written before any output is read:
+/// fine for today's callers (slurp gets a few lines and prints one), but a
+/// command that fills its output pipe before reading all its input would
+/// wait forever.
 fn run_with_input(command: &mut Command, input: &[u8]) -> Result<Output> {
     let mut child = command.stdin(Stdio::piped()).spawn()?;
     let mut stdin = child.stdin.take().context("no stdin")?;
@@ -406,6 +438,18 @@ mod tests {
         assert_eq!(
             boxes(&monitors, &clients),
             "400,20 500x600\n10,20 300x200\n"
+        );
+    }
+
+    #[test]
+    fn file_urls_are_percent_encoded() {
+        assert_eq!(
+            file_url(Path::new("/home/me/My Pictures/#1/café.png")),
+            "file:///home/me/My%20Pictures/%231/caf%C3%A9.png"
+        );
+        assert_eq!(
+            file_url(Path::new("/tmp/Screenshot_2026-10-28_19-04-11.png")),
+            "file:///tmp/Screenshot_2026-10-28_19-04-11.png"
         );
     }
 

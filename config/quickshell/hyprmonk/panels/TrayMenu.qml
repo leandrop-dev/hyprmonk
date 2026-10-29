@@ -141,6 +141,7 @@ ColumnLayout {
             Text {
                 Layout.fillWidth: true
                 text: row.text
+                textFormat: Text.PlainText
                 color: Theme.foreground
                 font.family: Theme.font
                 font.pixelSize: Theme.rowFontSize

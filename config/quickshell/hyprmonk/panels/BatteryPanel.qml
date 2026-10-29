@@ -58,6 +58,7 @@ ColumnLayout {
                     Text {
                         Layout.fillWidth: true
                         text: row.modelData.name
+                        textFormat: Text.PlainText
                         color: Theme.foreground
                         font.family: Theme.font
                         font.pixelSize: Theme.rowFontSize

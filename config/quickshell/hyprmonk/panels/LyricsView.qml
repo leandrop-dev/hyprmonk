@@ -63,6 +63,7 @@ Item {
 
             width: list.width
             text: modelData.text
+            textFormat: Text.PlainText
             color: current ? Theme.foreground : Theme.fg(view.synced ? 0.4 : 0.7)
             font.family: Theme.font
             font.pixelSize: Theme.bodyFontSize

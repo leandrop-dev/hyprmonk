@@ -35,17 +35,12 @@ scrolling) and `panels/LyricsView.qml` (until the next line).
 
 ## 3. Notifications and outside text
 
-- **Notification bodies are rich text with links opened**
-  (`notifications/NotificationCard.qml:163-176`). A sender's `<img src>` is
-  fetched (remote addresses too), and a link of any scheme goes to
-  `Qt.openUrlExternally`. Fix: strip `<img>`; open only http, https and
-  mailto. To check.
-- **Outside text read as markup**: lyrics (`panels/LyricsView.qml:65`),
-  track titles (`bar/Media.qml:377`, `panels/MediaPanel.qml:133,144`, the
-  OSD's caption), app names (`notifications/NotificationCard.qml:118`,
-  `NotificationGroup.qml:37`), tray menu labels (`panels/TrayMenu.qml`),
-  polkit (`polkit/Polkit.qml:125,188`). A `<b>` or `&amp;` in a title would
-  render. Fix: `textFormat: Text.PlainText`.
+Done 2026-10-29: notification bodies drop `<img>` (seen drawing a local
+file before the fix; a remote address would have been fetched the same
+way) and open only http, https and mailto links. Text other apps send
+(titles, artists, lyrics, app and device names, tray menus, polkit
+messages, the launcher's apps) shows as plain text: set on `BarText`,
+`SectionLabel`, `Chip`, `OptionRow`, `Button` and each such `Text`.
 
 ## 4. Caps Lock
 
@@ -79,25 +74,14 @@ scrolling) and `panels/LyricsView.qml` (until the next line).
 
 ## 6. The hyprmonk crate
 
-- **The screenshot name ignores `date` failing**
-  (`crates/hyprmonk/src/screenshot.rs:347`): a failed `date` names every
-  shot `Screenshot_.png`, each overwriting the last; two copies within a
-  second share one preview file. Fix: check the exit status; milliseconds
-  in the previews' names.
-- **The battery JSON is written by hand** (`src/battery.rs:101-126`) while
-  `serde_json` is already a dependency. Fix: `serde_json::json!`, dropping
-  `json_object` and `json_escape`; the test output stays the same.
-- **`std::env::args()` panics on arguments that are not UTF-8**
-  (`src/main.rs:24`). Fix: `args_os` with `to_string_lossy`, so bad input
-  gets the usage text.
-- **"Show in folder" builds the `file://` link unencoded**
-  (`src/screenshot.rs:200`): a space in the Pictures folder makes it
-  invalid. Fix: percent-encode the path.
-- Smaller: `run_with_input` writes all input before reading output, which
-  would deadlock a future caller with large input and large output (say so,
-  or write on a thread); `read_all` stops at the first device that fails
-  (matters once there is more than one mouse); `pictures_folder` falls back
-  to a relative path without `HOME`.
+Done 2026-10-29: `date` failing is an error (no more `Screenshot_.png`),
+copied previews carry milliseconds, the battery JSON comes from
+`serde_json` (its keys now sorted; the shell parses it, the test compares
+values), arguments that are not UTF-8 get the usage text instead of a
+panic, "Show in folder" percent-encodes the path, and `run_with_input`
+says when it would deadlock. Left as they are: `read_all` stopping at the
+first device that fails (one mouse today), `pictures_folder` without
+`HOME`, `poll` not retried after a signal (no signal handlers).
 
 ## 7. Smaller, as they come up
 

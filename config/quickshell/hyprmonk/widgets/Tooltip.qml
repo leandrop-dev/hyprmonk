@@ -43,6 +43,7 @@ PopupWindow {
 
             Text {
                 text: tip.lines[0]
+                textFormat: Text.PlainText
                 color: Theme.foreground
                 font.family: Theme.font
                 font.pixelSize: Theme.bodyFontSize

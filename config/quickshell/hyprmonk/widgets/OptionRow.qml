@@ -36,6 +36,7 @@ Rectangle {
         Text {
             Layout.fillWidth: true
             text: option.text
+            textFormat: Text.PlainText
             color: Theme.foreground
             font.family: Theme.font
             font.pixelSize: Theme.rowFontSize

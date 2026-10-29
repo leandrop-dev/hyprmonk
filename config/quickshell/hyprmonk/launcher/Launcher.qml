@@ -281,6 +281,7 @@ Scope {
                         anchors.rightMargin: 10
                         anchors.verticalCenter: parent.verticalCenter
                         text: row.modelData.name
+                        textFormat: Text.PlainText
                         color: Theme.foreground
                         font.family: Theme.font
                         font.pixelSize: Theme.rowFontSize
@@ -346,6 +347,7 @@ Scope {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.maximumWidth: parent.width - 48
                 text: root.picked?.name ?? ""
+                textFormat: Text.PlainText
                 color: Theme.foreground
                 font.family: Theme.font
                 font.pixelSize: 18
@@ -358,6 +360,7 @@ Scope {
                 Layout.maximumWidth: parent.width - 64
                 visible: text !== ""
                 text: root.detailOf(root.picked)
+                textFormat: Text.PlainText
                 color: Theme.fg(Theme.dimOpacity)
                 font.family: Theme.font
                 font.pixelSize: Theme.bodyFontSize

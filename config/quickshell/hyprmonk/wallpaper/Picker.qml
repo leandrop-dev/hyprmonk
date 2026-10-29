@@ -217,6 +217,7 @@ Scope {
             y: window.cardHeight - window.bottom + 8
             width: window.cardWidth - 40
             text: root.current < root.shown.length ? root.nameOf(root.shown[root.current]) : ""
+            textFormat: Text.PlainText
             elide: Text.ElideMiddle
             color: Theme.fg(0.6)
             font.family: Theme.font

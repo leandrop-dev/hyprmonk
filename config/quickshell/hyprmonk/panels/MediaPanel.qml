@@ -131,6 +131,7 @@ ClippingRectangle {
                 Layout.topMargin: 4
                 visible: !Lyrics.shown
                 text: panel.player?.trackTitle || "Unknown track"
+                textFormat: Text.PlainText
                 color: Theme.foreground
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSize
@@ -142,6 +143,7 @@ ClippingRectangle {
                 Layout.fillWidth: true
                 visible: text !== "" && !Lyrics.shown
                 text: [panel.player?.trackArtist, panel.player?.trackAlbum].filter(s => s).join(" · ")
+                textFormat: Text.PlainText
                 color: Theme.fg(0.7)
                 font.family: Theme.font
                 font.pixelSize: Theme.bodyFontSize

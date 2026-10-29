@@ -153,6 +153,7 @@ Rectangle {
             width: parent.width
             horizontalAlignment: Text.AlignRight
             text: surface.player?.trackTitle ?? ""
+            textFormat: Text.PlainText
             color: Theme.foreground
             font.family: Theme.font
             font.pixelSize: Math.round(24 * surface.s)
@@ -164,6 +165,7 @@ Rectangle {
             horizontalAlignment: Text.AlignRight
             visible: text !== ""
             text: surface.player?.trackArtist ?? ""
+            textFormat: Text.PlainText
             color: Theme.fg(0.73)
             font.family: Theme.font
             font.pixelSize: Math.round(20 * surface.s)

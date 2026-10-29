@@ -4,6 +4,7 @@ use std::fmt::Write as _;
 use std::path::Path;
 
 use anyhow::Result;
+use serde_json::{Value, json};
 
 use crate::hidraw::{self, Device};
 use crate::steelseries;
@@ -91,38 +92,20 @@ pub fn render(readings: &[Reading], format: Format) -> String {
             }
         }
         Format::Json => {
-            let items: Vec<String> = readings.iter().map(json_object).collect();
-            let _ = writeln!(out, "[{}]", items.join(","));
+            let items: Vec<Value> = readings.iter().map(json_object).collect();
+            let _ = writeln!(out, "{}", Value::Array(items));
         }
     }
     out
 }
 
-fn json_object(reading: &Reading) -> String {
-    let (percent, charging) = match reading.charge {
-        Some(charge) => (charge.percent.to_string(), charge.charging.to_string()),
-        None => ("null".to_owned(), "null".to_owned()),
-    };
-    format!(
-        r#"{{"name":"{}","kind":"{}","percent":{percent},"charging":{charging}}}"#,
-        json_escape(reading.name),
-        reading.kind.as_str()
-    )
-}
-
-fn json_escape(text: &str) -> String {
-    let mut out = String::with_capacity(text.len());
-    for c in text.chars() {
-        match c {
-            '"' => out.push_str("\\\""),
-            '\\' => out.push_str("\\\\"),
-            c if c.is_control() => {
-                let _ = write!(out, "\\u{:04x}", u32::from(c));
-            }
-            c => out.push(c),
-        }
-    }
-    out
+fn json_object(reading: &Reading) -> Value {
+    json!({
+        "name": reading.name,
+        "kind": reading.kind.as_str(),
+        "percent": reading.charge.map(|charge| charge.percent),
+        "charging": reading.charge.map(|charge| charge.charging),
+    })
 }
 
 #[cfg(test)]
@@ -164,15 +147,17 @@ mod tests {
     }
 
     #[test]
-    fn json_escapes_names_and_uses_null_when_asleep() {
+    fn json_is_one_line_with_null_when_asleep() {
+        let out = render(&readings(), Format::Json);
+        assert!(out.ends_with("]\n") && out.lines().count() == 1, "{out:?}");
+        let parsed: Value = serde_json::from_str(&out).expect("valid JSON");
         assert_eq!(
-            render(&readings(), Format::Json),
-            concat!(
-                r#"[{"name":"Mouse","kind":"mouse","percent":13,"charging":false},"#,
-                r#"{"name":"Pad \"2\"","kind":"mouse","percent":90,"charging":true},"#,
-                r#"{"name":"Asleep","kind":"mouse","percent":null,"charging":null}]"#,
-                "\n"
-            )
+            parsed,
+            json!([
+                { "name": "Mouse", "kind": "mouse", "percent": 13, "charging": false },
+                { "name": "Pad \"2\"", "kind": "mouse", "percent": 90, "charging": true },
+                { "name": "Asleep", "kind": "mouse", "percent": null, "charging": null }
+            ])
         );
     }
 

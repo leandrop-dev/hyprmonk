@@ -285,6 +285,7 @@ Scope {
                                 width: parent.width - x - 12
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: entry.modelData.description
+                                textFormat: Text.PlainText
                                 color: Theme.foreground
                                 font.family: Theme.font
                                 font.pixelSize: Theme.rowFontSize
