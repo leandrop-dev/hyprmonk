@@ -107,25 +107,50 @@ cargo clippy --all-targets -- -D warnings
 - A clean install, still to do: run it on a fresh Arch with no desktop (a
   VM) and fix what shows up. `packages/pacman.txt` was checked against
   everything the shell, the config and the units run; what remains open:
-  - A login screen to choose (greetd with tuigreet, SDDM, ly, or none: the
-    text console and `uwsm start`). KWallet unlocks at login only if that
-    login's PAM file has `pam_kwallet5.so` (Plasma's login has it today).
+  - The login screen: SDDM with the
+    [sddm-astronaut-theme](https://github.com/Keyitdev/sddm-astronaut-theme)
+    (GPL-3.0), astronaut first. It needs `sddm qt6-svg qt6-virtualkeyboard
+    qt6-multimedia-ffmpeg`; the installer clones the theme into
+    `/usr/share/sddm/themes`, copies its fonts and sets it in
+    `/etc/sddm.conf.d/`. This machine runs Plasma's login today (disable
+    `plasmalogin`, enable `sddm`). KWallet unlocks at login only if SDDM's
+    PAM file has `pam_kwallet5.so`: to check once installed. Later, a
+    picker for its ten themes: `hyprmonk sddm-theme NAME` changes
+    `ConfigFile=` in the theme's `metadata.desktop` through pkexec (the
+    shell's polkit agent asks), listed in a card or quick action.
   - The GPU driver: hyprmonk does not install one (NVIDIA needs its own
     packages; `uwsm/env` sets the NVIDIA variables only when it is loaded).
-  - How apps look outside Plasma (GTK and Qt themes for Dolphin and the
-    rest).
+  - How apps look outside Plasma. GTK: the adw-gtk3 theme with a
+    matugen-generated `gtk.css` for GTK 3 and 4 (the accent and surfaces),
+    applied with `gsettings` (dark scheme, icons, cursor: this also brings
+    the cursor to GTK apps). Qt: qt6ct with the Breeze style and a
+    matugen-generated palette, tried on Dolphin and Ark first (KDE apps may
+    want a KDE colour scheme instead).
 - An installer that is pleasant to use: a gum menu (Install, Update,
   Uninstall, Check, Quit), installing gum first when it is missing (on Arch
   it is in `extra`). Update pulls and re-runs what changed; Uninstall
   removes the links (restoring the `*.bak-DATE` copies) and the units.
-- What a fresh install brings besides the shell, to choose after trying the
-  options: the file manager, the icons and an image viewer (what Open on a
-  screenshot starts).
+- What a fresh install brings besides the shell:
+  - Files: Nautilus (GTK 4, sandboxed thumbnailers, `FileManager1` for Show
+    in folder); `fileManager` in `hyprland.lua` moves from Dolphin.
+    [Strata](https://github.com/lgse/strata) to look at again once it is
+    older than two months and in the official repos.
+  - Images: Loupe (sandboxed decoders), what Open on a screenshot starts.
+  - Icons: [Cosmic-Noir](https://github.com/atraxsrc/cosmic-icon-themes)
+    (GPL-3.0, from Kanagawa), downloaded by the installer with its SHA256
+    checked: all three variants, Dark (grey folders) by default and Orange
+    (Noir's `#F25623`) while the Noir tone is picked.
+- The terminal in the theme: kitty's 16 colours from cosmic-noir's
+  terminal palette (`cosmic-term/Noir-term.ron`), so ls, btop and the rest
+  look like it; its background, text, cursor and selection follow the
+  Appearance tone (Noir's own for Noir, the tone and the wallpaper's accent
+  for the others), reloaded live on a pick. Light tones need a darker take
+  on the palette to stay readable.
 - More from [cosmic-noir-theme](https://github.com/atraxsrc/cosmic-noir-theme),
-  where the wallpapers come from (its palette is the Noir tone): its
-  terminal, btop and fastfetch colours.
+  where the wallpapers come from (its palette is the Noir tone): its btop
+  and fastfetch colours.
 - The cursor in GTK apps (they read it from their own settings, not from
-  `XCURSOR_THEME`).
+  `XCURSOR_THEME`): comes with the GTK settings above.
 - Fedora (and Fedora-based) once Arch is stable: a `packages/` list for
   dnf, and COPRs for what Fedora does not ship.
 
