@@ -20,7 +20,7 @@ load_optional(state .. "/theme/colors.lua")
 load_optional(state .. "/theme/tone.lua")
 
 terminal    = "kitty"
-fileManager = "dolphin"
+fileManager = "nautilus"
 launcher    = "qs -c hyprmonk ipc call overlays toggle launcher"
 
 hl.monitor({ output = "HDMI-A-1", mode = "2560x1080@75", position = "0x0", scale = 1 })

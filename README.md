@@ -25,7 +25,7 @@ from `paru-bin`):
 sudo pacman -S --needed git
 git clone https://github.com/leandrop-dev/hyprmonk.git
 cd hyprmonk
-./install.sh            # packages, AUR packages, configs, folders, cursor, wallpapers, hyprmonk, the shell
+./install.sh            # packages, AUR packages, configs, folders, default apps, cursor, wallpapers, hyprmonk, the shell
 ./install.sh udev       # once: lets hyprmonk read the mouse battery (sudo)
 ```
 
@@ -96,8 +96,7 @@ cargo clippy --all-targets -- -D warnings
   and the light ones were dropped; more to pick later). Only Wallpaper takes
   its colours from the wallpaper; every other tone brings its own accent and
   green, as Noir does, and the tone's accent reaches everything: the shell,
-  Hyprland's window borders and kitty do (the shell writes `theme/tone.lua`
-  and `theme/kitty-tone.conf`); GTK apps still to come.
+  Hyprland's window borders, kitty and GTK apps do (`ThemeOutputs.qml`).
 - Appearance: from HyprFlow, a panel to tweak a tone (card opacity, blur, text
   colour).
 - Lights, parked (not a must-have): the keyboard and mouse in the accent.
@@ -125,10 +124,11 @@ cargo clippy --all-targets -- -D warnings
     shell's polkit agent asks), listed in a card or quick action.
   - The GPU driver: hyprmonk does not install one (NVIDIA needs its own
     packages; `uwsm/env` sets the NVIDIA variables only when it is loaded).
-  - How apps look outside Plasma. GTK: the adw-gtk3 theme with a
-    matugen-generated `gtk.css` for GTK 3 and 4 (the accent and surfaces),
-    applied with `gsettings` (dark scheme, icons, cursor: this also brings
-    the cursor to GTK apps). Qt: qt6ct with the Breeze style and a
+  - How apps look outside Plasma. GTK: done, adw-gtk3 and GTK's named
+    colours, the wallpaper's from matugen and a tone's own over them, in
+    `~/.config/gtk-{3,4}.0/gtk.css` (written by the shell under Hyprland,
+    by Plasma under Plasma); open GTK 4 apps change with the tone, GTK 3
+    ones when opened again. Qt: qt6ct with the Breeze style and a
     matugen-generated palette, tried on Dolphin and Ark first (KDE apps may
     want a KDE colour scheme instead).
 - An installer that is pleasant to use: a gum menu (Install, Update,
@@ -136,11 +136,12 @@ cargo clippy --all-targets -- -D warnings
   it is in `extra`). Update pulls and re-runs what changed; Uninstall
   removes the links (restoring the `*.bak-DATE` copies) and the units.
 - What a fresh install brings besides the shell:
-  - Files: Nautilus (GTK 4, sandboxed thumbnailers, `FileManager1` for Show
-    in folder); `fileManager` in `hyprland.lua` moves from Dolphin.
+  - Files: done, Nautilus (GTK 4, sandboxed thumbnailers, `FileManager1`
+    for Show in folder), on Super+E and for folders (`install.sh apps`).
     [Strata](https://github.com/lgse/strata) to look at again once it is
     older than two months and in the official repos.
-  - Images: Loupe (sandboxed decoders), what Open on a screenshot starts.
+  - Images: done, Loupe (sandboxed decoders), what Open on a screenshot
+    starts.
   - Icons: [Yaru](https://github.com/ubuntu/yaru), as Omarchy does
     (`yaru-icon-theme` from the AUR, `install.sh aur`). Done for GTK apps:
     Noir takes Yaru's orange, Wallpaper the colour nearest its accent. The
@@ -153,8 +154,6 @@ cargo clippy --all-targets -- -D warnings
 - More from [cosmic-noir-theme](https://github.com/atraxsrc/cosmic-noir-theme),
   where the wallpapers come from (its palette is the Noir tone): its btop
   and fastfetch colours.
-- The cursor in GTK apps (they read it from their own settings, not from
-  `XCURSOR_THEME`): comes with the GTK settings above.
 - Fedora (and Fedora-based) once Arch is stable: a `packages/` list for
   dnf, and COPRs for what Fedora does not ship.
 

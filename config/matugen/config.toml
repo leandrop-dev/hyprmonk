@@ -15,6 +15,11 @@ input_path = "~/.config/matugen/templates/quickshell.json"
 output_path = "~/.local/state/hyprmonk/theme/colors.json"
 post_hook = "qs -c hyprmonk ipc call theme reload"
 
+[templates.gtk]
+input_path = "~/.config/matugen/templates/gtk-colors.css"
+output_path = "~/.local/state/hyprmonk/theme/gtk-colors.css"
+post_hook = "qs -c hyprmonk ipc call gtk reload"
+
 [templates.kitty]
 input_path = "~/.config/matugen/templates/kitty.conf"
 output_path = "~/.local/state/hyprmonk/theme/kitty.conf"

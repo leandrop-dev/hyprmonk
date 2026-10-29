@@ -55,127 +55,12 @@ Singleton {
     readonly property color positive: tone.positive ?? (tone.light ? "#1f9d3a" : "#3dff3d")
     readonly property color warning: "#ff5f56"
     readonly property color selection: Qt.rgba(0, 0, 0, tone.light ? 0.1 : 0.4)  // the picked row in a list
+    readonly property color wallpaperAccent: colors.accent  // whatever the tone (ThemeOutputs.qml)
 
     // Foreground at an opacity: secondary text, hover fills, idle items. On
     // a light tone, text (0.3 and up) is lifted so it still reads.
     function fg(alpha: real): color {
         return Qt.alpha(foreground, alpha >= 0.3 && tone.light ? Math.min(1, alpha + 0.25) : alpha);
-    }
-
-    // Icons: Yaru (from the AUR), in the colour a tone names (`icons`, "" for
-    // Yaru's own orange) or else the one nearest in hue to the accent; a
-    // dark tone takes the -dark variant. Only the saved tone counts, so a
-    // preview does not repaint every app. GTK apps get it through gsettings;
-    // the shell's own icons are QS_ICON_THEME (uwsm/env), read at its start.
-    // Hues sampled from each colour's folder.
-    readonly property var yaruHues: ({ "": 17, red: 350, yellow: 38, olive: 85, prussiangreen: 179, blue: 210, purple: 250, magenta: 299 })
-    readonly property string iconTheme: {
-        const saved = tones[savedTone] ?? tones.noir;
-        const name = "icons" in saved ? saved.icons : yaruNearest(saved.accent ?? colors.accent);
-        return "Yaru" + (name ? "-" + name : "") + (saved.light ? "" : "-dark");
-    }
-
-    // A greyish accent takes a muted colour (wartybrown when warm, sage when
-    // cool); the others the closest hue, around the circle.
-    function yaruNearest(accent: color): string {
-        const hue = Math.max(0, accent.hslHue) * 360;
-        if (accent.hslSaturation < 0.25) return hue < 70 || hue > 330 ? "wartybrown" : "sage";
-        let best = "", distance = 360;
-        for (const name in yaruHues) {
-            const apart = Math.abs(hue - yaruHues[name]);
-            const around = Math.min(apart, 360 - apart);
-            if (around < distance) {
-                best = name;
-                distance = around;
-            }
-        }
-        return best;
-    }
-
-    // Hyprland's window borders take a tone's own accent: written to
-    // theme/tone.lua, which hyprland.lua loads after matugen's colors.lua.
-    // Empty for a tone without one, so the wallpaper's stays.
-    readonly property string hyprlandTone: {
-        const accent = (tones[savedTone] ?? tones.noir).accent;
-        return "-- Written by the shell (Theme.qml) for the saved tone. Do not edit.\n"
-            + (accent ? `theme.accent = "rgba(${Qt.color(accent).toString().slice(1)}ee)"\n` : "");
-    }
-
-    // kitty's text, background, cursor and selection from a tone with its own
-    // accent (theme/kitty-tone.conf, after matugen's in kitty.conf); empty
-    // for one without, so the wallpaper's stay. Its 16 colours do not change.
-    readonly property string kittyTone: {
-        const saved = tones[savedTone] ?? tones.noir;
-        const lines = ["# Written by the shell (Theme.qml) for the saved tone. Do not edit."];
-        if (saved.accent) {
-            const hex = c => Qt.color(c).toString();
-            const mix = alpha => hex(Qt.tint(saved.background, Qt.alpha(saved.foreground, alpha)));
-            const colours = {
-                foreground: hex(saved.foreground),
-                background: hex(saved.background),
-                selection_foreground: hex(saved.background),
-                selection_background: hex(saved.accent),
-                cursor: hex(saved.accent),
-                cursor_text_color: hex(saved.background),
-                url_color: hex(saved.positive ?? saved.accent),
-                active_border_color: hex(saved.accent),
-                inactive_border_color: mix(0.25),
-                active_tab_foreground: hex(saved.background),
-                active_tab_background: hex(saved.accent),
-                inactive_tab_foreground: mix(0.6),
-                inactive_tab_background: mix(0.06)
-            };
-            for (const name in colours) lines.push(name.padEnd(24) + colours[name]);
-        }
-        return lines.join("\n") + "\n";
-    }
-
-    onIconThemeChanged: applyTone.restart()
-    onHyprlandToneChanged: applyTone.restart()
-    onKittyToneChanged: applyTone.restart()
-
-    // The saved tone, outside the shell. Waits for the files to be read (and
-    // a burst of changes to settle); Hyprland and kitty reload only when
-    // their file changes, not on every start.
-    Timer {
-        id: applyTone
-        interval: 500
-        running: true
-        onTriggered: {
-            gsettings.running = true;
-            if (toneFile.text() !== theme.hyprlandTone) toneFile.setText(theme.hyprlandTone);
-            if (kittyFile.text() !== theme.kittyTone) kittyFile.setText(theme.kittyTone);
-        }
-    }
-
-    FileView {
-        id: kittyFile
-        path: theme.stateDir + "/theme/kitty-tone.conf"
-        printErrors: false
-        onSaved: kittyReload.running = true
-    }
-
-    // kitty reads its config again on USR1, as after matugen.
-    Process {
-        id: kittyReload
-        command: ["pkill", "-USR1", "-x", "kitty"]
-    }
-
-    FileView {
-        id: toneFile
-        path: theme.stateDir + "/theme/tone.lua"
-        printErrors: false
-        onSaved: hyprReload.running = true
-    }
-
-    Process {
-        id: hyprReload
-        command: ["hyprctl", "reload", "config-only"]
-    }
-
-    Process {
-        id: gsettings
-        command: ["gsettings", "set", "org.gnome.desktop.interface", "icon-theme", theme.iconTheme]
     }
 
     // Type

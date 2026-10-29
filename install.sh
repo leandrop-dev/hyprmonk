@@ -9,7 +9,7 @@ usage() {
     cat <<EOF
 usage: install.sh [step...]
 
-With no step: packages aur link folders cursor wallpapers bin services.
+With no step: packages aur link folders apps cursor wallpapers bin services.
 
 steps:
   check      list packages from packages/pacman.txt and aur.txt that are not installed
@@ -17,6 +17,7 @@ steps:
   aur        install the missing ones from aur.txt with paru (uses sudo; gets paru first)
   link       symlink the configs into ~/.config (existing ones are moved to *.bak-DATE)
   folders    create ~/Pictures/Wallpapers, where the wallpaper picker looks
+  apps       open folders in Nautilus and images in Loupe (xdg-open)
   cursor     download the cursor theme (Bibata) to ~/.local/share/icons
   wallpapers download the cosmic-noir wallpapers, and pick one if none is set
   bin        build hyprmonk and install it to ~/.local/bin
@@ -112,6 +113,23 @@ step_folders() {
     command -v xdg-user-dirs-update >/dev/null && xdg-user-dirs-update
     mkdir -p "$HOME/Pictures/Wallpapers"
     echo "   ok       ~/Pictures/Wallpapers"
+}
+
+# What xdg-open starts. Without it a folder opens in kitty: kitty-open.desktop
+# claims folders too, and sorts first.
+APPS=(
+    "org.gnome.Nautilus.desktop:inode/directory"
+    "org.gnome.Loupe.desktop:image/png image/jpeg image/webp image/gif image/bmp image/tiff image/svg+xml"
+)
+
+step_apps() {
+    say "Setting default apps"
+    local pair app
+    for pair in "${APPS[@]}"; do
+        app=${pair%%:*}
+        xdg-mime default "$app" ${pair#*:}
+        echo "   ok       ${app%.desktop}: ${pair#*:}"
+    done
 }
 
 # The cursor: Bibata (GPL-3.0), not in the official repos, so its release
@@ -269,11 +287,11 @@ step_plugins() {
 
 main() {
     local steps=("$@")
-    [[ ${#steps[@]} -eq 0 ]] && steps=(packages aur link folders cursor wallpapers bin services)
+    [[ ${#steps[@]} -eq 0 ]] && steps=(packages aur link folders apps cursor wallpapers bin services)
     local step
     for step in "${steps[@]}"; do
         case $step in
-            check | packages | aur | link | folders | cursor | wallpapers | bin | services | udev | plugins) "step_$step" ;;
+            check | packages | aur | link | folders | apps | cursor | wallpapers | bin | services | udev | plugins) "step_$step" ;;
             -h | --help | help) usage ;;
             *)
                 usage >&2
