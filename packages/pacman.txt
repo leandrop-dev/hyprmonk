@@ -1,6 +1,6 @@
-# Packages from the official repos (all in Arch's extra or core: nothing from
-# the AUR). `install.sh check` lists the missing ones, `install.sh packages`
-# installs them. A bare Arch install (no desktop) needs every one: what a
+# Packages from the official repos (all in Arch's extra or core; the AUR ones
+# are in aur.txt). `install.sh check` lists the missing ones, `install.sh
+# packages` installs them. A bare Arch install (no desktop) needs every one: what a
 # desktop would have brought (fonts, the PulseAudio layer) is here. The
 # cursor and the wallpapers are downloaded by install.sh (not in the repos).
 
@@ -14,7 +14,6 @@ quickshell
 matugen
 qt6-imageformats   # WebP wallpapers
 ttf-jetbrains-mono-nerd
-tela-circle-icon-theme-purple
 noto-fonts   # text in apps and notifications beyond JetBrains Mono
 noto-fonts-emoji
 xdg-user-dirs   # ~/Pictures and the rest, where the wallpapers live

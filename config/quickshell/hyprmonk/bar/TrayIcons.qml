@@ -1,7 +1,9 @@
 // Apps' status icons (services/Tray.qml). Click: the app (or its menu, for
 // those that only have one); middle click: its other action; right click:
-// its menu, as a panel; scroll: passed to the app.
+// its menu, as a panel; scroll: passed to the app. Symbolic icons take the
+// text colour.
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell.Services.SystemTray
 import Quickshell.Widgets
@@ -36,9 +38,33 @@ RowLayout {
             onScrolled: steps => modelData.scroll(steps, false)
 
             contents: [
-                IconImage {
-                    implicitSize: 16
-                    source: Tray.iconSource(mod.modelData)
+                // A symbolic icon is a shape for the desktop to paint in its
+                // text colour (as Plasma does; drawn in KDE's dark text,
+                // it would vanish on the bar): only its outline is kept.
+                Item {
+                    readonly property bool symbolic: icon.source.toString().includes("-symbolic")
+
+                    implicitWidth: 16
+                    implicitHeight: 16
+
+                    IconImage {
+                        id: icon
+                        anchors.fill: parent
+                        source: Tray.iconSource(mod.modelData)
+                        visible: !parent.symbolic
+                        layer.enabled: parent.symbolic
+                    }
+
+                    Rectangle {
+                        anchors.fill: parent
+                        visible: parent.symbolic
+                        color: Theme.foreground
+                        layer.enabled: true
+                        layer.effect: MultiEffect {
+                            maskEnabled: true
+                            maskSource: icon
+                        }
+                    }
                 },
                 // Asking to be looked at.
                 Rectangle {

@@ -16,14 +16,16 @@ polkit agent, the Hyprland config and the helpers. More panels come next
 
 ## Install
 
-On Arch (or an Arch-based distro) with or without a desktop; every package
-comes from the official repos:
+On Arch (or an Arch-based distro) with or without a desktop. Packages come
+from the official repos, except the icons (Yaru), from the AUR through paru,
+which the installer gets first (from the repos on CachyOS, else built once
+from `paru-bin`):
 
 ```bash
 sudo pacman -S --needed git
 git clone https://github.com/leandrop-dev/hyprmonk.git
 cd hyprmonk
-./install.sh            # packages, configs, folders, cursor, icons, wallpapers, hyprmonk, the shell
+./install.sh            # packages, AUR packages, configs, folders, cursor, wallpapers, hyprmonk, the shell
 ./install.sh udev       # once: lets hyprmonk read the mouse battery (sudo)
 ```
 
@@ -90,12 +92,12 @@ cargo clippy --all-targets -- -D warnings
   [docs/optimizations.md](docs/optimizations.md): the bar's idle CPU first.
 - Quick actions still to come from HyprFlow: the screens (mirror, only the
   main one; need a second screen to test).
-- Appearance: only the Wallpaper tone takes its colours from the wallpaper.
-  Every other tone brings its own accent and green, as Noir does today
-  (Black, Slate, Espresso and the light ones still take the wallpaper's
-  accent), and the tone's accent reaches everything: the shell, Hyprland's
-  window borders (today always the wallpaper's, even with Noir), kitty and
-  GTK apps. Each tone's accent is to choose, in its own hue.
+- Appearance: two tones for now, Noir and Wallpaper (Black, Slate, Espresso
+  and the light ones were dropped; more to pick later). Only Wallpaper takes
+  its colours from the wallpaper; every other tone brings its own accent and
+  green, as Noir does, and the tone's accent reaches everything: the shell,
+  Hyprland's window borders (today always the wallpaper's, even with Noir),
+  kitty and GTK apps.
 - Appearance: from HyprFlow, a panel to tweak a tone (card opacity, blur, text
   colour), and the tone reaching kitty.
 - Lights, parked (not a must-have): the keyboard and mouse in the accent.
@@ -142,18 +144,17 @@ cargo clippy --all-targets -- -D warnings
     [Strata](https://github.com/lgse/strata) to look at again once it is
     older than two months and in the official repos.
   - Images: Loupe (sandboxed decoders), what Open on a screenshot starts.
-  - Icons: [Cosmic-Noir](https://github.com/atraxsrc/cosmic-icon-themes)
-    (GPL-3.0, from Kanagawa): `install.sh icons` downloads all three
-    variants (pinned by SHA256). Still to do: apply them (with the GTK
-    settings), Dark (grey folders) by default and Orange (Noir's `#F25623`)
-    while the Noir tone is picked. They inherit Yaru, which Arch does not
-    ship: icons missing from the pack fall back to hicolor only.
+  - Icons: [Yaru](https://github.com/ubuntu/yaru), as Omarchy does
+    (`yaru-icon-theme` from the AUR, `install.sh aur`). Done for GTK apps:
+    Noir takes Yaru's orange, Wallpaper the colour nearest its accent. The
+    shell's own icons stay Yaru's orange (`QS_ICON_THEME` is read once);
+    Qt apps follow with the Qt theming.
 - The terminal in the theme: kitty's 16 colours from cosmic-noir's
   terminal palette (`cosmic-term/Noir-term.ron`), so ls, btop and the rest
   look like it; its background, text, cursor and selection follow the
   Appearance tone (Noir's own for Noir, the tone and the wallpaper's accent
-  for the others), reloaded live on a pick. Light tones need a darker take
-  on the palette to stay readable.
+  for the others), reloaded live on a pick. A light tone, if one comes
+  back, needs a darker take on the palette to stay readable.
 - More from [cosmic-noir-theme](https://github.com/atraxsrc/cosmic-noir-theme),
   where the wallpapers come from (its palette is the Noir tone): its btop
   and fastfetch colours.
@@ -176,9 +177,8 @@ cargo clippy --all-targets -- -D warnings
   panel shows them.
 - The cursor: [Bibata](https://github.com/ful1e5/Bibata_Cursor) Modern Ice
   (GPL-3.0), downloaded by the installer.
-- The icons: [Cosmic-Noir](https://github.com/atraxsrc/cosmic-icon-themes)
-  by atraxsrc (GPL-3.0), from Fausto Korpsvart's Kanagawa pack (itself from
-  Suru++ and Papirus), downloaded by the installer.
+- The icons: [Yaru](https://github.com/ubuntu/yaru) by the Ubuntu community
+  (CC BY-SA 4.0 and GPL-3.0), installed from the AUR.
 
 ## License
 

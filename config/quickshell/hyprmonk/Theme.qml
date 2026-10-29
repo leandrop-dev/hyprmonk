@@ -8,8 +8,7 @@
 // matugen's post_hook calls `qs -c hyprmonk ipc call theme reload`: a file
 // watch alone misses the first run, when the file does not exist yet.
 //
-// IPC: qs -c hyprmonk ipc call theme tone NAME  (black, slate, espresso,
-//      noir, light, mist, ivory or wallpaper)
+// IPC: qs -c hyprmonk ipc call theme tone NAME  (noir or wallpaper)
 pragma Singleton
 
 import QtQuick
@@ -23,29 +22,24 @@ Singleton {
 
     // Tones: the background, the text and how opaque cards are. One is in
     // use (quick actions > Appearance, kept in appearance.json); "wallpaper"
-    // takes its colours from matugen's scheme for the wallpaper. Each sits
-    // apart in hue (cool, warm, neutral) and covers enough of the wallpaper
-    // to show it; light ones need more, or a dark wallpaper greys them. A
-    // tone may bring its own accent (and green) instead of the wallpaper's.
+    // takes its colours from matugen's scheme for the wallpaper. A tone may
+    // bring its own accent (and green) instead of the wallpaper's. A light
+    // one (`light: true`) needs more card opacity, or a dark wallpaper greys
+    // it; none is in the list for now, the rest below still handles one.
     readonly property var tones: ({
-        black:     { label: "Black",     background: "#000000", foreground: "#ffffff", card: 0.38, light: false },
-        slate:     { label: "Slate",     background: "#1a2433", foreground: "#e4ecf7", card: 0.78, light: false },
-        espresso:  { label: "Espresso",  background: "#2e2018", foreground: "#f5e8d8", card: 0.78, light: false },
         // From cosmic-noir-theme: charcoal, fog text, orange, sage.
         noir:      { label: "Noir",      background: "#171717", foreground: "#ccd0cf", card: 0.88, light: false,
-                     accent: "#f25623", positive: "#88a57d" },
-        light:     { label: "Light",     background: "#ffffff", foreground: "#2c2c30", card: 0.86, light: true },
-        mist:      { label: "Mist",      background: "#dbe4f0", foreground: "#1a2433", card: 0.86, light: true },
-        ivory:     { label: "Ivory",     background: "#f4e8d0", foreground: "#45392a", card: 0.86, light: true },
+                     accent: "#f25623", positive: "#88a57d", icons: "" },
         wallpaper: { label: "Wallpaper", background: colors.surface, foreground: colors.surfaceText, card: 0.78, light: false }
     })
-    // Espresso until the settings are read (and for a name it does not know).
+    // Noir until the settings are read (and for a name it does not know, such
+    // as a tone that was dropped).
     // A previewed tone (quick actions, while moving through them) shows
     // without being saved.
-    readonly property string savedTone: appearance?.tone in tones ? appearance.tone : "espresso"
+    readonly property string savedTone: appearance?.tone in tones ? appearance.tone : "noir"
     property string previewTone: ""
     readonly property string toneName: previewTone in tones ? previewTone : savedTone
-    readonly property var tone: tones[toneName] ?? tones.espresso
+    readonly property var tone: tones[toneName] ?? tones.noir
 
     function setTone(name: string): void {
         if (name in tones) appearance.tone = name;
@@ -66,6 +60,51 @@ Singleton {
     // a light tone, text (0.3 and up) is lifted so it still reads.
     function fg(alpha: real): color {
         return Qt.alpha(foreground, alpha >= 0.3 && tone.light ? Math.min(1, alpha + 0.25) : alpha);
+    }
+
+    // Icons: Yaru (from the AUR), in the colour a tone names (`icons`, "" for
+    // Yaru's own orange) or else the one nearest in hue to the accent; a
+    // dark tone takes the -dark variant. Only the saved tone counts, so a
+    // preview does not repaint every app. GTK apps get it through gsettings;
+    // the shell's own icons are QS_ICON_THEME (uwsm/env), read at its start.
+    // Hues sampled from each colour's folder.
+    readonly property var yaruHues: ({ "": 17, red: 350, yellow: 38, olive: 85, prussiangreen: 179, blue: 210, purple: 250, magenta: 299 })
+    readonly property string iconTheme: {
+        const saved = tones[savedTone] ?? tones.noir;
+        const name = "icons" in saved ? saved.icons : yaruNearest(saved.accent ?? colors.accent);
+        return "Yaru" + (name ? "-" + name : "") + (saved.light ? "" : "-dark");
+    }
+
+    // A greyish accent takes a muted colour (wartybrown when warm, sage when
+    // cool); the others the closest hue, around the circle.
+    function yaruNearest(accent: color): string {
+        const hue = Math.max(0, accent.hslHue) * 360;
+        if (accent.hslSaturation < 0.25) return hue < 70 || hue > 330 ? "wartybrown" : "sage";
+        let best = "", distance = 360;
+        for (const name in yaruHues) {
+            const apart = Math.abs(hue - yaruHues[name]);
+            const around = Math.min(apart, 360 - apart);
+            if (around < distance) {
+                best = name;
+                distance = around;
+            }
+        }
+        return best;
+    }
+
+    onIconThemeChanged: applyIcons.restart()
+
+    // Waits for the files to be read (and a burst of changes to settle).
+    Timer {
+        id: applyIcons
+        interval: 500
+        running: true
+        onTriggered: gsettings.running = true
+    }
+
+    Process {
+        id: gsettings
+        command: ["gsettings", "set", "org.gnome.desktop.interface", "icon-theme", theme.iconTheme]
     }
 
     // Type
@@ -116,7 +155,7 @@ Singleton {
 
         JsonAdapter {
             id: appearance
-            property string tone: "espresso"
+            property string tone: "noir"
         }
     }
 

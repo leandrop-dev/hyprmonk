@@ -1,0 +1,4 @@
+# What the official repos do not have, from the AUR through paru
+# (install.sh aur). One package per line; # starts a comment.
+
+yaru-icon-theme   # the icons; each tone picks one of its colours

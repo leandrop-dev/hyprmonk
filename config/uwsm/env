@@ -17,5 +17,6 @@ export QT_QPA_PLATFORM="wayland;xcb"
 export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 export ELECTRON_OZONE_PLATFORM_HINT=auto
 
-# Icons in the shell (packages/pacman.txt installs them)
-export QS_ICON_THEME=Tela-circle-purple-dark
+# Icons in the shell: Yaru (packages/aur.txt). Read once at its start, so it
+# does not follow the tone as GTK apps do (Theme.qml); dark, Yaru's orange.
+export QS_ICON_THEME=Yaru-dark
