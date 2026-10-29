@@ -39,7 +39,7 @@ hl.config({
 
 hl.curve("easeOutQuint", { type = "bezier", points = { {0.23, 1},  {0.32, 1} } })
 hl.curve("almostLinear", { type = "bezier", points = { {0.5, 0.5}, {0.75, 1} } })
-hl.curve("snappy",       { type = "spring", mass = 1, stiffness = 238.1191, dampening = 24.21279333 })
+hl.curve("snappy",       { type = "spring", mass = 1, stiffness = 238.1191, damping = 24.21279333 })
 
 hl.animation({ leaf = "global",     enabled = true, speed = 10,   bezier = "default" })
 hl.animation({ leaf = "border",     enabled = true, speed = 5.39, bezier = "easeOutQuint" })
