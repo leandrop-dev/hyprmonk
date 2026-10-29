@@ -95,9 +95,9 @@ cargo clippy --all-targets -- -D warnings
 - Appearance: two tones for now, Noir and Wallpaper (Black, Slate, Espresso
   and the light ones were dropped; more to pick later). Only Wallpaper takes
   its colours from the wallpaper; every other tone brings its own accent and
-  green, as Noir does, and the tone's accent reaches everything: the shell,
-  Hyprland's window borders (today always the wallpaper's, even with Noir),
-  kitty and GTK apps.
+  green, as Noir does, and the tone's accent reaches everything: the shell
+  and Hyprland's window borders do (the shell writes `theme/tone.lua`);
+  kitty and GTK apps still to come.
 - Appearance: from HyprFlow, a panel to tweak a tone (card opacity, blur, text
   colour), and the tone reaching kitty.
 - Lights, parked (not a must-have): the keyboard and mouse in the accent.

@@ -16,6 +16,8 @@ theme = {
     shadow   = "rgba(11111bee)",
 }
 load_optional(state .. "/theme/colors.lua")
+-- The Appearance tone's own accent, if it has one (written by the shell).
+load_optional(state .. "/theme/tone.lua")
 
 terminal    = "kitty"
 fileManager = "dolphin"

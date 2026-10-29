@@ -92,14 +92,41 @@ Singleton {
         return best;
     }
 
-    onIconThemeChanged: applyIcons.restart()
+    // Hyprland's window borders take a tone's own accent: written to
+    // theme/tone.lua, which hyprland.lua loads after matugen's colors.lua.
+    // Empty for a tone without one, so the wallpaper's stays.
+    readonly property string hyprlandTone: {
+        const accent = (tones[savedTone] ?? tones.noir).accent;
+        return "-- Written by the shell (Theme.qml) for the saved tone. Do not edit.\n"
+            + (accent ? `theme.accent = "rgba(${Qt.color(accent).toString().slice(1)}ee)"\n` : "");
+    }
 
-    // Waits for the files to be read (and a burst of changes to settle).
+    onIconThemeChanged: applyTone.restart()
+    onHyprlandToneChanged: applyTone.restart()
+
+    // The saved tone, outside the shell. Waits for the files to be read (and
+    // a burst of changes to settle); Hyprland reloads only when its file
+    // changes, not on every start.
     Timer {
-        id: applyIcons
+        id: applyTone
         interval: 500
         running: true
-        onTriggered: gsettings.running = true
+        onTriggered: {
+            gsettings.running = true;
+            if (toneFile.text() !== theme.hyprlandTone) toneFile.setText(theme.hyprlandTone);
+        }
+    }
+
+    FileView {
+        id: toneFile
+        path: theme.stateDir + "/theme/tone.lua"
+        printErrors: false
+        onSaved: hyprReload.running = true
+    }
+
+    Process {
+        id: hyprReload
+        command: ["hyprctl", "reload", "config-only"]
     }
 
     Process {
