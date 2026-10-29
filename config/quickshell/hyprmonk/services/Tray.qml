@@ -34,6 +34,13 @@ Singleton {
     function enter(entry: var): void { path = [...path, entry]; }
     function back(): void { path = path.slice(0, -1); }
 
+    // Entries the app removed read no properties once gone: the path stops
+    // before the first of them.
+    function prune(): void {
+        const gone = path.findIndex(entry => entry.objectName === undefined);
+        if (gone >= 0) path = path.slice(0, gone);
+    }
+
     // The app quit with its menu open.
     onItemChanged: if (!item && Panels.open === "tray") Panels.close()
 

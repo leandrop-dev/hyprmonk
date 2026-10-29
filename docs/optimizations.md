@@ -108,19 +108,29 @@ first device that fails (one mouse today), `pictures_folder` without
 - ~~The Commands tab sorts every program on PATH per keystroke~~: timed
   2026-10-29 with 3,598 programs: about 2 ms a keystroke, 13 ms when the
   tab opens with nothing typed (one frame). Left as it is.
-- **Tray submenus that change while open** (`services/Tray.qml:20`,
-  `panels/TrayMenu.qml:21`): the stored entry dies and the panel shows an
-  empty submenu. Fix: one menu opener per level, drop dead entries. To
-  check.
+- ~~Tray submenus~~ (done 2026-10-29): every submenu showed empty. The
+  panel's one menu opener moved from the app's menu to the submenu, and
+  with no opener left on the app's menu Quickshell drops it, the submenu
+  entry with it (`DBusMenuHandle::unrefHandle`). One opener now holds the
+  app's menu and another opens the submenu; an entry the app removes
+  (its menu rebuilt) takes the panel back to what is left. Checked with a
+  test tray icon, before and after.
 - **Tray icons that fail to load** (`bar/TrayIcons.qml:39`) leave a blank
   gap. Fix: fall back to the icon theme or a glyph.
 - ~~Lyrics~~ (done 2026-10-29): the position is read once when the player
   changes; a request that takes over 15 s is aborted and counts as an
   error (asked again in 30 s), and a new one aborts the one before;
   `line` is guarded while `lines` and `index` update.
-- **The player's length after a track change** (`services/Player.qml:135`)
-  may keep the previous track's length when the title arrives first. To
-  check.
+- ~~The player's length after a track change~~ (checked 2026-10-29): fine.
+  Quickshell applies each MPRIS metadata change in one property update
+  group, so the title and the length change together; a title without a
+  length shows none until it comes.
+- ~~The picker's and the lyrics' position after their list changes~~ (done
+  2026-10-29): a new model puts a view's own `currentIndex` back to 0, even
+  when bound (checked on Qt 6.12), so the picker scrolled to the top when
+  the folder changed and lyrics arriving mid-song held the first line in
+  the middle until the next. Both set it again when the model changes, as
+  the launcher does; the picker keeps `current` inside a shorter list.
 - **The media panel may be about 7 px short** (`panels/MediaPanel.qml:22`)
   with an artist line and a seek bar. To check on screen.
 - ~~The previous wallpaper stays in memory~~ (done 2026-10-29): let go once

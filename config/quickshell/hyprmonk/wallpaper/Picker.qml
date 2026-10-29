@@ -30,6 +30,12 @@ Scope {
         return file.slice(file.lastIndexOf("/") + 1);
     }
 
+    // The folder can change while the picker is open: `current` stays inside
+    // the list. A new model also puts the grid's own index back to 0, so the
+    // grid is told again (below).
+    onShownChanged: if (current >= shown.length) current = Math.max(0, shown.length - 1)
+    onCurrentChanged: grid.currentIndex = current
+
     function move(step: int): void {
         if (shown.length > 0) current = Math.max(0, Math.min(shown.length - 1, current + step));
     }
@@ -124,7 +130,7 @@ Scope {
             cellWidth: window.tileWidth
             cellHeight: window.tileHeight
             model: root.shown
-            currentIndex: root.current
+            onModelChanged: currentIndex = root.current
             boundsBehavior: Flickable.StopAtBounds
             clip: true
 

@@ -16,9 +16,20 @@ ColumnLayout {
 
     spacing: 2
 
+    // One opener holds the app's menu while the panel shows it: with none,
+    // Quickshell drops the menu, and every submenu entry in Tray.path with
+    // it. The other opens the submenu shown, if any.
     QsMenuOpener {
-        id: opener
-        menu: panel.submenu ?? Tray.item?.menu ?? null
+        id: whole
+        menu: Tray.item?.menu ?? null
+    }
+
+    QsMenuOpener {
+        id: opened
+        menu: panel.submenu
+        // Gone when the app rebuilds its menu: back to what is left (once
+        // the entry is fully gone).
+        onMenuChanged: Qt.callLater(Tray.prune)
     }
 
     SectionLabel {
@@ -42,7 +53,7 @@ ColumnLayout {
     }
 
     Repeater {
-        model: opener.children
+        model: opened.menu ? opened.children : whole.children
 
         Loader {
             id: slot

@@ -47,8 +47,11 @@ Item {
         interactive: !view.synced
         boundsBehavior: Flickable.StopAtBounds
 
-        // Synced: the current line held in the middle.
-        currentIndex: view.synced ? Math.max(0, Lyrics.index) : -1
+        // Synced: the current line held in the middle. New lyrics put the
+        // view's own index back to 0 (a new model), so it is bound again.
+        readonly property int line: view.synced ? Math.max(0, Lyrics.index) : -1
+        currentIndex: line
+        onModelChanged: currentIndex = Qt.binding(() => line)
         highlightRangeMode: view.synced ? ListView.StrictlyEnforceRange : ListView.NoHighlightRange
         preferredHighlightBegin: height / 2 - 12
         preferredHighlightEnd: height / 2 + 12
