@@ -17,6 +17,8 @@ Scope {
     readonly property bool open: Overlays.open === "wallpapers"
     property string query: ""
     property int current: 0
+    property int hovered: -1
+    property point pointer: Qt.point(-1, -1)
 
     readonly property var shown: Wallpaper.files.filter(file => {
         const name = file.slice(file.lastIndexOf("/") + 1).toLowerCase();
@@ -34,7 +36,17 @@ Scope {
     // the list. A new model also puts the grid's own index back to 0, so the
     // grid is told again (below).
     onShownChanged: if (current >= shown.length) current = Math.max(0, shown.length - 1)
-    onCurrentChanged: grid.currentIndex = current
+    onCurrentChanged: {
+        grid.currentIndex = current;
+        hovered = -1;
+    }
+
+    // A tile lights up only when the pointer really moves over it, not when
+    // the grid slides one under a pointer at rest.
+    function hover(at: point, index: int): void {
+        if (pointer.x >= 0 && (at.x !== pointer.x || at.y !== pointer.y)) hovered = index;
+        pointer = at;
+    }
 
     function move(step: int): void {
         if (shown.length > 0) current = Math.max(0, Math.min(shown.length - 1, current + step));
@@ -50,6 +62,8 @@ Scope {
         query = "";
         current = Math.max(0, shown.indexOf(Wallpaper.path));
         grid.positionViewAtIndex(current, GridView.Contain);
+        pointer = Qt.point(-1, -1);
+        hovered = -1;
         search.forceActiveFocus();
     }
 
@@ -135,6 +149,7 @@ Scope {
             clip: true
 
             onCurrentIndexChanged: positionViewAtIndex(currentIndex, GridView.Contain)
+            onContentYChanged: root.hovered = -1
 
             delegate: Item {
                 id: tile
@@ -173,7 +188,7 @@ Scope {
                 Rectangle {
                     anchors.fill: frame
                     radius: frame.radius
-                    color: mouse.containsMouse && !tile.picked ? Theme.fg(Theme.hoverOpacity) : "transparent"
+                    color: root.hovered === tile.index && !tile.picked ? Theme.fg(Theme.hoverOpacity) : "transparent"
                     border.width: tile.picked ? 2 : 1
                     border.color: tile.picked ? Theme.accent : Theme.rim
                 }
@@ -202,6 +217,8 @@ Scope {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
+                    onPositionChanged: mouse => root.hover(mapToItem(null, mouse.x, mouse.y), tile.index)
+                    onExited: if (root.hovered === tile.index) root.hovered = -1
                     onClicked: {
                         root.current = tile.index;
                         root.pick();

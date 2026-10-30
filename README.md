@@ -279,15 +279,24 @@ cargo clippy --all-targets -- -D warnings
 
 **Later**
 
-- More tones, and a panel to adjust one (card opacity, blur, text colour).
-- Calendar events, from a source still to choose (local, Google or CalDAV).
+An open list, in no fixed order.
+
+- A Settings app or panel for what does not fit in quick actions: display size
+  and refresh rate, border sizes, window gaps, rearranging the bar's modules.
+  Ideas to gather from noctalia, HANCORE-linux and Ryoku.
+- More tones, with ideas from HANCORE-linux's themes, and a panel to adjust one
+  (card opacity, blur, text colour).
+- btop and fastfetch following the appearance, the Wallpaper tone included.
+- A picker for fastfetch's look, with presets like LierB/fastfetch's.
+- A simple Vesktop theme that follows the appearance.
+- Calendar events from all three sources: local, Google and CalDAV.
+- A phone module on the bar, beyond its battery: notifications, the clipboard,
+  files, ringing it to find it. KDE Connect or an app of our own, still to
+  decide.
 - Screen quick actions (mirror, main screen only) and the lock screen on
   several screens.
-- btop and fastfetch in the cosmic-noir colours.
-- A phone module on the bar, beyond its battery: notifications, the clipboard,
-  files, ringing it to find it. KDE Connect looks like the way to do it.
-- A login screen look of its own, drawn like the lock screen.
-- Fedora, with its own package list.
+- The Rust and QML reviewers again, to keep it all lean.
+- Fedora, with its own package list, last of all.
 
 **Known issues**
 

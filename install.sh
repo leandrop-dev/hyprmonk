@@ -165,6 +165,12 @@ step_check() {
         echo "   off      udev rule (./install.sh udev)"
         off=$((off + 1))
     fi
+    if [[ -e /var/cache/hyprpm/$USER/state.toml ]]; then
+        echo "   ok       hyprpm plugins"
+    else
+        echo "   off      hyprpm plugins (./install.sh plugins, inside Hyprland)"
+        off=$((off + 1))
+    fi
     if [[ $(getent passwd "$USER" | cut -d: -f7) == */zsh ]]; then
         echo "   ok       login shell zsh"
     else

@@ -51,9 +51,13 @@ bind(mod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }),               
 bind(mod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }),                 "Previous workspace")
 
 section = "Shell"
--- Overview (hymission); a no-op until the plugin is loaded.
+-- Overview (hymission); until the plugin is loaded, it says how to get it.
 bind(mod .. " + Tab", function()
-    if hl.plugin.hymission then hl.plugin.hymission.toggle() end
+    if hl.plugin.hymission then
+        hl.plugin.hymission.toggle()
+    else
+        hl.exec_cmd('notify-send --app-name Overview "The overview is not installed" "Run hyprmonk install plugins in a terminal"')
+    end
 end, "Overview")
 bind(mod .. " + A",         hl.dsp.exec_cmd("qs -c hyprmonk ipc call overlays toggle quickactions"), "Quick actions")
 bind(mod .. " + K",         hl.dsp.exec_cmd("qs -c hyprmonk ipc call overlays toggle keyguide"),     "Key guide")

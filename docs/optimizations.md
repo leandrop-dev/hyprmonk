@@ -42,9 +42,10 @@ clock still while paused). What is left:
 Done 2026-10-29: hovering picks a row only when the pointer really moves
 (the launcher, quick actions, the key guide, the power menu), and the
 launcher's list is told its index again whenever its model changes, with
-`current` kept inside a shorter list. Still in the same pattern, not yet
-changed: `wallpaper/Picker.qml:126` (mostly hidden by its explicit
-scrolling) and `panels/LyricsView.qml` (until the next line).
+`current` kept inside a shorter list. The wallpaper picker and the lyrics got
+that second fix under section 7. The picker never picked on hover; its tiles
+lit up under a pointer at rest as the grid moved, and since 2026-10-30 they
+light only when the pointer moves. The lyrics have no hover at all.
 
 ## 3. Notifications and outside text
 
