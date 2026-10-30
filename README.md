@@ -44,7 +44,8 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
 - Panels from the bar: Wi-Fi (networks, passwords, the connection editor for
   the rest), Bluetooth (pairing, connecting, batteries), sound (outputs,
   inputs, a mixer), batteries, a calendar, and media with synced lyrics.
-- A running cat, faster the busier the CPU, that opens a hardware drawer:
+- A running cat, faster the busier the CPU and resting when the machine is
+  quiet, that opens a hardware drawer:
   temperature, CPU, memory, disk and network.
 - A launcher for apps, commands, SSH hosts and the clipboard history.
 - Quick actions: appearance (the tone), wallpaper, game mode, screen recording,
@@ -255,15 +256,15 @@ cargo clippy --all-targets -- -D warnings
 
 **Next**
 
-- The optimizations in [docs/optimizations.md](docs/optimizations.md), the
-  bar's idle CPU first.
+- The rest of the optimizations in [docs/optimizations.md](docs/optimizations.md).
 
 **Later**
 
 - More tones, and a panel to adjust one (card opacity, blur, text colour).
 - Calendar events, from a source still to choose (local, Google or CalDAV).
 - More recording options: a region or a window as well as the screen, sound
-  and microphone on or off, pausing, and saving the last moments on a key.
+  and microphone on or off, pausing, and saving the last moments on a key
+  ([docs/recording.md](docs/recording.md)).
 - Screen quick actions (mirror, main screen only) and the lock screen on
   several screens.
 - btop and fastfetch in the cosmic-noir colours.

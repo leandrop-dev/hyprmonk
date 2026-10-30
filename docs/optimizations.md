@@ -20,9 +20,22 @@ clock still while paused). What is left:
   changed nothing for the shell, Hyprland or the GPU, within noise, so the
   tall window stays. The running cat's frames still cost the shell about
   1.5% of a core; that is Qt's per-frame work, not the window's size.
-- **The player's position is asked for twice a second** while both the
-  media drawer (`bar/Media.qml:343`) and the lyrics (`services/Lyrics.qml`)
-  run: ask in one place.
+- ~~The player's position is asked for twice a second~~: not worth a
+  change. `positionChanged()` only tells bindings to read again, and
+  Quickshell works the position out from what it holds, with no D-Bus call
+  (read in its `player.cpp`, master, 2026-10-30). The timers run only while
+  the media drawer, its panel or the lyrics in the bar are showing.
+- **The spectrum while music plays**: measured 2026-10-30 at about 14% of a
+  core for the shell. Drawing it into a framebuffer object rather than an
+  image (`renderTarget`) changed nothing: 13.8%, 14.3%, then 13.5% back on
+  the image, 40 s each.
+- **The running cat is the rest of the idle cost**: measured 2026-10-30 with
+  everything closed but one terminal, in % of a core, 32 s a run. Running,
+  the shell took 1.1 to 2.2, Hyprland 0.9 to 4.7 and `nv_queue` 1.0 to 4.6;
+  with the cat stopped, about 0.3, 0.05 and 0.4. Slowing it from 6 to 3
+  frames a second gained nothing beyond the noise, so only stopping it helps.
+  Done: it rests below 4% CPU and wakes at 6% (`bar/Runcat.qml`). With Steam,
+  Discord and Zen open the load stays around 15%, so it still runs there.
 
 ## 2. The wrong item picked
 
