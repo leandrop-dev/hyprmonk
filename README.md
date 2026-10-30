@@ -62,7 +62,8 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
 - Always installed: kitty, Nautilus, Loupe, NetworkManager, Bluetooth,
   GNOME Keyring (with its SSH agent), clipboard history, USB drives mounted
   as they are plugged in, and the common codecs.
-- Picked one by one at install: Zen Browser, mpv, Papers, Zed, Calculator,
+- Picked one by one at install: Zen Browser, mpv, Papers, Zed, GitHub CLI,
+  Claude Code, opencode, Calculator,
   btop, Resources, KDE Partition Manager, Filelight, archive tools,
   LocalSend, GPU Screen Recorder, Deskflow, printing, Flatpak, firmware
   updates, and spell checking in English and Portuguese.
@@ -97,7 +98,7 @@ first if it is missing):
 
 | Entry | What it does |
 |-------|--------------|
-| **Install** | A checklist of the apps (`packages/apps.txt`), then every step: packages, AUR packages, the apps, configs, folders, default apps, cursor, wallpapers, the `hyprmonk` binary, user and system services, zsh, the login screen |
+| **Install** | A checklist of the apps (`packages/apps.txt`), then every step: packages, AUR packages, the apps, configs, folders, default apps, cursor, wallpapers, the `hyprmonk` binary, user and system services, the udev rule for device batteries, zsh, the login screen |
 | **Update** | Pulls the repo and runs only the steps its changes need, restarting the shell when its code changed |
 | **Check** | Lists what is missing, and the step that fixes each |
 | **Uninstall** | Removes the links and units and puts back what they replaced; says how to undo the rest |
@@ -108,7 +109,6 @@ finish from a terminal inside Hyprland:
 
 ```bash
 hyprmonk install plugins   # the overview (hymission; compiles)
-hyprmonk install udev      # optional: lets hyprmonk read a SteelSeries mouse's battery
 ```
 
 **What the installer touches.** Configs already in the way are moved to

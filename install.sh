@@ -40,7 +40,8 @@ steps:
   system     enable NetworkManager, Bluetooth, printing and Avahi (uses sudo)
   shell      zsh as your login shell, its config linked to ~/.zshrc (asks your
              password)
-  udev       install the udev rule for device batteries (uses sudo)
+  udev       the udev rule that lets hyprmonk read device batteries; it does
+             nothing without such a device (uses sudo)
   login      the login screen: SDDM with sddm-astronaut-theme, enabled in place of
              the current display manager (uses sudo; from the next boot); its
              look is picked in quick actions
@@ -51,7 +52,7 @@ EOF
 say() { printf '\033[1m::\033[0m %s\n' "$*"; }
 
 # What Install runs, in order (plugins too from inside Hyprland).
-INSTALL_STEPS=(packages aur apps link folders defaults cursor wallpapers bin services system shell login)
+INSTALL_STEPS=(packages aur apps link folders defaults cursor wallpapers bin services system udev shell login)
 
 # repo path -> target, relative to the repo and $HOME
 LINKS=(
@@ -158,6 +159,12 @@ step_check() {
             off=$((off + 1))
         fi
     done
+    if [[ -e /etc/udev/rules.d/70-hyprmonk.rules ]]; then
+        echo "   ok       udev rule"
+    else
+        echo "   off      udev rule (./install.sh udev)"
+        off=$((off + 1))
+    fi
     if [[ $(getent passwd "$USER" | cut -d: -f7) == */zsh ]]; then
         echo "   ok       login shell zsh"
     else
@@ -597,10 +604,10 @@ updated_from() {
             install.sh) want link; want defaults; want services; want system; want login ;;
             config/systemd/user/*) want link; want services ;;
             crates/* | Cargo.*) want bin ;;
-            udev/*) [[ -e /etc/udev/rules.d/70-hyprmonk.rules ]] && want udev ;;
+            udev/*) want udev ;;
         esac
     done <<< "$changed"
-    for step in "${INSTALL_STEPS[@]}" udev; do
+    for step in "${INSTALL_STEPS[@]}"; do
         [[ " ${wanted[*]} " == *" $step "* ]] && "step_$step"
     done
     if echo "$changed" | grep -q '^config/quickshell/' && systemctl --user is-active --quiet hyprmonk-shell.service; then

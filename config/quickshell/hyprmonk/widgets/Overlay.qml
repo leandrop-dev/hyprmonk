@@ -40,7 +40,16 @@ PanelWindow {
     implicitWidth: cardWidth + margin * 2
     implicitHeight: windowHeight
     exclusionMode: ExclusionMode.Ignore
-    mask: Region { item: card }
+    // The card's place, not `item: card`: an item is measured with its fold's
+    // rotation and again only when its size changes, so a card of fixed height
+    // (the power menu) would keep the sliver it had when opening, and a click
+    // on it would land outside and dismiss it.
+    mask: Region {
+        x: card.x
+        y: card.y
+        width: card.width
+        height: card.height
+    }
 
     WlrLayershell.namespace: name
     WlrLayershell.layer: WlrLayer.Overlay

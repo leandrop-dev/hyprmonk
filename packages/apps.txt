@@ -8,6 +8,9 @@ Zen Browser | zen-browser-bin | the browser; opens web links
 mpv | mpv mpv-mpris | video and audio, seen by the media panel
 Papers | papers | PDFs and other documents
 Zed | zed | text and code; opens text files
+GitHub CLI | github-cli | GitHub from the terminal (gh)
+Claude Code | claude-code | coding agent in the terminal
+opencode | opencode | open source coding agent in the terminal
 Calculator | gnome-calculator | GNOME's calculator
 btop | btop | system monitor in the terminal
 Resources | resources | system monitor, with the GPU
