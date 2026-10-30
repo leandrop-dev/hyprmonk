@@ -1,6 +1,7 @@
 //! `hyprmonk`: command-line helpers for the hyprmonk desktop.
 
 mod battery;
+mod bluetooth;
 mod hidraw;
 mod installer;
 mod screenshot;
@@ -18,6 +19,7 @@ commands:
   battery [--json]                       charge of devices UPower cannot see (SteelSeries Rival 3 Wireless)
   screenshot region|window|screen [--copy]
                                          take a screenshot: annotate and save it, or copy it
+  bluetooth-agent                        answer BlueZ's pairing requests through the shell (the shell runs this)
 
 the installer (the repo's install.sh, found through ~/.config/hypr):
   menu                                   Install, Update, Check, Uninstall
@@ -64,6 +66,7 @@ fn run(args: &[&str]) -> Result<ExitCode> {
         [command @ ("update" | "check" | "uninstall")] => {
             installer::exec(&[command]).map(|()| ExitCode::SUCCESS)
         }
+        ["bluetooth-agent"] => bluetooth::run().map(|()| ExitCode::SUCCESS),
         ["help" | "--help" | "-h"] => {
             print!("{USAGE}");
             Ok(ExitCode::SUCCESS)

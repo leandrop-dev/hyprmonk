@@ -203,6 +203,7 @@ need, installed to `~/.local/bin`:
 ```
 hyprmonk battery [--json]                       charge of devices UPower cannot see
 hyprmonk screenshot region|window|screen [--copy]
+hyprmonk bluetooth-agent                        answers BlueZ's pairing requests; the shell runs it
 hyprmonk menu | install [step...] | update | check | uninstall
 ```
 
@@ -213,6 +214,8 @@ hyprmonk menu | install [step...] | update | check | uninstall
   opens the shot in satty to annotate; Enter saves it to
   `~/Pictures/Screenshots`, `--copy` puts it on the clipboard instead. A
   notification offers Open and Show in folder.
+- `bluetooth-agent` is the pairing agent Quickshell lacks: it passes what
+  BlueZ asks to the shell, which shows the code in the Bluetooth panel.
 - The installer commands find the clone through `~/.config/hypr`, a link
   into it; `HYPRMONK_DIR` overrides that.
 
@@ -258,6 +261,8 @@ cargo clippy --all-targets -- -D warnings
 - Screen quick actions (mirror, main screen only) and the lock screen on
   several screens.
 - btop and fastfetch in the cosmic-noir colours.
+- A phone module on the bar, beyond its battery: notifications, the clipboard,
+  files, ringing it to find it. KDE Connect looks like the way to do it.
 - A login screen look of its own, drawn like the lock screen.
 - Fedora, with its own package list.
 
@@ -265,8 +270,8 @@ cargo clippy --all-targets -- -D warnings
 
 - A copied screenshot's notification shows a grey preview instead of the
   shot.
-- Bluetooth devices that ask for a code or a confirmation cannot pair from the
-  panel, which has no pairing agent; `bluetoothctl` does them.
+- Pairing from a phone does not get through while the Bluetooth panel is
+  searching, which it does for the first seconds: try again once it stops.
 
 **Parked**
 
