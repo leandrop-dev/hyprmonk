@@ -2,7 +2,8 @@
 // does when run. Given `options`, running it opens them as a list of their
 // own, the pill's `value` marked, and `picked` says which was chosen. With
 // `previews`, the option under the cursor is tried as it moves (`previewed`)
-// and put back when the list is left without picking (`unpreviewed`).
+// and put back when the list is left without picking (`unpreviewed`). With
+// `stays`, running it leaves the card open, for switches set in a row.
 import QtQuick
 
 QtObject {
@@ -14,6 +15,7 @@ QtObject {
     property bool available: true
     property var options: []
     property bool previews: false
+    property bool stays: false
 
     signal run()
     signal picked(string option)

@@ -50,13 +50,6 @@ Scope {
         },
         Action {
             section: "System"
-            icon: "\u{F044A}"
-            label: "Screen recording"
-            on: Recorder.active
-            onRun: Recorder.toggle()
-        },
-        Action {
-            section: "System"
             icon: "\u{F009B}"
             label: "Do not disturb"
             on: Notifications.doNotDisturb
@@ -83,6 +76,29 @@ Scope {
             icon: "\u{F0425}"
             label: "Power menu"
             onRun: Overlays.toggle("power")
+        },
+        Action {
+            section: "Recording"
+            icon: "\u{F044A}"
+            label: "Screen recording"
+            on: Recorder.active
+            onRun: Recorder.toggle()
+        },
+        Action {
+            section: "Recording"
+            icon: "\u{F04C3}"
+            label: "Record system sound"
+            on: Recorder.sound
+            stays: true
+            onRun: Recorder.setSound(!Recorder.sound)
+        },
+        Action {
+            section: "Recording"
+            icon: "\u{F036C}"
+            label: "Record microphone"
+            on: Recorder.microphone
+            stays: true
+            onRun: Recorder.setMicrophone(!Recorder.microphone)
         },
         Action {
             section: "Appearance"
@@ -210,7 +226,7 @@ Scope {
             clearSearch();
             current = Math.max(0, item.options.indexOf(item.value));
         } else {
-            Overlays.close();
+            if (!item.stays) Overlays.close();
             item.run();
         }
     }

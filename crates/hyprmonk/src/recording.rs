@@ -1,5 +1,5 @@
-//! `hyprmonk record`: a screen with its sound to the Videos folder, by GPU
-//! Screen Recorder. The shell runs it and stops it with SIGINT, which is why
+//! `hyprmonk record`: a screen to the Videos folder, by GPU Screen Recorder,
+//! with the system's sound, the microphone, both or neither. The shell runs it and stops it with SIGINT, which is why
 //! this becomes the recorder rather than waiting for it; `hyprmonk
 //! recording-saved` then says where it went.
 
@@ -15,13 +15,49 @@ use crate::screenshot;
 
 const RECORDER: &str = "gpu-screen-recorder";
 
+/// What is heard in a recording.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Audio {
+    Silent,
+    /// What the system plays.
+    Sound,
+    /// The default microphone.
+    Microphone,
+    /// Both, mixed into one track, so any player plays them together.
+    Both,
+}
+
+impl Audio {
+    /// From `record`'s flags, in any order; `None` for anything else.
+    #[must_use]
+    pub fn from_flags(flags: &[&str]) -> Option<Self> {
+        match flags {
+            [] => Some(Audio::Silent),
+            ["--sound"] => Some(Audio::Sound),
+            ["--microphone"] => Some(Audio::Microphone),
+            ["--sound", "--microphone"] | ["--microphone", "--sound"] => Some(Audio::Both),
+            _ => None,
+        }
+    }
+
+    /// The recorder's `-a` source, if there is one.
+    fn source(self) -> Option<&'static str> {
+        match self {
+            Audio::Silent => None,
+            Audio::Sound => Some("default_output"),
+            Audio::Microphone => Some("default_input"),
+            Audio::Both => Some("default_output|default_input"),
+        }
+    }
+}
+
 /// Prints the file it will write, then becomes the recorder. Returns only if
 /// that fails.
 ///
 /// # Errors
 ///
 /// Fails when the folder cannot be made or the recorder cannot start.
-pub fn start(monitor: &str) -> Result<()> {
+pub fn start(monitor: &str, audio: Audio) -> Result<()> {
     let folder = screenshot::user_folder("VIDEOS", "Videos").join("Recordings");
     fs::create_dir_all(&folder).with_context(|| format!("creating {}", folder.display()))?;
     let stamp = screenshot::timestamp(screenshot::FILE_TIME)?;
@@ -36,21 +72,12 @@ pub fn start(monitor: &str) -> Result<()> {
     writeln!(stdout, "{}", path.display())?;
     stdout.flush()?;
 
-    let err = Command::new(RECORDER)
-        .args([
-            "-w",
-            monitor,
-            "-f",
-            "60",
-            "-a",
-            "default_output",
-            "-v",
-            "no",
-        ])
-        .args(encoder(&info))
-        .arg("-o")
-        .arg(&path)
-        .exec();
+    let mut recorder = Command::new(RECORDER);
+    recorder.args(["-w", monitor, "-f", "60", "-v", "no"]);
+    if let Some(source) = audio.source() {
+        recorder.args(["-a", source]);
+    }
+    let err = recorder.args(encoder(&info)).arg("-o").arg(&path).exec();
     Err(err).with_context(|| format!("running {RECORDER}"))
 }
 
@@ -111,6 +138,27 @@ fn first_frame(file: &Path) -> Result<std::path::PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn flags_say_what_is_heard() {
+        assert_eq!(Audio::from_flags(&[]), Some(Audio::Silent));
+        assert_eq!(Audio::from_flags(&["--sound"]), Some(Audio::Sound));
+        assert_eq!(
+            Audio::from_flags(&["--microphone"]),
+            Some(Audio::Microphone)
+        );
+        assert_eq!(
+            Audio::from_flags(&["--microphone", "--sound"]),
+            Some(Audio::Both)
+        );
+        assert_eq!(Audio::from_flags(&["--loud"]), None);
+    }
+
+    #[test]
+    fn both_are_one_source() {
+        assert_eq!(Audio::Silent.source(), None);
+        assert_eq!(Audio::Both.source(), Some("default_output|default_input"));
+    }
 
     #[test]
     fn the_hardware_encoder_comes_first() {
