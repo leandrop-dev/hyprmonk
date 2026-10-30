@@ -17,6 +17,7 @@ section = "Apps"
 bind(mod .. " + Return", hl.dsp.exec_cmd(terminal),    "Terminal")
 bind(mod .. " + E",      hl.dsp.exec_cmd(fileManager), "File manager")
 bind(mod .. " + Space",  hl.dsp.exec_cmd(launcher),    "App launcher")
+bind(mod .. " + SHIFT + V", hl.dsp.exec_cmd("qs -c hyprmonk ipc call overlays toggle clipboard"), "Clipboard history")
 
 section = "Windows"
 bind(mod .. " + Q",         hl.dsp.window.close(),                            "Close window")

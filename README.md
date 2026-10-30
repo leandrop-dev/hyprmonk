@@ -46,7 +46,7 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   inputs, a mixer), batteries, a calendar, and media with synced lyrics.
 - A running cat, faster the busier the CPU, that opens a hardware drawer:
   temperature, CPU, memory, disk and network.
-- A launcher for apps, commands and SSH hosts.
+- A launcher for apps, commands, SSH hosts and the clipboard history.
 - Quick actions: appearance (the tone), wallpaper, game mode, power profile,
   audio output, microphone, keyboard layout, do not disturb, the spectrum's
   style, the login screen's look and the power menu.
@@ -132,6 +132,7 @@ this is only the start.
 |------|--------|
 | `Super` `Return` | Terminal (kitty) |
 | `Super` `Space` | Launcher |
+| `Super` `Shift` `V` | Clipboard history |
 | `Super` `E` | Files (Nautilus) |
 | `Super` `A` | Quick actions |
 | `Super` `W` | Wallpapers |
@@ -247,8 +248,6 @@ cargo clippy --all-targets -- -D warnings
 
 **Next**
 
-- A fresh install on CachyOS in a virtual machine, fixing what shows up.
-- Clipboard history in the launcher.
 - Screen recording (GPU Screen Recorder) from quick actions, a key and a dot
   on the bar.
 - The optimizations in [docs/optimizations.md](docs/optimizations.md), the

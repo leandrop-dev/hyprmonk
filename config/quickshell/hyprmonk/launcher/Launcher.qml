@@ -1,12 +1,15 @@
 // The launcher (Super+Space, or the distro logo): a card in the middle of
 // the focused screen. On the left, the search, the tabs (Apps, Commands,
-// SSH) and what matches; on the right, the one picked, large.
+// SSH, Clipboard) and what matches; on the right, the one picked, large.
 //
 // Typing searches; the arrows move, Tab and Shift+Tab switch tabs, Enter
-// starts the one picked (in Commands, Shift+Enter runs it in the terminal);
-// Escape or a click elsewhere closes it. Lists come from services/Apps.qml.
+// starts the one picked (in Commands, Shift+Enter runs it in the terminal; in
+// Clipboard it goes back on the clipboard and Shift+Delete forgets it);
+// Escape or a click elsewhere closes it. Lists come from services/Apps.qml
+// and services/Clipboard.qml.
 //
-// IPC: qs -c hyprmonk ipc call overlays toggle launcher
+// IPC: qs -c hyprmonk ipc call overlays toggle launcher | clipboard
+//      (clipboard opens it on that tab)
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -18,7 +21,7 @@ import qs.widgets
 Scope {
     id: root
 
-    readonly property bool open: Overlays.open === "launcher"
+    readonly property bool open: Overlays.open === "launcher" || Overlays.open === "clipboard"
     property string query: ""
     property int tab: 0
     property int current: 0
@@ -26,7 +29,8 @@ Scope {
     readonly property var tabs: [
         { label: "Apps", icon: "\u{F003B}", hint: "Search apps", find: Apps.findApps },
         { label: "Commands", icon: "\u{F018D}", hint: "Run a command", find: Apps.findCommands },
-        { label: "SSH", icon: "\u{F048D}", hint: "Connect to a host", find: Apps.findHosts }
+        { label: "SSH", icon: "\u{F048D}", hint: "Connect to a host", find: Apps.findHosts },
+        { label: "Clipboard", icon: "\u{F018F}", hint: "Search what you copied", find: Clipboard.find }
     ]
     readonly property var shown: tabs[tab].find(query)
     readonly property var picked: shown[current] ?? null
@@ -36,11 +40,14 @@ Scope {
     // view's own index back to 0, so the view is told again (list below).
     onShownChanged: if (current >= shown.length) current = Math.max(0, shown.length - 1)
     onCurrentChanged: list.currentIndex = current
+    onPickedChanged: Clipboard.preview(picked)
 
     onOpenChanged: {
         if (!open) return;
         pointer = Qt.point(-1, -1);
         Apps.refreshPrograms();
+        Clipboard.refresh();
+        if (Overlays.open === "clipboard") tab = tabs.length - 1;
         search.forceActiveFocus();
     }
 
@@ -73,11 +80,13 @@ Scope {
     function start(item: var, inTerminal: bool): void {
         if (!item) return;
         Overlays.close();
-        Apps.launch(item, inTerminal);
+        if (item.kind === "clip") Clipboard.copy(item);
+        else Apps.launch(item, inTerminal);
     }
 
     // What each kind shows: an app its own icon, the rest a glyph.
     function glyphOf(item: var): string {
+        if (item?.kind === "clip") return item.image ? "\u{F02E9}" : "\u{F018F}";
         return item?.kind === "command" ? "\u{F018D}" : item?.kind === "host" ? "\u{F048D}" : "";
     }
 
@@ -156,6 +165,9 @@ Scope {
                         Keys.onPressed: event => {
                             if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                                 root.start(root.picked, (event.modifiers & Qt.ShiftModifier) !== 0);
+                                event.accepted = true;
+                            } else if (event.key === Qt.Key_Delete && (event.modifiers & Qt.ShiftModifier) && root.picked?.kind === "clip") {
+                                Clipboard.remove(root.picked);
                                 event.accepted = true;
                             } else if (event.key === Qt.Key_PageDown) {
                                 root.move(6);
@@ -298,8 +310,10 @@ Scope {
                     x: 10
                     height: window.rowHeight
                     verticalAlignment: Text.AlignVCenter
-                    text: root.tab === 2 && Apps.hosts.length === 0 && root.query === ""
-                          ? "No hosts in ~/.ssh/config: type one" : "Nothing matches"
+                    text: root.query !== "" ? "Nothing matches"
+                        : root.tab === 2 ? "No hosts in ~/.ssh/config: type one"
+                        : root.tab === 3 ? "Nothing copied yet"
+                        : "Nothing matches"
                     color: Theme.fg(Theme.dimOpacity)
                     font.family: Theme.font
                     font.pixelSize: Theme.rowFontSize
@@ -320,7 +334,7 @@ Scope {
             x: window.listWidth + 1
             width: window.cardWidth - window.listWidth - 1
             anchors.verticalCenter: parent.verticalCenter
-            visible: root.picked !== null
+            visible: root.picked !== null && root.picked.kind !== "clip"
             spacing: 14
 
             Rectangle {
@@ -374,6 +388,51 @@ Scope {
             }
         }
 
+        // A copied thing shows itself: the text, or the image and what it is.
+        ColumnLayout {
+            x: window.listWidth + 17
+            y: 16
+            width: window.cardWidth - window.listWidth - 33
+            height: window.cardHeight - 56
+            visible: root.picked?.kind === "clip"
+            spacing: 10
+
+            Text {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                visible: !root.picked?.image
+                text: root.picked?.text ?? ""
+                textFormat: Text.PlainText
+                color: Theme.foreground
+                font.family: Theme.font
+                font.pixelSize: Theme.rowFontSize
+                wrapMode: Text.WrapAnywhere
+                elide: Text.ElideRight
+            }
+
+            Image {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                visible: root.picked?.image ?? false
+                source: Clipboard.imagePath
+                sourceSize.width: width
+                sourceSize.height: height
+                fillMode: Image.PreserveAspectFit
+                asynchronous: true
+                cache: false
+            }
+
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                visible: root.picked?.image ?? false
+                text: (root.picked?.name ?? "") + ", " + (root.picked?.detail ?? "")
+                textFormat: Text.PlainText
+                color: Theme.fg(Theme.dimOpacity)
+                font.family: Theme.font
+                font.pixelSize: Theme.bodyFontSize
+            }
+        }
+
         // The keys, at the foot of the right side.
         Text {
             x: window.listWidth + 1
@@ -381,7 +440,8 @@ Scope {
             y: window.cardHeight - height - 16
             horizontalAlignment: Text.AlignHCenter
             text: root.tab === 1 ? "Enter run  ·  Shift+Enter in terminal  ·  Tab switch"
-                                 : "Enter open  ·  Tab switch  ·  Esc close"
+                : root.tab === 3 ? "Enter copy  ·  Shift+Delete forget  ·  Tab switch"
+                : "Enter open  ·  Tab switch  ·  Esc close"
             color: Theme.fg(0.3)
             font.family: Theme.font
             font.pixelSize: Theme.smallFontSize

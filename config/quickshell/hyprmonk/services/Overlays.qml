@@ -10,7 +10,8 @@
 // while a card is open, instead of unmapping under it.
 //
 // IPC: qs -c hyprmonk ipc call overlays toggle NAME | close
-//      ("launcher", "quickactions", "power", "keyguide" or "wallpapers")
+//      ("launcher", "clipboard" (the launcher on that tab), "quickactions",
+//      "power", "keyguide" or "wallpapers")
 pragma Singleton
 
 import QtQuick
