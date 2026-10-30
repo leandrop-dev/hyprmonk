@@ -47,8 +47,8 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
 - A running cat, faster the busier the CPU, that opens a hardware drawer:
   temperature, CPU, memory, disk and network.
 - A launcher for apps, commands, SSH hosts and the clipboard history.
-- Quick actions: appearance (the tone), wallpaper, game mode, power profile,
-  audio output, microphone, keyboard layout, do not disturb, the spectrum's
+- Quick actions: appearance (the tone), wallpaper, game mode, screen recording,
+  power profile, audio output, microphone, keyboard layout, do not disturb, the spectrum's
   style, the login screen's look and the power menu.
 - Notifications with a notification centre, an on-screen card for what just
   changed (volume, microphone, audio output, keyboard layout, Caps and Num
@@ -145,6 +145,7 @@ this is only the start.
 | `Super` `S` | Scratchpad |
 | `Print`, then `R`, `W` or `S` | Screenshot of a region, a window or the screen (`Shift` copies it) |
 | `Super` `Alt` `L` | Lock |
+| `Super` `Shift` `R` | Start or stop screen recording |
 | `Super` `Shift` `E` | Power menu |
 | `Super` `K` | Key guide |
 
@@ -204,6 +205,8 @@ need, installed to `~/.local/bin`:
 ```
 hyprmonk battery [--json]                       charge of devices UPower cannot see
 hyprmonk screenshot region|window|screen [--copy]
+hyprmonk record MONITOR                         records a screen with its sound; the shell runs it
+hyprmonk recording-saved FILE                   offers a finished recording; the shell runs it
 hyprmonk bluetooth-agent                        answers BlueZ's pairing requests; the shell runs it
 hyprmonk menu | install [step...] | update | check | uninstall
 ```
@@ -215,6 +218,10 @@ hyprmonk menu | install [step...] | update | check | uninstall
   opens the shot in satty to annotate; Enter saves it to
   `~/Pictures/Screenshots`, `--copy` puts it on the clipboard instead. A
   notification offers Open and Show in folder.
+- `record` is GPU Screen Recorder on the focused screen with the system's
+  sound, not the microphone, on the cheapest encoder the machine has (Vulkan
+  when NVENC is too new for the driver). It saves to `~/Videos/Recordings`,
+  and a notification offers Open and Show in folder.
 - `bluetooth-agent` is the pairing agent Quickshell lacks: it passes what
   BlueZ asks to the shell, which shows the code in the Bluetooth panel.
 - The installer commands find the clone through `~/.config/hypr`, a link
@@ -248,8 +255,6 @@ cargo clippy --all-targets -- -D warnings
 
 **Next**
 
-- Screen recording (GPU Screen Recorder) from quick actions, a key and a dot
-  on the bar.
 - The optimizations in [docs/optimizations.md](docs/optimizations.md), the
   bar's idle CPU first.
 
@@ -257,6 +262,8 @@ cargo clippy --all-targets -- -D warnings
 
 - More tones, and a panel to adjust one (card opacity, blur, text colour).
 - Calendar events, from a source still to choose (local, Google or CalDAV).
+- More recording options: a region or a window as well as the screen, sound
+  and microphone on or off, pausing, and saving the last moments on a key.
 - Screen quick actions (mirror, main screen only) and the lock screen on
   several screens.
 - btop and fastfetch in the cosmic-noir colours.
@@ -267,8 +274,6 @@ cargo clippy --all-targets -- -D warnings
 
 **Known issues**
 
-- A copied screenshot's notification shows a grey preview instead of the
-  shot.
 - Pairing from a phone does not get through while the Bluetooth panel is
   searching, which it does for the first seconds: try again once it stops.
 

@@ -138,6 +138,7 @@ PanelWindow {
              : Panels.open === "tray" ? trayMenu
              : null
 
+        Recording {}
         TrayIcons {}
         NetworkButton { active: bar.panelOpen && Panels.open === "network" }
         BluetoothButton { active: bar.panelOpen && Panels.open === "bluetooth" }

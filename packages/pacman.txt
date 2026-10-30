@@ -96,6 +96,9 @@ xdg-desktop-portal
 xdg-desktop-portal-hyprland   # screen sharing, input capture (Deskflow)
 xdg-desktop-portal-gtk   # file pickers
 
+# Screen recording (hyprmonk record); it brings ffmpeg, for the notification's picture
+gpu-screen-recorder
+
 # Audio, media and batteries
 pipewire
 pipewire-pulse   # apps speaking PulseAudio (pavucontrol, browsers)

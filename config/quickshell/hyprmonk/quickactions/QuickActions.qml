@@ -50,6 +50,13 @@ Scope {
         },
         Action {
             section: "System"
+            icon: "\u{F044A}"
+            label: "Screen recording"
+            on: Recorder.active
+            onRun: Recorder.toggle()
+        },
+        Action {
+            section: "System"
             icon: "\u{F009B}"
             label: "Do not disturb"
             on: Notifications.doNotDisturb

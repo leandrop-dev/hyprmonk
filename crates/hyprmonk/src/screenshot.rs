@@ -161,7 +161,7 @@ fn capture(source: &Source) -> Result<Vec<u8>> {
 
 /// Opens the shot in satty; once it is saved there, says so.
 fn save(png: &[u8]) -> Result<()> {
-    let folder = pictures_folder().join("Screenshots");
+    let folder = user_folder("PICTURES", "Pictures").join("Screenshots");
     fs::create_dir_all(&folder).with_context(|| format!("creating {}", folder.display()))?;
     let path = folder.join(format!("Screenshot_{}.png", timestamp(FILE_TIME)?));
     let status = run_with_input(
@@ -181,24 +181,31 @@ fn save(png: &[u8]) -> Result<()> {
     if !path.exists() {
         return Ok(());
     }
+    offer(APP, "Screenshot saved", &path, Some(&path))
+}
+
+/// Says a file was saved, with its picture, and waits to open it or show it
+/// in the file manager.
+pub(crate) fn offer(app: &str, summary: &str, path: &Path, picture: Option<&Path>) -> Result<()> {
     let name = path
         .file_name()
         .map_or_else(String::new, |name| name.to_string_lossy().into_owned());
     let action = notify(
-        "Screenshot saved",
+        app,
+        summary,
         &name,
-        &path,
+        picture,
         &["default=Open", "open=Open", "folder=Show in folder"],
     )?;
     match action.as_str() {
-        "default" | "open" => spawn(Command::new("xdg-open").arg(&path)),
+        "default" | "open" => spawn(Command::new("xdg-open").arg(path)),
         "folder" => spawn(Command::new("dbus-send").args([
             "--session",
             "--dest=org.freedesktop.FileManager1",
             "--type=method_call",
             "/org/freedesktop/FileManager1",
             "org.freedesktop.FileManager1.ShowItems",
-            &format!("array:string:{}", file_url(&path)),
+            &format!("array:string:{}", file_url(path)),
             "string:",
         ])),
         _ => Ok(()),
@@ -227,19 +234,27 @@ fn copy(png: &[u8]) -> Result<()> {
     fs::create_dir_all(&folder).with_context(|| format!("creating {}", folder.display()))?;
     let preview = folder.join(format!("{}.png", timestamp(PREVIEW_TIME)?));
     fs::write(&preview, png).with_context(|| format!("writing {}", preview.display()))?;
-    notify("Copied to clipboard", "", &preview, &[])?;
+    notify(APP, "Copied to clipboard", "", Some(&preview), &[])?;
     Ok(())
 }
 
 /// Sends a notification with the picture; with actions, waits for one and
 /// returns its name (empty when it is dismissed).
-fn notify(summary: &str, body: &str, picture: &Path, actions: &[&str]) -> Result<String> {
+fn notify(
+    app: &str,
+    summary: &str,
+    body: &str,
+    picture: Option<&Path>,
+    actions: &[&str],
+) -> Result<String> {
     let mut command = Command::new("notify-send");
-    command
-        .args(["--app-name", APP, "--icon", "camera-photo"])
-        .arg(format!("--hint=string:image-path:{}", picture.display()))
-        // The shell's cards show this picture large.
-        .arg("--hint=boolean:x-hyprmonk-preview:true");
+    command.args(["--app-name", app, "--icon", "camera-photo"]);
+    if let Some(picture) = picture {
+        command
+            .arg(format!("--hint=string:image-path:{}", picture.display()))
+            // The shell's cards show this picture large.
+            .arg("--hint=boolean:x-hyprmonk-preview:true");
+    }
     for action in actions {
         command.arg(format!("--action={action}"));
     }
@@ -329,30 +344,31 @@ fn hyprctl(what: &str) -> Result<Value> {
     serde_json::from_slice(&output.stdout).with_context(|| format!("reading hyprctl {what}"))
 }
 
-/// The user's Pictures folder (xdg-user-dirs), else ~/Pictures.
-fn pictures_folder() -> PathBuf {
+/// A folder of the user's (xdg-user-dirs), else the one by that name in the
+/// home folder.
+pub(crate) fn user_folder(kind: &str, fallback: &str) -> PathBuf {
     let named = Command::new("xdg-user-dir")
-        .arg("PICTURES")
+        .arg(kind)
         .output()
         .ok()
         .filter(|output| output.status.success())
         .map(|output| String::from_utf8_lossy(&output.stdout).trim().to_owned())
         .filter(|path| !path.is_empty());
     named.map_or_else(
-        || PathBuf::from(std::env::var_os("HOME").unwrap_or_default()).join("Pictures"),
+        || PathBuf::from(std::env::var_os("HOME").unwrap_or_default()).join(fallback),
         PathBuf::from,
     )
 }
 
 /// A saved shot's time: 2026-10-28_19-04-11.
-const FILE_TIME: &str = "+%Y-%m-%d_%H-%M-%S";
+pub(crate) const FILE_TIME: &str = "+%Y-%m-%d_%H-%M-%S";
 
 /// A copied shot's preview, with milliseconds: two copies within a second
 /// must not share a file (the first notification would show the second).
 const PREVIEW_TIME: &str = "+%Y-%m-%d_%H-%M-%S-%3N";
 
 /// The local time in `format`, from `date` (std has no local time).
-fn timestamp(format: &str) -> Result<String> {
+pub(crate) fn timestamp(format: &str) -> Result<String> {
     let output = Command::new("date")
         .arg(format)
         .output()

@@ -29,12 +29,16 @@ Rectangle {
     readonly property bool preview: notification.hints["x-hyprmonk-preview"] === true
     // `notify-send -i name` sends the name as the image (image://icon/name), not
     // as the app icon. Theme icons resolve to "" when missing, not a checkerboard.
+    // A picture sent as a path comes the same way, with the path as the name.
     readonly property string pictureSource: preview ? "" : resolve(notification.image)
     readonly property string iconSource: resolve(notification.appIcon)
         || resolve(DesktopEntries.byId(notification.desktopEntry)?.icon ?? "")
 
     function resolve(icon: string): string {
-        if (icon.startsWith("image://icon/")) return Quickshell.iconPath(icon.slice(13), true);
+        if (icon.startsWith("image://icon/")) {
+            const name = icon.slice(13);
+            return name.startsWith("/") ? "file://" + name : Quickshell.iconPath(name, true);
+        }
         if (icon.startsWith("/")) return "file://" + icon;
         if (icon.includes("://")) return icon;
         return icon ? Quickshell.iconPath(icon, true) : "";

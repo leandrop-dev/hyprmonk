@@ -18,7 +18,6 @@ Partition Manager | partitionmanager | disks and partitions (KDE)
 Filelight | filelight | what fills a disk (KDE)
 Archive tools | unzip zip 7zip unrar | zip, 7z and RAR, in the terminal and in Nautilus
 LocalSend | localsend | sharing files with nearby devices
-GPU Screen Recorder | gpu-screen-recorder | screen recording
 Deskflow | deskflow | keyboard and mouse shared with other computers
 Printing | cups cups-pk-helper system-config-printer | printers, network ones too
 Flatpak | flatpak | apps from Flathub

@@ -4,10 +4,12 @@ mod battery;
 mod bluetooth;
 mod hidraw;
 mod installer;
+mod recording;
 mod screenshot;
 mod steelseries;
 
 use std::io::{self, Write};
+use std::path::Path;
 use std::process::ExitCode;
 
 use anyhow::Result;
@@ -19,6 +21,8 @@ commands:
   battery [--json]                       charge of devices UPower cannot see (SteelSeries Rival 3 Wireless)
   screenshot region|window|screen [--copy]
                                          take a screenshot: annotate and save it, or copy it
+  record MONITOR                         record a screen with its sound until SIGINT (the shell runs this)
+  recording-saved FILE                   offer a finished recording (the shell runs this)
   bluetooth-agent                        answer BlueZ's pairing requests through the shell (the shell runs this)
 
 the installer (the repo's install.sh, found through ~/.config/hypr):
@@ -66,6 +70,8 @@ fn run(args: &[&str]) -> Result<ExitCode> {
         [command @ ("update" | "check" | "uninstall")] => {
             installer::exec(&[command]).map(|()| ExitCode::SUCCESS)
         }
+        ["record", monitor] => recording::start(monitor).map(|()| ExitCode::SUCCESS),
+        ["recording-saved", file] => recording::saved(Path::new(file)).map(|()| ExitCode::SUCCESS),
         ["bluetooth-agent"] => bluetooth::run().map(|()| ExitCode::SUCCESS),
         ["help" | "--help" | "-h"] => {
             print!("{USAGE}");
