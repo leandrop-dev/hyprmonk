@@ -1,13 +1,14 @@
 //! `hyprmonk record`: a screen or a region picked with slurp to the Videos
 //! folder, by GPU Screen Recorder, with the system's sound, the microphone,
-//! both or neither. The shell runs it and stops it with SIGINT, which is why
-//! this becomes the recorder rather than waiting for it; `hyprmonk
-//! recording-saved` then says where it went.
+//! both or neither. `hyprmonk replay` keeps the last minute of a screen in
+//! memory instead. The shell runs them and signals them, which is why this
+//! becomes the recorder rather than waiting for it; `hyprmonk recording-saved`
+//! then says where it went.
 
 use std::fs;
 use std::io::{self, Write as _};
 use std::os::unix::process::CommandExt as _;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::thread;
 use std::time::Duration;
@@ -20,6 +21,9 @@ const RECORDER: &str = "gpu-screen-recorder";
 
 /// The quick actions card folds away before the picker covers the screen.
 const CARD_GONE: Duration = Duration::from_millis(250);
+
+/// How much a replay keeps.
+const REPLAY_SECONDS: &str = "60";
 
 /// What is heard in a recording.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -75,27 +79,55 @@ pub fn start(area: &str, audio: Audio) -> Result<()> {
         area.to_owned()
     };
 
+    let stamp = screenshot::timestamp(screenshot::FILE_TIME)?;
+    let path = folder()?.join(format!("Recording_{stamp}.mp4"));
+    let mut recorder = recorder(&target, audio)?;
+
+    let mut stdout = io::stdout();
+    writeln!(stdout, "{}", path.display())?;
+    stdout.flush()?;
+
+    let err = recorder.arg("-o").arg(&path).exec();
+    Err(err).with_context(|| format!("running {RECORDER}"))
+}
+
+/// Keeps the last minute of `monitor` in memory: becomes the recorder, which
+/// writes it to the folder on SIGUSR1, printing the file, and drops it on
+/// SIGINT.
+///
+/// # Errors
+///
+/// Fails when the folder or the recorder fails.
+pub fn replay(monitor: &str, audio: Audio) -> Result<()> {
+    let err = recorder(monitor, audio)?
+        .args(["-r", REPLAY_SECONDS, "-c", "mp4", "-o"])
+        .arg(folder()?)
+        .exec();
+    Err(err).with_context(|| format!("running {RECORDER}"))
+}
+
+/// Where recordings go, made if it is not there.
+fn folder() -> Result<PathBuf> {
     let folder = screenshot::user_folder("VIDEOS", "Videos").join("Recordings");
     fs::create_dir_all(&folder).with_context(|| format!("creating {}", folder.display()))?;
-    let stamp = screenshot::timestamp(screenshot::FILE_TIME)?;
-    let path = folder.join(format!("Recording_{stamp}.mp4"));
+    Ok(folder)
+}
+
+/// The recorder for `target`, up to where a recording and a replay differ.
+fn recorder(target: &str, audio: Audio) -> Result<Command> {
     let info = Command::new(RECORDER)
         .arg("--info")
         .output()
         .with_context(|| format!("running {RECORDER}"))?;
     let info = String::from_utf8_lossy(&info.stdout);
 
-    let mut stdout = io::stdout();
-    writeln!(stdout, "{}", path.display())?;
-    stdout.flush()?;
-
     let mut recorder = Command::new(RECORDER);
-    recorder.args(["-w", &target, "-f", "60", "-v", "no"]);
+    recorder.args(["-w", target, "-f", "60", "-v", "no"]);
     if let Some(source) = audio.source() {
         recorder.args(["-a", source]);
     }
-    let err = recorder.args(encoder(&info)).arg("-o").arg(&path).exec();
-    Err(err).with_context(|| format!("running {RECORDER}"))
+    recorder.args(encoder(&info));
+    Ok(recorder)
 }
 
 /// The cheapest encoder `--info` lists. Plain `h264` is NVENC or VAAPI; the
@@ -132,7 +164,7 @@ pub fn saved(file: &Path) -> Result<()> {
 }
 
 /// The first frame as a PNG in the runtime folder, gone at logout.
-fn first_frame(file: &Path) -> Result<std::path::PathBuf> {
+fn first_frame(file: &Path) -> Result<PathBuf> {
     let runtime = std::env::var_os("XDG_RUNTIME_DIR").context("XDG_RUNTIME_DIR is not set")?;
     let folder = Path::new(&runtime).join("hyprmonk/recordings");
     fs::create_dir_all(&folder).with_context(|| format!("creating {}", folder.display()))?;

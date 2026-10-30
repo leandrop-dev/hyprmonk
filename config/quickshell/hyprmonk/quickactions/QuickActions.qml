@@ -110,6 +110,20 @@ Scope {
             onRun: Recorder.setMicrophone(!Recorder.microphone)
         },
         Action {
+            section: "Recording"
+            icon: "\u{F0459}"
+            label: "Keep the last minute"
+            on: Recorder.replaying
+            onRun: Recorder.toggleReplay()
+        },
+        Action {
+            section: "Recording"
+            icon: "\u{F0193}"
+            label: "Save the last minute"
+            available: Recorder.replaying
+            onRun: Recorder.saveReplay()
+        },
+        Action {
             section: "Appearance"
             icon: "\u{F050E}"
             label: "Appearance"

@@ -61,6 +61,7 @@ bind(mod .. " + W",         hl.dsp.exec_cmd("qs -c hyprmonk ipc call overlays to
 bind(mod .. " + N",         hl.dsp.exec_cmd("qs -c hyprmonk ipc call notifications toggle"),         "Notification centre")
 bind(mod .. " + SHIFT + N", hl.dsp.exec_cmd("qs -c hyprmonk ipc call notifications clear"),          "Clear notifications")
 bind(mod .. " + SHIFT + R", hl.dsp.exec_cmd("qs -c hyprmonk ipc call recorder toggle"),              "Screen recording")
+bind(mod .. " + SHIFT + G", hl.dsp.exec_cmd("qs -c hyprmonk ipc call recorder saveReplay"),          "Save the last minute")
 
 -- Screenshots: Print enters a mode whose keys pick what to take (the shell
 -- shows them on a card while it lasts); each one leaves the mode. Shift

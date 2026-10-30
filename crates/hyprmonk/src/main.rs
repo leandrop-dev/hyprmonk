@@ -23,6 +23,8 @@ commands:
                                          take a screenshot: annotate and save it, or copy it
   record MONITOR|region [--sound] [--microphone]
                                          record until SIGINT (the shell runs this)
+  replay MONITOR [--sound] [--microphone]
+                                         keep the last minute, saved on SIGUSR1 (the shell runs this)
   recording-saved FILE                   offer a finished recording (the shell runs this)
   bluetooth-agent                        answer BlueZ's pairing requests through the shell (the shell runs this)
 
@@ -72,6 +74,7 @@ fn run(args: &[&str]) -> Result<ExitCode> {
             installer::exec(&[command]).map(|()| ExitCode::SUCCESS)
         }
         ["record", area, flags @ ..] => record(area, flags),
+        ["replay", monitor, flags @ ..] => replay(monitor, flags),
         ["recording-saved", file] => recording::saved(Path::new(file)).map(|()| ExitCode::SUCCESS),
         ["bluetooth-agent"] => bluetooth::run().map(|()| ExitCode::SUCCESS),
         ["help" | "--help" | "-h"] => {
@@ -97,6 +100,14 @@ fn record(area: &str, flags: &[&str]) -> Result<ExitCode> {
         return Ok(ExitCode::from(2));
     };
     recording::start(area, audio).map(|()| ExitCode::SUCCESS)
+}
+
+fn replay(monitor: &str, flags: &[&str]) -> Result<ExitCode> {
+    let Some(audio) = recording::Audio::from_flags(flags) else {
+        eprint!("{USAGE}");
+        return Ok(ExitCode::from(2));
+    };
+    recording::replay(monitor, audio).map(|()| ExitCode::SUCCESS)
 }
 
 fn take_screenshot(area: &str, target: screenshot::Target) -> Result<ExitCode> {

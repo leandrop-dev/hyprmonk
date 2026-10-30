@@ -4,9 +4,20 @@
 // from the next recording. SIGINT ends it and saves the file; the bar shows
 // the time while it runs, and a notification offers the file after. It is
 // `active` from the first line it prints, so not while a region is being
-// picked; Escape there ends it with nothing printed.
+// picked; Escape there ends it with nothing printed. SIGUSR2 pauses it, and
+// resumes it.
+//
+// The replay keeps the last minute of the focused screen in memory, with the
+// same sound, until saved; it can run beside a recording. It costs about 17%
+// of a core while on, so it is switched on by hand and not kept between
+// sessions. SIGUSR1 saves, SIGINT drops it. That signal kills the recorder
+// until it has started, and a save with nothing to save only prints an error
+// where the file would be, so the first moments of a replay cannot save.
 //
 // IPC: qs -c hyprmonk ipc call recorder toggle
+//      qs -c hyprmonk ipc call recorder pause
+//      qs -c hyprmonk ipc call recorder replay
+//      qs -c hyprmonk ipc call recorder saveReplay
 pragma Singleton
 
 import QtQuick
@@ -19,6 +30,7 @@ Singleton {
     id: root
 
     readonly property bool active: recording.running && file !== ""
+    readonly property bool replaying: replay.running
     readonly property var areas: ["Screen", "Region"]
     readonly property string area: settings.area
     readonly property bool sound: settings.sound
@@ -28,6 +40,7 @@ Singleton {
     function setSound(on: bool): void { settings.sound = on; }
     function setMicrophone(on: bool): void { settings.microphone = on; }
 
+    property bool paused: false
     property int seconds: 0
 
     // "0:07", "1:02:45"
@@ -41,6 +54,7 @@ Singleton {
     readonly property string hyprmonk: Quickshell.env("HOME") + "/.local/bin/hyprmonk"
     property string file: ""
     property string failure: ""
+    property string replayFailure: ""
     property real startedAt: 0
 
     function toggle(): void {
@@ -52,10 +66,45 @@ Singleton {
         if (!target) return;
         file = "";
         failure = "";
-        recording.command = [hyprmonk, "record", target,
-                             ...(sound ? ["--sound"] : []),
-                             ...(microphone ? ["--microphone"] : [])];
+        recording.command = [hyprmonk, "record", target, ...audioFlags()];
         recording.running = true;
+    }
+
+    function pause(): void {
+        if (!active) return;
+        recording.signal(12);  // SIGUSR2
+        paused = !paused;
+        if (!paused) startedAt = Date.now() - seconds * 1000;
+    }
+
+    function toggleReplay(): void {
+        if (replay.running) {
+            replay.signal(2);  // SIGINT
+            return;
+        }
+        const target = Hyprland.focusedMonitor?.name;
+        if (!target) return;
+        replayFailure = "";
+        replay.command = [hyprmonk, "replay", target, ...audioFlags()];
+        replay.running = true;
+        replayStarting.restart();
+    }
+
+    function saveReplay(): void {
+        if (!replay.running) {
+            notify("Replay is off", "Turn it on in quick actions");
+        } else if (!replayStarting.running) {
+            replay.signal(10);  // SIGUSR1
+        }
+    }
+
+    function audioFlags(): var {
+        return [...(sound ? ["--sound"] : []), ...(microphone ? ["--microphone"] : [])];
+    }
+
+    function notify(summary: string, body: string): void {
+        Quickshell.execDetached(["notify-send", "--app-name", "Screen recording", "--icon", "dialog-error",
+                                 summary, body]);
     }
 
     Process {
@@ -78,11 +127,11 @@ Singleton {
         onExited: (code, status) => {
             const saved = root.file;
             root.file = "";
+            root.paused = false;
             if (code === 0 && saved !== "") {
                 Quickshell.execDetached([root.hyprmonk, "recording-saved", saved]);
             } else if (code !== 0) {
-                Quickshell.execDetached(["notify-send", "--app-name", "Screen recording", "--icon", "dialog-error",
-                                         "Recording failed", root.failure || "It stopped with code " + code]);
+                root.notify("Recording failed", root.failure || "It stopped with code " + code);
             }
         }
     }
@@ -90,8 +139,33 @@ Singleton {
     Timer {
         interval: 1000
         repeat: true
-        running: root.active
+        running: root.active && !root.paused
         onTriggered: root.seconds = Math.round((Date.now() - root.startedAt) / 1000)
+    }
+
+    Process {
+        id: replay
+
+        // Each save prints its file, or an error in its place.
+        stdout: SplitParser {
+            onRead: line => {
+                if (line.startsWith("/")) Quickshell.execDetached([root.hyprmonk, "recording-saved", line]);
+                else root.notify("Replay not saved", line);
+            }
+        }
+        stderr: SplitParser {
+            onRead: line => {
+                if (line.includes("error")) root.replayFailure = line;
+            }
+        }
+        onExited: (code, status) => {
+            if (code !== 0) root.notify("Replay stopped", root.replayFailure || "It stopped with code " + code);
+        }
+    }
+
+    Timer {
+        id: replayStarting
+        interval: 2000
     }
 
     FileView {
@@ -113,6 +187,18 @@ Singleton {
 
         function toggle(): void {
             root.toggle();
+        }
+
+        function pause(): void {
+            root.pause();
+        }
+
+        function replay(): void {
+            root.toggleReplay();
+        }
+
+        function saveReplay(): void {
+            root.saveReplay();
         }
     }
 }

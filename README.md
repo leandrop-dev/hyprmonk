@@ -147,6 +147,7 @@ this is only the start.
 | `Print`, then `R`, `W` or `S` | Screenshot of a region, a window or the screen (`Shift` copies it) |
 | `Super` `Alt` `L` | Lock |
 | `Super` `Shift` `R` | Start or stop screen recording |
+| `Super` `Shift` `G` | Save the last minute, while it is being kept |
 | `Super` `Shift` `E` | Power menu |
 | `Super` `K` | Key guide |
 
@@ -208,6 +209,8 @@ hyprmonk battery [--json]                       charge of devices UPower cannot 
 hyprmonk screenshot region|window|screen [--copy]
 hyprmonk record MONITOR|region [--sound] [--microphone]
                                                 records until stopped; the shell runs it
+hyprmonk replay MONITOR [--sound] [--microphone]
+                                                keeps the last minute; the shell runs it
 hyprmonk recording-saved FILE                   offers a finished recording; the shell runs it
 hyprmonk bluetooth-agent                        answers BlueZ's pairing requests; the shell runs it
 hyprmonk menu | install [step...] | update | check | uninstall
@@ -226,6 +229,13 @@ hyprmonk menu | install [step...] | update | check | uninstall
   are set in quick actions and kept between sessions: the screen, sound on and
   the microphone off to begin with. It saves
   to `~/Videos/Recordings`, and a notification offers Open and Show in folder.
+  A right click on the bar's dot pauses it.
+- `replay` keeps the last minute of the focused screen in memory, for
+  `Super` `Shift` `G` to save. Keep the last minute in quick actions turns it
+  on, with the same sound settings, and an icon on the bar saves it on a click
+  and stops it on a right click. It stays off after a restart: while on it
+  costs about 17% of a core, and 220 MB of memory on a still screen, more in a
+  game.
 - `bluetooth-agent` is the pairing agent Quickshell lacks: it passes what
   BlueZ asks to the shell, which shows the code in the Bluetooth panel.
 - The installer commands find the clone through `~/.config/hypr`, a link
@@ -265,8 +275,7 @@ cargo clippy --all-targets -- -D warnings
 
 - More tones, and a panel to adjust one (card opacity, blur, text colour).
 - Calendar events, from a source still to choose (local, Google or CalDAV).
-- More recording options: a window as well as the screen or a region, pausing,
-  and saving the last moments on a key
+- Recording a window as well as the screen or a region
   ([docs/recording.md](docs/recording.md)).
 - Screen quick actions (mirror, main screen only) and the lock screen on
   several screens.
