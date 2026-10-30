@@ -86,6 +86,15 @@ Scope {
         },
         Action {
             section: "Recording"
+            icon: "\u{F0489}"
+            label: "Record area"
+            value: Recorder.area
+            options: Recorder.areas
+            stays: true
+            onPicked: option => Recorder.setArea(option)
+        },
+        Action {
+            section: "Recording"
             icon: "\u{F04C3}"
             label: "Record system sound"
             on: Recorder.sound
@@ -220,7 +229,8 @@ Scope {
         if (!item) return;
         if (opened) {
             opened.picked(item.label);
-            Overlays.close();
+            if (opened.stays) back();
+            else Overlays.close();
         } else if (item.options.length > 0) {
             opened = item;
             clearSearch();

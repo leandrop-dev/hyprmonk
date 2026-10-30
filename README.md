@@ -206,7 +206,8 @@ need, installed to `~/.local/bin`:
 ```
 hyprmonk battery [--json]                       charge of devices UPower cannot see
 hyprmonk screenshot region|window|screen [--copy]
-hyprmonk record MONITOR [--sound] [--microphone] records a screen; the shell runs it
+hyprmonk record MONITOR|region [--sound] [--microphone]
+                                                records until stopped; the shell runs it
 hyprmonk recording-saved FILE                   offers a finished recording; the shell runs it
 hyprmonk bluetooth-agent                        answers BlueZ's pairing requests; the shell runs it
 hyprmonk menu | install [step...] | update | check | uninstall
@@ -219,10 +220,11 @@ hyprmonk menu | install [step...] | update | check | uninstall
   opens the shot in satty to annotate; Enter saves it to
   `~/Pictures/Screenshots`, `--copy` puts it on the clipboard instead. A
   notification offers Open and Show in folder.
-- `record` is GPU Screen Recorder on the focused screen, on the cheapest
-  encoder the machine has (Vulkan when NVENC is too new for the driver). The
-  system's sound and the microphone are switches in quick actions, kept
-  between sessions: sound on and the microphone off to begin with. It saves
+- `record` is GPU Screen Recorder on the focused screen or a region picked
+  with the mouse, on the cheapest encoder the machine has (Vulkan when NVENC
+  is too new for the driver). Which one, the system's sound and the microphone
+  are set in quick actions and kept between sessions: the screen, sound on and
+  the microphone off to begin with. It saves
   to `~/Videos/Recordings`, and a notification offers Open and Show in folder.
 - `bluetooth-agent` is the pairing agent Quickshell lacks: it passes what
   BlueZ asks to the shell, which shows the code in the Bluetooth panel.
@@ -263,7 +265,7 @@ cargo clippy --all-targets -- -D warnings
 
 - More tones, and a panel to adjust one (card opacity, blur, text colour).
 - Calendar events, from a source still to choose (local, Google or CalDAV).
-- More recording options: a region or a window as well as the screen, pausing,
+- More recording options: a window as well as the screen or a region, pausing,
   and saving the last moments on a key
   ([docs/recording.md](docs/recording.md)).
 - Screen quick actions (mirror, main screen only) and the lock screen on

@@ -21,8 +21,8 @@ commands:
   battery [--json]                       charge of devices UPower cannot see (SteelSeries Rival 3 Wireless)
   screenshot region|window|screen [--copy]
                                          take a screenshot: annotate and save it, or copy it
-  record MONITOR [--sound] [--microphone]
-                                         record a screen until SIGINT (the shell runs this)
+  record MONITOR|region [--sound] [--microphone]
+                                         record until SIGINT (the shell runs this)
   recording-saved FILE                   offer a finished recording (the shell runs this)
   bluetooth-agent                        answer BlueZ's pairing requests through the shell (the shell runs this)
 
@@ -71,7 +71,7 @@ fn run(args: &[&str]) -> Result<ExitCode> {
         [command @ ("update" | "check" | "uninstall")] => {
             installer::exec(&[command]).map(|()| ExitCode::SUCCESS)
         }
-        ["record", monitor, flags @ ..] => record(monitor, flags),
+        ["record", area, flags @ ..] => record(area, flags),
         ["recording-saved", file] => recording::saved(Path::new(file)).map(|()| ExitCode::SUCCESS),
         ["bluetooth-agent"] => bluetooth::run().map(|()| ExitCode::SUCCESS),
         ["help" | "--help" | "-h"] => {
@@ -91,12 +91,12 @@ fn print_battery(format: battery::Format) -> Result<ExitCode> {
     Ok(ExitCode::SUCCESS)
 }
 
-fn record(monitor: &str, flags: &[&str]) -> Result<ExitCode> {
+fn record(area: &str, flags: &[&str]) -> Result<ExitCode> {
     let Some(audio) = recording::Audio::from_flags(flags) else {
         eprint!("{USAGE}");
         return Ok(ExitCode::from(2));
     };
-    recording::start(monitor, audio).map(|()| ExitCode::SUCCESS)
+    recording::start(area, audio).map(|()| ExitCode::SUCCESS)
 }
 
 fn take_screenshot(area: &str, target: screenshot::Target) -> Result<ExitCode> {

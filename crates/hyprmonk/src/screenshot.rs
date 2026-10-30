@@ -132,7 +132,7 @@ enum Source {
 }
 
 /// Runs slurp, feeding it `boxes`; `None` when the selection is cancelled.
-fn select(flags: &[&str], boxes: &str) -> Result<Option<String>> {
+pub(crate) fn select(flags: &[&str], boxes: &str) -> Result<Option<String>> {
     let output = run_with_input(
         Command::new("slurp").args(flags).stdout(Stdio::piped()),
         boxes.as_bytes(),

@@ -1,5 +1,6 @@
-//! `hyprmonk record`: a screen to the Videos folder, by GPU Screen Recorder,
-//! with the system's sound, the microphone, both or neither. The shell runs it and stops it with SIGINT, which is why
+//! `hyprmonk record`: a screen or a region picked with slurp to the Videos
+//! folder, by GPU Screen Recorder, with the system's sound, the microphone,
+//! both or neither. The shell runs it and stops it with SIGINT, which is why
 //! this becomes the recorder rather than waiting for it; `hyprmonk
 //! recording-saved` then says where it went.
 
@@ -8,12 +9,17 @@ use std::io::{self, Write as _};
 use std::os::unix::process::CommandExt as _;
 use std::path::Path;
 use std::process::Command;
+use std::thread;
+use std::time::Duration;
 
 use anyhow::{Context, Result, bail};
 
 use crate::screenshot;
 
 const RECORDER: &str = "gpu-screen-recorder";
+
+/// The quick actions card folds away before the picker covers the screen.
+const CARD_GONE: Duration = Duration::from_millis(250);
 
 /// What is heard in a recording.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -51,13 +57,24 @@ impl Audio {
     }
 }
 
-/// Prints the file it will write, then becomes the recorder. Returns only if
-/// that fails.
+/// Records `area`, a monitor's name or `region` to pick one. Prints the file
+/// it will write, then becomes the recorder. Returns only if that fails, or at
+/// once with nothing printed if the pick is cancelled.
 ///
 /// # Errors
 ///
-/// Fails when the folder cannot be made or the recorder cannot start.
-pub fn start(monitor: &str, audio: Audio) -> Result<()> {
+/// Fails when the picker, the folder or the recorder fails.
+pub fn start(area: &str, audio: Audio) -> Result<()> {
+    let target = if area == "region" {
+        thread::sleep(CARD_GONE);
+        let Some(region) = screenshot::select(&["-d", "-f", "%wx%h+%x+%y"], "")? else {
+            return Ok(());
+        };
+        region
+    } else {
+        area.to_owned()
+    };
+
     let folder = screenshot::user_folder("VIDEOS", "Videos").join("Recordings");
     fs::create_dir_all(&folder).with_context(|| format!("creating {}", folder.display()))?;
     let stamp = screenshot::timestamp(screenshot::FILE_TIME)?;
@@ -73,7 +90,7 @@ pub fn start(monitor: &str, audio: Audio) -> Result<()> {
     stdout.flush()?;
 
     let mut recorder = Command::new(RECORDER);
-    recorder.args(["-w", monitor, "-f", "60", "-v", "no"]);
+    recorder.args(["-w", &target, "-f", "60", "-v", "no"]);
     if let Some(source) = audio.source() {
         recorder.args(["-a", source]);
     }

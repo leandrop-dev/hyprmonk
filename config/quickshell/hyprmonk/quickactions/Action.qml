@@ -3,7 +3,8 @@
 // own, the pill's `value` marked, and `picked` says which was chosen. With
 // `previews`, the option under the cursor is tried as it moves (`previewed`)
 // and put back when the list is left without picking (`unpreviewed`). With
-// `stays`, running it leaves the card open, for switches set in a row.
+// `stays`, running it leaves the card open, and picking an option goes back
+// to the list, for settings changed in a row.
 import QtQuick
 
 QtObject {
