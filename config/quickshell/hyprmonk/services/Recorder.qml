@@ -1,11 +1,16 @@
-// Recording the focused screen or a region picked for each recording
-// (`hyprmonk record`, which becomes GPU Screen Recorder), with the system's
-// sound and the microphone as set here, kept between sessions; a change counts
-// from the next recording. SIGINT ends it and saves the file; the bar shows
-// the time while it runs, and a notification offers the file after. It is
-// `active` from the first line it prints, so not while a region is being
-// picked; Escape there ends it with nothing printed. SIGUSR2 pauses it, and
-// resumes it.
+// Recording the focused screen, a region picked for each recording or the
+// focused window (`hyprmonk record`, which becomes GPU Screen Recorder), with
+// the system's sound and the microphone as set here, kept between sessions; a
+// change counts from the next recording. SIGINT ends it and saves the file;
+// the bar shows the time while it runs, and a notification offers the file
+// after. It is `active` from the first line it prints, so not while a region
+// is being picked; Escape there ends it with nothing printed. SIGUSR2 pauses
+// it, and resumes it.
+//
+// A window's picture freezes for good if it changes size or closes, while the
+// recorder runs on, so either ends the recording there. A change of size
+// shows as the recorder's stream leaving "streaming"; a close shows nothing
+// from the recorder, so it comes from Hyprland.
 //
 // The replay keeps the last minute of the focused screen in memory, with the
 // same sound, until saved; it can run beside a recording. It costs about 17%
@@ -31,7 +36,7 @@ Singleton {
 
     readonly property bool active: recording.running && file !== ""
     readonly property bool replaying: replay.running
-    readonly property var areas: ["Screen", "Region"]
+    readonly property var areas: ["Screen", "Region", "Window"]
     readonly property string area: settings.area
     readonly property bool sound: settings.sound
     readonly property bool microphone: settings.microphone
@@ -56,18 +61,30 @@ Singleton {
     property string failure: ""
     property string replayFailure: ""
     property real startedAt: 0
+    property string window: ""  // the window's address while one is recorded
 
     function toggle(): void {
         if (recording.running) {
-            if (active) recording.signal(2);  // SIGINT
+            if (active) stop();
             return;
         }
-        const target = area === "Region" ? "region" : Hyprland.focusedMonitor?.name;
+        window = area === "Window" ? Hyprland.activeToplevel?.address ?? "" : "";
+        if (area === "Window" && window === "") {
+            notify("No window to record", "Focus one first");
+            return;
+        }
+        const target = window !== "" ? "window:" + window
+                     : area === "Region" ? "region" : Hyprland.focusedMonitor?.name;
         if (!target) return;
         file = "";
         failure = "";
         recording.command = [hyprmonk, "record", target, ...audioFlags()];
         recording.running = true;
+    }
+
+    function stop(): void {
+        window = "";
+        recording.signal(2);  // SIGINT
     }
 
     function pause(): void {
@@ -122,17 +139,30 @@ Singleton {
         stderr: SplitParser {
             onRead: line => {
                 if (line.includes("error")) root.failure = line;
+                if (root.window !== "" && line.includes('previous state: "streaming"')) {
+                    root.notify("Recording stopped", "The window changed size, which ends a window's recording");
+                    root.stop();
+                }
             }
         }
         onExited: (code, status) => {
             const saved = root.file;
             root.file = "";
+            root.window = "";
             root.paused = false;
             if (code === 0 && saved !== "") {
                 Quickshell.execDetached([root.hyprmonk, "recording-saved", saved]);
             } else if (code !== 0) {
                 root.notify("Recording failed", root.failure || "It stopped with code " + code);
             }
+        }
+    }
+
+    Connections {
+        target: Hyprland
+
+        function onRawEvent(event: HyprlandEvent): void {
+            if (event.name === "closewindow" && event.data === root.window) root.stop();
         }
     }
 

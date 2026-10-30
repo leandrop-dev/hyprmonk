@@ -207,11 +207,12 @@ need, installed to `~/.local/bin`:
 ```
 hyprmonk battery [--json]                       charge of devices UPower cannot see
 hyprmonk screenshot region|window|screen [--copy]
-hyprmonk record MONITOR|region [--sound] [--microphone]
+hyprmonk record MONITOR|region|window:ADDRESS [--sound] [--microphone]
                                                 records until stopped; the shell runs it
 hyprmonk replay MONITOR [--sound] [--microphone]
                                                 keeps the last minute; the shell runs it
 hyprmonk recording-saved FILE                   offers a finished recording; the shell runs it
+hyprmonk portal-picker [ARGS]                   says what to share; the portal runs it
 hyprmonk bluetooth-agent                        answers BlueZ's pairing requests; the shell runs it
 hyprmonk menu | install [step...] | update | check | uninstall
 ```
@@ -223,13 +224,18 @@ hyprmonk menu | install [step...] | update | check | uninstall
   opens the shot in satty to annotate; Enter saves it to
   `~/Pictures/Screenshots`, `--copy` puts it on the clipboard instead. A
   notification offers Open and Show in folder.
-- `record` is GPU Screen Recorder on the focused screen or a region picked
-  with the mouse, on the cheapest encoder the machine has (Vulkan when NVENC
-  is too new for the driver). Which one, the system's sound and the microphone
-  are set in quick actions and kept between sessions: the screen, sound on and
-  the microphone off to begin with. It saves
+- `record` is GPU Screen Recorder on the focused screen, a region picked with
+  the mouse or the focused window, on the cheapest encoder the machine has
+  (Vulkan when NVENC is too new for the driver). Which one, the system's sound
+  and the microphone are set in quick actions and kept between sessions: the
+  screen, sound on and the microphone off to begin with. It saves
   to `~/Videos/Recordings`, and a notification offers Open and Show in folder.
-  A right click on the bar's dot pauses it.
+  A right click on the bar's dot pauses it. A window's recording ends if the
+  window changes size or closes, because its picture would freeze there
+  ([docs/recording.md](docs/recording.md)). A window needs no dialog:
+  `portal-picker` answers the screen cast portal for it, and sharing a screen
+  from another app still gets the usual one. After installing, that takes
+  effect from the next login.
 - `replay` keeps the last minute of the focused screen in memory, for
   `Super` `Shift` `G` to save. Keep the last minute in quick actions turns it
   on, with the same sound settings, and an icon on the bar saves it on a click
@@ -275,8 +281,6 @@ cargo clippy --all-targets -- -D warnings
 
 - More tones, and a panel to adjust one (card opacity, blur, text colour).
 - Calendar events, from a source still to choose (local, Google or CalDAV).
-- Recording a window as well as the screen or a region
-  ([docs/recording.md](docs/recording.md)).
 - Screen quick actions (mirror, main screen only) and the lock screen on
   several screens.
 - btop and fastfetch in the cosmic-noir colours.

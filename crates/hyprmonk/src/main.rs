@@ -21,11 +21,12 @@ commands:
   battery [--json]                       charge of devices UPower cannot see (SteelSeries Rival 3 Wireless)
   screenshot region|window|screen [--copy]
                                          take a screenshot: annotate and save it, or copy it
-  record MONITOR|region [--sound] [--microphone]
+  record MONITOR|region|window:ADDRESS [--sound] [--microphone]
                                          record until SIGINT (the shell runs this)
   replay MONITOR [--sound] [--microphone]
                                          keep the last minute, saved on SIGUSR1 (the shell runs this)
   recording-saved FILE                   offer a finished recording (the shell runs this)
+  portal-picker [ARGS]                   say what to share: a recording's window, or ask (the portal runs this)
   bluetooth-agent                        answer BlueZ's pairing requests through the shell (the shell runs this)
 
 the installer (the repo's install.sh, found through ~/.config/hypr):
@@ -76,6 +77,7 @@ fn run(args: &[&str]) -> Result<ExitCode> {
         ["record", area, flags @ ..] => record(area, flags),
         ["replay", monitor, flags @ ..] => replay(monitor, flags),
         ["recording-saved", file] => recording::saved(Path::new(file)).map(|()| ExitCode::SUCCESS),
+        ["portal-picker", args @ ..] => recording::portal_picker(args).map(|()| ExitCode::SUCCESS),
         ["bluetooth-agent"] => bluetooth::run().map(|()| ExitCode::SUCCESS),
         ["help" | "--help" | "-h"] => {
             print!("{USAGE}");

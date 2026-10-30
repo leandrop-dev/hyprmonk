@@ -1,0 +1,3 @@
+#!/bin/sh
+# What the screen cast portal runs to learn what to share. See xdph.conf.
+exec "$HOME/.local/bin/hyprmonk" portal-picker "$@"
