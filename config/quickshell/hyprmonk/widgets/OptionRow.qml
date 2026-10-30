@@ -1,5 +1,5 @@
-// One choice in a list: an icon and a name. The selected one is filled with
-// the accent.
+// One choice in a list: an icon, a name and an optional detail at its end. The
+// selected one is filled with the accent.
 import QtQuick
 import QtQuick.Layouts
 import qs
@@ -9,6 +9,7 @@ Rectangle {
 
     property string icon: ""
     property string text: ""
+    property string detail: ""
     property bool selected: false
 
     signal clicked()
@@ -42,6 +43,15 @@ Rectangle {
             font.pixelSize: Theme.rowFontSize
             font.bold: option.selected
             elide: Text.ElideRight
+        }
+
+        Text {
+            visible: option.detail !== ""
+            text: option.detail
+            textFormat: Text.PlainText
+            color: Theme.fg(option.selected ? 0.8 : Theme.dimOpacity)
+            font.family: Theme.font
+            font.pixelSize: Theme.smallFontSize
         }
     }
 

@@ -12,7 +12,7 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    property string open: ""    // "sound", "microphone"; "" when none
+    property string open: ""    // "sound", "network", ...; "" when none
     property string screen: ""  // the screen's name
 
     function isOpen(name: string, screenName: string): bool {

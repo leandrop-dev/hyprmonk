@@ -131,12 +131,16 @@ PanelWindow {
         panel: !bar.panelOpen ? null
              : Panels.open === "sound" ? outputPanel
              : Panels.open === "microphone" ? inputPanel
+             : Panels.open === "network" ? networkPanel
+             : Panels.open === "bluetooth" ? bluetoothPanel
              : Panels.open === "batteries" ? batteryPanel
              : Panels.open === "calendar" ? calendarPanel
              : Panels.open === "tray" ? trayMenu
              : null
 
         TrayIcons {}
+        NetworkButton { active: bar.panelOpen && Panels.open === "network" }
+        BluetoothButton { active: bar.panelOpen && Panels.open === "bluetooth" }
         Batteries { active: bar.panelOpen && Panels.open === "batteries" }
         Volume { active: bar.panelOpen && Panels.open === "sound" }
         Microphone { active: bar.panelOpen && Panels.open === "microphone" }
@@ -154,6 +158,16 @@ PanelWindow {
     Component {
         id: inputPanel
         SoundPanel { kind: "input" }
+    }
+
+    Component {
+        id: networkPanel
+        NetworkPanel {}
+    }
+
+    Component {
+        id: bluetoothPanel
+        BluetoothPanel {}
     }
 
     Component {

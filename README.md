@@ -38,10 +38,12 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
 
 **The shell** (Quickshell, `config/quickshell/hyprmonk`)
 
-- A bar with workspaces, the tray, sound, microphone, batteries, the clock
+- A bar with workspaces, the tray, network, Bluetooth, sound, microphone,
+  batteries, the clock
   and the media in its centre card, with a live spectrum (cava, seven styles).
-- Panels from the bar: sound (outputs, inputs, a mixer), batteries,
-  a calendar, and media with synced lyrics.
+- Panels from the bar: Wi-Fi (networks, passwords, the connection editor for
+  the rest), Bluetooth (pairing, connecting, batteries), sound (outputs,
+  inputs, a mixer), batteries, a calendar, and media with synced lyrics.
 - A running cat, faster the busier the CPU, that opens a hardware drawer:
   temperature, CPU, memory, disk and network.
 - A launcher for apps, commands and SSH hosts.
@@ -243,8 +245,6 @@ cargo clippy --all-targets -- -D warnings
 **Next**
 
 - A fresh install on CachyOS in a virtual machine, fixing what shows up.
-- Wi-Fi and Bluetooth panels in the shell (`nmtui` and `bluetoothctl`
-  until then).
 - Clipboard history in the launcher.
 - Screen recording (GPU Screen Recorder) from quick actions, a key and a dot
   on the bar.
@@ -265,6 +265,8 @@ cargo clippy --all-targets -- -D warnings
 
 - A copied screenshot's notification shows a grey preview instead of the
   shot.
+- Bluetooth devices that ask for a code or a confirmation cannot pair from the
+  panel, which has no pairing agent; `bluetoothctl` does them.
 
 **Parked**
 
