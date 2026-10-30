@@ -290,7 +290,10 @@ cargo clippy --all-targets -- -D warnings
   code taken from either.
 - The Rival 3 Wireless battery protocol from [rivalcfg](https://github.com/flozz/rivalcfg).
 - The running cat's font from [runcat-text](https://github.com/AlejandroMinor/runcat-text)
-  (BSD-2-Clause, its licence in `config/quickshell/hyprmonk/assets/runcat/`).
+  (BSD-2-Clause, its licence in `config/quickshell/hyprmonk/assets/runcat/`),
+  with the sleeping cat added from [RunCat](https://kyome.io/runcat/index.html)'s
+  [RunCatResources](https://github.com/runcat-dev/RunCatResources) (Apache-2.0,
+  `LICENSE-RunCatResources` beside it).
 - Wallpapers from [cosmic-noir-theme](https://github.com/atraxsrc/cosmic-noir-theme)
   by atraxsrc (MIT), renders of subjects from HANCORE-linux's
   [omarchy-greek-noir-theme](https://github.com/HANCORE-linux/omarchy-greek-noir-theme);
