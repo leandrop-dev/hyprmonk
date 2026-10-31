@@ -8,7 +8,7 @@
 // matugen's post_hook calls `qs -c hyprmonk ipc call theme reload`: a file
 // watch alone misses the first run, when the file does not exist yet.
 //
-// IPC: qs -c hyprmonk ipc call theme tone NAME  (noir or wallpaper)
+// IPC: qs -c hyprmonk ipc call theme tone NAME  (a key of `tones`)
 pragma Singleton
 
 import QtQuick
@@ -57,11 +57,22 @@ Singleton {
     readonly property color card: Qt.alpha(background, cardOpacity)
     readonly property color rim: tone.light ? Qt.rgba(1, 1, 1, 0.5) : fg(0.08)
     readonly property color accent: tone.accent ?? (tone.light ? Qt.darker(colors.accent, 1.5) : colors.accent)  // darker reads on light
-    readonly property color positive: tone.positive ?? (tone.light ? "#1f9d3a" : "#3dff3d")
+    readonly property color positive: positiveOf(tone)
     readonly property color warning: "#ff5f56"
     readonly property color selection: Qt.rgba(0, 0, 0, tone.light ? 0.1 : 0.4)  // the picked row in a list
     readonly property color wallpaperAccent: colors.accent  // whatever the tone (ThemeOutputs.qml)
     readonly property var wallpaperColours: colors  // matugen's, for apps (ThemeOutputs.qml)
+
+    // A path as a URL: `#`, `?` and `%` in a file name would otherwise read as
+    // URL syntax, and the picture would not load.
+    function fileUrl(path: string): string {
+        return "file://" + path.split("/").map(encodeURIComponent).join("/");
+    }
+
+    // Of any tone: ThemeOutputs asks for the saved one, not a previewed one.
+    function positiveOf(which: var): color {
+        return which.positive ?? (which.light ? "#1f9d3a" : "#3dff3d");
+    }
 
     // Foreground at an opacity: secondary text, hover fills, idle items. On
     // a light tone, text (0.3 and up) is lifted so it still reads.

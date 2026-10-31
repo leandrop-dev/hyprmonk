@@ -37,10 +37,10 @@ Rectangle {
     function resolve(icon: string): string {
         if (icon.startsWith("image://icon/")) {
             const name = icon.slice(13);
-            return name.startsWith("/") ? "file://" + name : Quickshell.iconPath(name, true);
+            return name.startsWith("/") ? Theme.fileUrl(name) : Quickshell.iconPath(name, true);
         }
-        if (icon.startsWith("/")) return "file://" + icon;
-        if (icon.includes("://")) return icon;
+        if (icon.startsWith("/")) return Theme.fileUrl(icon);
+        if (icon.includes("://")) return /^(file|image):\/\//.test(icon) ? icon : "";
         return icon ? Quickshell.iconPath(icon, true) : "";
     }
 
@@ -170,7 +170,7 @@ Rectangle {
                 // Senders may use simple markup (bold, italics, links), never
                 // full HTML. Images are dropped: the shell would fetch any
                 // address a sender names. Only web and mail links open.
-                text: (card.notification.body ?? "").replace(/<img\b[^>]*>/gi, "")
+                text: (card.notification.body ?? "").replace(/<(\s*img)/gi, "&lt;$1")
                 color: Theme.fg(0.6)
                 linkColor: Theme.accent
                 font.family: Theme.font

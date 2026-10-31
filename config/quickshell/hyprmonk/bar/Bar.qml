@@ -100,8 +100,6 @@ PanelWindow {
         Spectrum { active: centreCard.mediaOpen }
 
         Item {
-            id: drawer
-
             property real reveal: centreCard.showMedia ? 1 : 0
 
             visible: reveal > 0

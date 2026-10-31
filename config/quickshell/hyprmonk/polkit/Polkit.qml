@@ -176,6 +176,7 @@ Scope {
                             // polkit's prompt reads "Password: ".
                             readonly property string prompt: (window.flow?.inputPrompt ?? "").replace(/:\s*$/, "") || "Password"
                             text: window.who ? prompt + " for " + window.who : prompt
+                            textFormat: Text.PlainText
                             color: Theme.fg(Theme.dimOpacity)
                             font: field.font
                         }

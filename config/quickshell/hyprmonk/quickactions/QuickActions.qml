@@ -155,6 +155,14 @@ Scope {
         },
         Action {
             section: "Appearance"
+            icon: "\u{F018D}"
+            label: "Fastfetch"
+            value: Fastfetch.presets[Fastfetch.saved]
+            options: Object.values(Fastfetch.presets)
+            onPicked: option => Fastfetch.set(Object.keys(Fastfetch.presets).find(name => Fastfetch.presets[name] === option))
+        },
+        Action {
+            section: "Appearance"
             icon: "\u{F0E09}"
             label: "Wallpaper"
             onRun: Overlays.toggle("wallpapers")
@@ -213,7 +221,7 @@ Scope {
     // tried live; Enter keeps it, leaving the list puts back what was there.
     readonly property string tried: opened?.previews ? (shown[current]?.label ?? "") : ""
 
-    onTriedChanged: if (opened?.previews && tried !== "") opened.previewed(tried)
+    onTriedChanged: if (open && opened?.previews && tried !== "") opened.previewed(tried)
 
     onOpenChanged: {
         if (!open) {
@@ -227,6 +235,7 @@ Scope {
 
     // Each open starts from the top of the full list, put back while hidden.
     function reset(): void {
+        opened?.unpreviewed();
         opened = null;
         clearSearch();
         current = 0;
@@ -254,9 +263,11 @@ Scope {
             if (opened.stays) back();
             else Overlays.close();
         } else if (item.options.length > 0) {
-            opened = item;
+            // `opened` last: with it set, `current` picks an option, and the
+            // action's row number would preview the wrong one.
             clearSearch();
             current = Math.max(0, item.options.indexOf(item.value));
+            opened = item;
         } else {
             if (!item.stays) Overlays.close();
             item.run();

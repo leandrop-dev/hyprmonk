@@ -68,7 +68,6 @@ Item {
     }
 
     Timer {
-        id: tooltipDelay
         interval: 500
         running: mod.hovered && mod.tooltip !== ""
         onTriggered: tooltipLoader.active = true

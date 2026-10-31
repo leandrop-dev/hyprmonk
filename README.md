@@ -46,11 +46,11 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   inputs, a mixer), batteries, a calendar, and media with synced lyrics.
 - A running cat, faster the busier the CPU and resting when the machine is
   quiet, that opens a hardware drawer:
-  temperature, CPU, memory, disk and network.
+  temperatures, CPU, GPU and video memory, memory, disk and network.
 - A launcher for apps, commands, SSH hosts and the clipboard history.
 - Quick actions: appearance (the tone), wallpaper, game mode, screen recording,
   power profile, audio output, microphone, keyboard layout, do not disturb, the spectrum's
-  style, the login screen's look and the power menu.
+  style, fastfetch's look, the login screen's look and the power menu.
 - Notifications with a notification centre, an on-screen card for what just
   changed (volume, microphone, audio output, keyboard layout, Caps and Num
   Lock, game mode, power profile), a lock screen (on a key and when idle),
@@ -201,7 +201,7 @@ The list keeps the dark tones and the light ones under their own headings.
 
 The tone reaches past the shell: Hyprland's window borders, kitty (live, in
 open terminals), the starship prompt and zsh's highlighting (from the next
-prompt), fastfetch (as a terminal opens), btop (live), Vesktop through its
+prompt), fastfetch (the same, in the look picked), btop (live), Vesktop through its
 Quick CSS (live), Zed (live), Zen and Heroic (at their next start), GTK apps
 through adw-gtk3, Qt and KDE apps through qt6ct with Breeze and a KDE colour
 scheme, the Yaru icons in the nearest colour, and the login screen's Desktop
@@ -298,6 +298,7 @@ cargo clippy --all-targets -- -D warnings
 | `config/matugen/` | Templates for Hyprland, the shell and kitty |
 | `config/kitty/` | kitty, with the Noir palette |
 | `config/zsh/`, `config/starship/` | zsh and its prompt |
+| `config/fastfetch/` | fastfetch's presets, picked in quick actions |
 | `config/uwsm/env` | The session's environment (NVIDIA, cursor, toolkits, SSH agent) |
 | `config/systemd/user/` | Units for the shell, hypridle, udiskie and clipboard history; they start only under Hyprland |
 | `crates/hyprmonk/` | The `hyprmonk` command |
@@ -319,8 +320,6 @@ An open list, in no fixed order.
   and refresh rate, border sizes, window gaps, rearranging the bar's modules.
   Ideas to gather from noctalia, HANCORE-linux's Shibumi Shell and Ryoku.
 - A panel to adjust a tone (card opacity, blur, text colour).
-- A picker for fastfetch's look, with presets of our own, inspired by
-  LierB/fastfetch's.
 - Calendar events from all three sources: local, Google and CalDAV.
 - A phone module on the bar, beyond its battery: notifications, the clipboard,
   files, ringing it to find it. KDE Connect or an app of our own, still to
@@ -360,6 +359,8 @@ An open list, in no fixed order.
   [HANCORE-linux](https://github.com/HANCORE-linux)'s Omarchy themes (MIT,
   `assets/LICENSE-HANCORE-themes` beside it), some of which adapt earlier
   schemes such as Kanso.
+- fastfetch's presets are our own, inspired by
+  [LierB/fastfetch](https://github.com/LierB/fastfetch)'s; no code taken.
 - Steam's optional skin: [Adwaita-for-Steam](https://github.com/tkashkin/Adwaita-for-Steam)
   (MIT), installed by hand, not kept in this repo.
 - Synced lyrics from [LRCLIB](https://lrclib.net), looked up while the media

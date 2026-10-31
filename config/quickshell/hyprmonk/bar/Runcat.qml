@@ -5,6 +5,7 @@
 // are glyphs of its font (assets/runcat, BSD-2-Clause); a sixth, added to the
 // font from RunCatResources (Apache-2.0), is the cat asleep.
 import QtQuick
+import QtQuick.Layouts
 import qs
 import qs.services
 
@@ -13,7 +14,7 @@ Module {
 
     property int frame: 0
     property bool awake: true
-    readonly property bool running: awake && !Session.locked && !GameMode.on
+    readonly property bool running: awake && Session.seen
     readonly property int asleep: 5  // the frame
     readonly property real load: isNaN(Hardware.cpu) ? 0 : Math.max(0, Math.min(100, Hardware.cpu)) / 100
 
@@ -32,6 +33,9 @@ Module {
     }
 
     contents: Text {
+        // A frame's measured width varies by a pixel, which would shake
+        // whatever sits beside the cat.
+        Layout.preferredWidth: 26
         text: String.fromCodePoint(0xE900 + root.frame)
         color: root.active ? Theme.accent : root.color
         font.family: runcat.name

@@ -5,7 +5,6 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Pipewire
-import qs
 import qs.services
 import qs.widgets
 

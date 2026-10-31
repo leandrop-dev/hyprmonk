@@ -1,6 +1,6 @@
 // Network state for the bar and the network panel, from Quickshell's
-// Networking (NetworkManager). Scanning runs only while `scanning` is set: the
-// panel sets it while it is open.
+// Networking (NetworkManager). Scanning runs only while a panel is open and
+// counted in `watchers`.
 pragma Singleton
 
 import QtQuick
@@ -10,7 +10,8 @@ import Quickshell.Networking
 Singleton {
     id: root
 
-    property bool scanning: false
+    property int watchers: 0
+    readonly property bool scanning: watchers > 0
 
     readonly property var devices: Networking.devices.values
     readonly property WifiDevice wifi: devices.find(d => d.type === DeviceType.Wifi) ?? null

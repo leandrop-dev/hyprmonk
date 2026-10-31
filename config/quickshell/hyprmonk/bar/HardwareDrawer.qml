@@ -1,9 +1,10 @@
 // The left card's hardware drawer: the running cat stays; a click on it
-// slides out the CPU temperature, CPU use, memory in use, used disk space on
-// / and network speed (services/Hardware.qml, read only while open); another
+// slides out the CPU temperature and use, the GPU, memory and disk space on
+// / as used/total, and network speed (services/Hardware.qml, read only while open); another
 // click folds them. Hovering one shows its details, in fixed-width columns.
 import QtQuick
 import QtQuick.Layouts
+import qs
 import qs.services
 
 RowLayout {
@@ -40,7 +41,9 @@ RowLayout {
             spacing: 2
             opacity: Math.max(0, (drawer.reveal - 0.4) / 0.6)
 
-            Temperature {}
+            Temperature {
+                watched: drawer.open
+            }
 
             // Every core's use, four to a row.
             Module {
@@ -57,10 +60,22 @@ RowLayout {
                 }
             }
 
+            // The GPU: temperature and video memory. Hidden when it cannot be read.
+            Module {
+                readonly property int hot: 85
+
+                visible: !isNaN(Hardware.gpuTemp)
+                icon: "\u{F08AE}"
+                label: Math.round(Hardware.gpuTemp) + "°C " + Hardware.used(Hardware.vramUsed, Hardware.vramTotal)
+                tooltip: Hardware.gpuName + "\nUse " + Math.round(Hardware.gpuUse) + "%"
+                    + "\nVideo memory " + Hardware.human(Hardware.vramUsed) + " / " + Hardware.human(Hardware.vramTotal)
+                color: Hardware.gpuTemp >= hot ? Theme.warning : Theme.foreground
+            }
+
             // The apps using the most, each with everything it started.
             Module {
                 icon: "\u{F035B}"
-                label: Hardware.human(Hardware.memUsed)
+                label: Hardware.used(Hardware.memUsed, Hardware.memTotal)
                 tooltip: "Memory " + Hardware.human(Hardware.memUsed) + " / " + Hardware.human(Hardware.memTotal)
                     + Hardware.apps.map(app => "\n" + app.name.slice(0, 16).padEnd(17) + Hardware.human(app.bytes).padStart(6)).join("")
 
@@ -71,7 +86,7 @@ RowLayout {
             // Every disk: used, size and how full.
             Module {
                 icon: "\u{F02CA}"
-                label: Hardware.human(Hardware.diskUsed)
+                label: Hardware.used(Hardware.diskUsed, Hardware.diskSize)
                 tooltip: "Disks" + Hardware.disks.map(disk => "\n" + disk.mount.padEnd(8)
                     + Hardware.human(disk.used).padStart(6) + " / " + Hardware.human(disk.size).padStart(5)
                     + (Math.round(100 * disk.used / disk.size) + "%").padStart(5)).join("")

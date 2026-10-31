@@ -146,6 +146,10 @@ impl Agent {
 
 /// Registers with `BlueZ` as the default agent and relays until stdin ends,
 /// which is the shell stopping it or going away.
+///
+/// # Errors
+///
+/// Fails when the system bus cannot be reached or `BlueZ` refuses the agent.
 pub fn run() -> Result<()> {
     let pending = Pending::default();
     let agent = Agent {

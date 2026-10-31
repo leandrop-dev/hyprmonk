@@ -32,10 +32,10 @@ ColumnLayout {
 
     spacing: 10
 
-    Component.onCompleted: Bluez.scanning = true
+    Component.onCompleted: Bluez.watchers += 1
     Component.onDestruction: {
-        Bluez.scanning = false;
-        Bluez.answer(false, "");  // nothing left to answer it
+        Bluez.watchers -= 1;
+        if (!Bluez.scanning) Bluez.answer(false, "");  // nothing left to answer it
     }
 
     RowLayout {
@@ -224,6 +224,7 @@ ColumnLayout {
         visible: Bluez.on
         text: "Others see this machine as " + (Bluez.adapter?.name ?? "") + " while this is open"
         textFormat: Text.PlainText
+        wrapMode: Text.Wrap
         color: Theme.fg(Theme.dimOpacity)
         font.family: Theme.font
         font.pixelSize: Theme.bodyFontSize

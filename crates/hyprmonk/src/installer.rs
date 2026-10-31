@@ -10,6 +10,10 @@ use anyhow::{Context, Result, bail};
 
 /// Replaces this process with `install.sh args...`, so the menu gets the
 /// terminal. Returns only if that fails.
+///
+/// # Errors
+///
+/// Fails when the repo cannot be found or `install.sh` cannot be started.
 pub fn exec(args: &[&str]) -> Result<()> {
     let script = repo()?.join("install.sh");
     let err = Command::new(&script).args(args).exec();

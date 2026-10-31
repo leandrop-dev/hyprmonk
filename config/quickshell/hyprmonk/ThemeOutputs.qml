@@ -119,7 +119,7 @@ Scope {
                 dialog_fg_color: fg,
                 accent_bg_color: hex(saved.accent),
                 accent_fg_color: hex(saved.background),
-                success_bg_color: hex(saved.positive ?? Theme.positive),
+                success_bg_color: hex(Theme.positiveOf(saved)),
                 destructive_bg_color: hex(Theme.warning),
                 error_bg_color: hex(Theme.warning)
             };
@@ -156,12 +156,12 @@ Scope {
             window: saved.background, view: Qt.darker(saved.background, 1.3), button: mix(0.09),
             header: mix(0.05), tooltip: mix(0.09), alternate: mix(0.03), text: saved.foreground, muted: mix(0.6),
             accent: saved.accent, accentText: saved.background, negative: Theme.warning,
-            positive: saved.positive ?? Theme.positive
+            positive: Theme.positiveOf(saved)
         };
         return {
             window: w.surface, view: w.surfaceLowest, button: w.surfaceHigh, header: w.surfaceContainer,
             tooltip: w.surfaceHighest, alternate: w.surfaceLow, text: w.surfaceText, muted: w.surfaceMuted,
-            accent: w.accent, accentText: w.surface, negative: w.error, positive: Theme.positive
+            accent: w.accent, accentText: w.surface, negative: w.error, positive: Theme.positiveOf(saved)
         };
     }
 
@@ -265,8 +265,10 @@ Scope {
             `ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=${c(p.muted)}'`
         ];
         for (const name in styles) lines.push(`ZSH_HIGHLIGHT_STYLES[${name}]='fg=${styles[name]}'`);
-        // fastfetch's colours, for zshrc to pass it.
-        lines.push("hyprmonk_fastfetch=("
+        // fastfetch's look and colours, for zshrc's `fastfetch` to pass it; the look comes
+        // first, for the colours to count.
+        const preset = Fastfetch.saved === "default" ? "" : `--config '${config}/fastfetch/${Fastfetch.saved}.jsonc' `;
+        lines.push("hyprmonk_fastfetch=(" + preset
             + `--color-keys '${c(p.accent)}' --color-title '${c(p.accent)}' --color-output '${c(p.text)}' `
             + `--color-separator '${c(p.muted)}' --logo-color-1 '${c(p.accent)}' --logo-color-2 '${c(p.text)}')`);
         return lines.join("\n") + "\n";

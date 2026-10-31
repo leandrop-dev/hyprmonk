@@ -22,8 +22,10 @@ Rectangle {
     required property var lock
     required property ShellScreen screen
 
-    readonly property bool main: lock.primary === "" || screen?.name === lock.primary
+    readonly property bool main: screen?.name === lock.mainScreen
     readonly property real s: Math.min(width / 2560, height / 1440)
+
+    onMainChanged: if (main) input.forceActiveFocus()
 
     // Until the wallpaper is in, or with none set.
     color: Theme.background
@@ -33,7 +35,7 @@ Rectangle {
     Image {
         id: wallpaper
         anchors.fill: parent
-        source: Wallpaper.path ? "file://" + Wallpaper.path : ""
+        source: Wallpaper.path ? Theme.fileUrl(Wallpaper.path) : ""
         fillMode: Image.PreserveAspectCrop
         sourceSize: Qt.size(width, height)
         asynchronous: true

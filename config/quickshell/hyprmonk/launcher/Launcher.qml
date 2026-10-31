@@ -239,7 +239,10 @@ Scope {
                 Layout.fillHeight: true
                 clip: true
                 model: root.shown
-                onModelChanged: currentIndex = root.current
+                onModelChanged: {
+                    currentIndex = root.current;
+                    positionViewAtIndex(currentIndex, ListView.Contain);
+                }
                 boundsBehavior: Flickable.StopAtBounds
                 highlightMoveDuration: 120
                 highlightFollowsCurrentItem: true

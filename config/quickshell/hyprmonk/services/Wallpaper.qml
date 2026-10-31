@@ -1,5 +1,5 @@
 // The wallpaper: which picture the shell draws behind every window
-// (wallpaper/Wallpaper.qml), and the pictures to choose from, the images in
+// (wallpaper/Background.qml), and the pictures to choose from, the images in
 // one folder (~/Pictures/Wallpapers unless wallpaper.json names another).
 // Setting one also runs matugen on it, so the accent follows.
 //
@@ -37,9 +37,7 @@ Singleton {
     }
 
     FolderListModel {
-        id: pictures
-
-        folder: "file://" + root.folder
+        folder: Theme.fileUrl(root.folder)
         nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp", "*.bmp"]
         caseSensitive: false
         showDirs: false

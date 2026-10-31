@@ -1,6 +1,7 @@
-// CPU package temperature from the hwmon sensor named `sensor`
-// (coretemp on Intel; k10temp on AMD). hwmon numbers change between boots,
-// so the sensor is looked up by name once, then read every few seconds.
+// CPU package temperature from whichever hwmon sensor is here (coretemp on
+// Intel; k10temp or zenpower on AMD). hwmon numbers change between boots, so
+// the sensor is looked up by name once, then read every few seconds while
+// `watched`.
 import QtQuick
 import Quickshell.Io
 import qs
@@ -8,7 +9,8 @@ import qs
 Module {
     id: root
 
-    property string sensor: "coretemp"
+    property bool watched: false
+    property string sensor: ""
     property int hot: 85
     property real celsius: NaN
 
@@ -20,11 +22,13 @@ Module {
 
     Process {
         running: true
-        command: ["sh", "-c", 'grep -lx "$1" /sys/class/hwmon/hwmon*/name', "sh", root.sensor]
+        command: ["sh", "-c", 'grep -HxE "coretemp|k10temp|zenpower" /sys/class/hwmon/hwmon*/name']
         stdout: StdioCollector {
             onStreamFinished: {
-                const name = text.split("\n")[0];
-                if (name) reading.path = name.replace(/name$/, "temp1_input");
+                const [file, name] = text.split("\n")[0].split(":");
+                if (!name) return;
+                root.sensor = name;
+                reading.path = file.replace(/name$/, "temp1_input");
             }
         }
     }
@@ -35,9 +39,10 @@ Module {
     }
 
     Timer {
-        running: reading.path !== ""
+        running: root.watched && reading.path !== ""
         interval: 5000
         repeat: true
+        triggeredOnStart: true
         onTriggered: reading.reload()
     }
 }

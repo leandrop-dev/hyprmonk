@@ -45,6 +45,7 @@ Singleton {
     }
 
     property string wanted: ""
+    property string decoding: ""
 
     // "[[ binary data 1.2 MiB png 800x600 ]]" is how cliphist lists an image.
     function parse(line: string): var {
@@ -71,17 +72,22 @@ Singleton {
 
         interval: 120
         onTriggered: {
-            if (decode.running) restart();
-            else decode.running = true;
+            if (decode.running) {
+                restart();
+                return;
+            }
+            root.decoding = root.wanted;
+            decode.running = true;
         }
     }
 
     Process {
         id: decode
 
-        command: ["sh", "-c", "cliphist decode \"$1\" > \"$2\"", "sh", root.wanted, root.imageFile]
+        command: ["sh", "-c", "cliphist decode \"$1\" > \"$2\"", "sh", root.decoding, root.imageFile]
+        // Another clip may be wanted by now: its run comes next.
         onExited: (code, status) => {
-            if (code === 0 && root.wanted !== "") root.imagePath = "file://" + root.imageFile;
+            if (code === 0 && root.decoding === root.wanted) root.imagePath = "file://" + root.imageFile;
         }
     }
 }

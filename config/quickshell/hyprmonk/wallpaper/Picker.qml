@@ -175,7 +175,7 @@ Scope {
                         property bool noThumbnail: false
 
                         anchors.fill: parent
-                        source: "file://" + (noThumbnail ? tile.modelData : Wallpaper.thumbnail(tile.modelData))
+                        source: Theme.fileUrl(noThumbnail ? tile.modelData : Wallpaper.thumbnail(tile.modelData))
                         sourceSize: Qt.size(width, height)
                         fillMode: Image.PreserveAspectCrop
                         asynchronous: true

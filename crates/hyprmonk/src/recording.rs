@@ -184,6 +184,9 @@ fn recorder(target: &str, audio: Audio) -> Result<Command> {
         .arg("--info")
         .output()
         .with_context(|| format!("running {RECORDER}"))?;
+    if !info.status.success() {
+        anyhow::bail!("{RECORDER} --info exited with {}", info.status);
+    }
     let info = String::from_utf8_lossy(&info.stdout);
 
     let mut recorder = Command::new(RECORDER);

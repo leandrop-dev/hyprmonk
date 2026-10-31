@@ -7,7 +7,6 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Notifications
 import qs
-import qs.services
 import qs.widgets
 
 ColumnLayout {

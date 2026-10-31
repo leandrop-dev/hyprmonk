@@ -20,7 +20,12 @@ const SIZE: &str = "480x270";
 
 const EXTENSIONS: [&str; 5] = ["jpg", "jpeg", "png", "webp", "bmp"];
 
-/// Brings the thumbnails up to date with `folder`.
+/// Brings the thumbnails up to date with `folder`. A picture that cannot be
+/// read is only reported: the shell falls back to the picture itself.
+///
+/// # Errors
+///
+/// Fails when the folder or the cache cannot be read or written.
 pub fn refresh(folder: &Path) -> Result<()> {
     let cache = cache_dir()?;
     fs::create_dir_all(&cache).with_context(|| format!("creating {}", cache.display()))?;
@@ -115,7 +120,9 @@ fn is_stale(folder: &Path, cache: &Path, name: &OsString) -> bool {
 /// Written beside its place and moved in, so the picker never reads half of it.
 fn make(picture: &Path, cache: &Path, name: &OsString) -> Result<()> {
     let target = cache.join(thumbnail_name(name));
+    // vipsthumbnail reads `%s` in `--output` as the picture's name.
     let partial = target.with_extension("partial.jpg");
+    let partial = PathBuf::from(partial.to_string_lossy().replace('%', "_"));
     let mut output = OsString::from(&partial);
     output.push("[Q=82,strip]");
     let done = Command::new("vipsthumbnail")

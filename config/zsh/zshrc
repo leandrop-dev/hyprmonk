@@ -74,4 +74,5 @@ unset _hyprmonk_theme
 
 [[ -r ${XDG_CONFIG_HOME:-$HOME/.config}/zsh/local.zsh ]] && source ${XDG_CONFIG_HOME:-$HOME/.config}/zsh/local.zsh
 
-command -v fastfetch > /dev/null && fastfetch "${hyprmonk_fastfetch[@]}"
+# fastfetch in the picked look and the tone (read before each prompt, as above).
+fastfetch() { command fastfetch "${hyprmonk_fastfetch[@]}" "$@" }

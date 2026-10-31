@@ -128,8 +128,11 @@ RowLayout {
                         visible: picture.faint
 
                         readonly property url url: picture.faint ? icon.source : ""
+                        property url loaded  // let go of once another comes
 
                         onUrlChanged: {
+                            if (loaded.toString() !== "") unloadImage(loaded);
+                            loaded = url;
                             if (url.toString() === "") return;
                             if (isImageLoaded(url)) requestPaint();
                             else loadImage(url);

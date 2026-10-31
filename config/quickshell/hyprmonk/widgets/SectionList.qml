@@ -41,18 +41,21 @@ Flickable {
     readonly property var layout: measure(model)
     readonly property bool picked: current >= 0 && current < model.length
     readonly property real rowY: picked ? layout.rows[current] : 0
-    // With its heading, when it is the first of its section.
-    readonly property real entryY: picked && layout.starts[current] ? rowY - headingHeight : rowY
 
     contentHeight: layout.height
     boundsBehavior: Flickable.StopAtBounds
     clip: true
 
     // Again when the list's height changes: rows can arrive (and move the
-    // picked one) before the list has grown to hold them.
+    // picked one) before the list has grown to hold them. Worked out here:
+    // a binding on rowY would still be one row behind in rowY's handler.
     function keepInView(): void {
-        if (entryY < contentY) contentY = entryY;
-        else if (rowY + rowHeight > contentY + height) contentY = rowY + rowHeight - height;
+        if (!picked) return;
+        const row = layout.rows[current];
+        // With its heading, when it is the first of its section.
+        const entry = layout.starts[current] ? row - headingHeight : row;
+        if (entry < contentY) contentY = entry;
+        else if (row + rowHeight > contentY + height) contentY = row + rowHeight - height;
     }
 
     onRowYChanged: keepInView()

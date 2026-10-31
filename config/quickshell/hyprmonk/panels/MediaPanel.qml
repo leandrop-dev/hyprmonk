@@ -91,6 +91,7 @@ ClippingRectangle {
                 Text {
                     Layout.fillWidth: true
                     text: Player.players.length > 1 ? panel.player?.identity + "  \u{F04E1}" : (panel.player?.identity ?? "")
+                    textFormat: Text.PlainText
                     color: Theme.fg(Theme.dimOpacity)
                     font.family: Theme.font
                     font.pixelSize: Theme.smallFontSize

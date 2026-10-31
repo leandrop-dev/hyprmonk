@@ -60,7 +60,7 @@ Singleton {
     property var levels: []
     readonly property bool silent: levels.every(level => level === 0)
 
-    readonly property bool wanted: !Session.locked && !GameMode.on
+    readonly property bool wanted: Session.seen
     property bool alive: true  // false for a moment after cava stops
     property string lastLine: ""
 

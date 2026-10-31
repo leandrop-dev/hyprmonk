@@ -232,10 +232,22 @@ fn copy(png: &[u8]) -> Result<()> {
     let runtime = std::env::var_os("XDG_RUNTIME_DIR").context("XDG_RUNTIME_DIR is not set")?;
     let folder = Path::new(&runtime).join("hyprmonk/screenshots");
     fs::create_dir_all(&folder).with_context(|| format!("creating {}", folder.display()))?;
+    prune_previews(&folder).with_context(|| format!("clearing {}", folder.display()))?;
     let preview = folder.join(format!("{}.png", timestamp(PREVIEW_TIME)?));
     fs::write(&preview, png).with_context(|| format!("writing {}", preview.display()))?;
     notify(APP, "Copied to clipboard", "", Some(&preview), &[])?;
     Ok(())
+}
+
+/// The runtime folder is held in memory, so only the newest previews stay, for
+/// the cards in the notification centre that show them. Their names sort by age.
+fn prune_previews(folder: &Path) -> std::io::Result<()> {
+    let mut previews = fs::read_dir(folder)?
+        .map(|entry| entry.map(|entry| entry.path()))
+        .collect::<std::io::Result<Vec<_>>>()?;
+    previews.sort();
+    let old = (previews.len() + 1).saturating_sub(PREVIEWS_KEPT);
+    previews[..old].iter().try_for_each(fs::remove_file)
 }
 
 /// Sends a notification with the picture; with actions, waits for one and
@@ -367,6 +379,9 @@ pub(crate) const FILE_TIME: &str = "+%Y-%m-%d_%H-%M-%S";
 /// must not share a file (the first notification would show the second).
 const PREVIEW_TIME: &str = "+%Y-%m-%d_%H-%M-%S-%3N";
 
+/// How many copied shots' previews stay, the new one included.
+const PREVIEWS_KEPT: usize = 20;
+
 /// The local time in `format`, from `date` (std has no local time).
 pub(crate) fn timestamp(format: &str) -> Result<String> {
     let output = Command::new("date")
@@ -467,6 +482,26 @@ mod tests {
             file_url(Path::new("/tmp/Screenshot_2026-10-28_19-04-11.png")),
             "file:///tmp/Screenshot_2026-10-28_19-04-11.png"
         );
+    }
+
+    #[test]
+    fn only_the_newest_previews_stay() {
+        let folder = std::env::temp_dir().join(format!("hyprmonk-previews-{}", std::process::id()));
+        fs::create_dir_all(&folder).expect("creating the folder");
+        for number in 0..PREVIEWS_KEPT + 3 {
+            fs::write(folder.join(format!("{number:03}.png")), "").expect("writing a preview");
+        }
+
+        prune_previews(&folder).expect("clearing the folder");
+
+        let mut left: Vec<_> = fs::read_dir(&folder)
+            .expect("listing the folder")
+            .map(|entry| entry.expect("reading an entry").file_name())
+            .collect();
+        left.sort();
+        fs::remove_dir_all(&folder).expect("removing the folder");
+        assert_eq!(left.len(), PREVIEWS_KEPT - 1);
+        assert_eq!(left[0], "004.png");
     }
 
     #[test]

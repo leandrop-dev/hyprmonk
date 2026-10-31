@@ -29,7 +29,7 @@ Module {
 
     // The position is read when asked: ask every second while it plays.
     Timer {
-        running: root.visible && (root.player?.isPlaying ?? false)
+        running: Session.seen && root.visible && (root.player?.isPlaying ?? false)
         interval: 1000
         repeat: true
         onTriggered: root.player.positionChanged()
@@ -59,8 +59,6 @@ Module {
         },
 
         BarText {
-            id: title
-
             Layout.maximumWidth: 360
             text: Lyrics.inBar && Lyrics.line !== "" ? Lyrics.line : Player.summary
             elide: Text.ElideRight

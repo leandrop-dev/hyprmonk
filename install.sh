@@ -62,6 +62,7 @@ LINKS=(
     "config/kitty:.config/kitty"
     "config/uwsm:.config/uwsm"
     "config/starship:.config/starship"
+    "config/fastfetch:.config/fastfetch"
 )
 
 # Every user unit in the repo is linked and enabled; each one checks for

@@ -48,8 +48,8 @@ ColumnLayout {
 
     spacing: 10
 
-    Component.onCompleted: Net.scanning = true
-    Component.onDestruction: Net.scanning = false
+    Component.onCompleted: Net.watchers += 1
+    Component.onDestruction: Net.watchers -= 1
 
     SectionLabel {
         visible: ethernet.visible

@@ -1,10 +1,11 @@
-// CPU, memory, disk and network use for the bar's hardware drawer.
+// CPU, GPU, memory, disk and network use for the bar's hardware drawer.
 //
 // CPU use is read every second, always: the running cat in the bar shows it.
-// Memory, the disks and the network every two seconds, only while some
+// The GPU, memory, the disks and the network every two seconds, only while some
 // drawer is open (watch() and unwatch()); the apps using the most memory only
 // while their tooltip shows (watchApps() and unwatchApps()). The network is a
-// rate: the first read after opening only sets the starting point.
+// rate: the first read after opening only sets the starting point. The GPU is
+// read from nvidia-smi or, on AMD, sysfs; on others it stays unknown.
 pragma Singleton
 
 import QtQuick
@@ -20,6 +21,11 @@ Singleton {
     property real memTotal: NaN
     property real diskUsed: NaN     // bytes, on /
     property real diskSize: NaN
+    property real gpuTemp: NaN      // °C
+    property real gpuUse: NaN       // percent
+    property real vramUsed: NaN     // bytes
+    property real vramTotal: NaN
+    property string gpuName: ""
     property var disks: []          // [{mount, used, size}], one per device
     property real down: NaN         // bytes a second, every interface but lo
     property real up: NaN
@@ -45,6 +51,11 @@ Singleton {
 
     function unwatchApps(): void {
         appWatchers = Math.max(0, appWatchers - 1);
+    }
+
+    // 12G/31G, the used part padded so the label keeps its width.
+    function used(part: real, whole: real): string {
+        return human(part).padStart(4) + "/" + human(whole);
     }
 
     // 1.2G, 340M, 12K: powers of 1024, as free and df -h print them.
@@ -73,6 +84,17 @@ Singleton {
             cores = use.slice(1);
         }
         lastCpu = now;
+    }
+
+    // "temperature, use, MiB used, MiB total, name", the first GPU's line.
+    function parseGpu(text: string): void {
+        const fields = text.split("\n")[0].split(", ");
+        if (fields.length < 5) return;
+        gpuTemp = Number(fields[0]);
+        gpuUse = Number(fields[1]);
+        vramUsed = Number(fields[2]) * 1048576;
+        vramTotal = Number(fields[3]) * 1048576;
+        gpuName = fields.slice(4).join(", ");
     }
 
     // /proc/meminfo and /proc/net/dev, then "---", then df.
@@ -164,7 +186,7 @@ Singleton {
     }
 
     Timer {
-        running: true
+        running: Session.seen || root.watchers > 0
         interval: 1000
         repeat: true
         triggeredOnStart: true
@@ -180,12 +202,37 @@ Singleton {
         }
     }
 
+    Process {
+        id: gpuReader
+        command: ["sh", "-c", `
+            if command -v nvidia-smi > /dev/null; then
+                nvidia-smi --format=csv,noheader,nounits \\
+                    --query-gpu=temperature.gpu,utilization.gpu,memory.used,memory.total,name
+                exit
+            fi
+            for device in /sys/class/drm/card*/device; do
+                [ -r "$device/mem_info_vram_total" ] || continue
+                temp=$(cat "$device"/hwmon/hwmon*/temp1_input)
+                read -r use < "$device/gpu_busy_percent"
+                read -r used < "$device/mem_info_vram_used"
+                read -r total < "$device/mem_info_vram_total"
+                echo "$((temp / 1000)), $use, $((used / 1048576)), $((total / 1048576)), AMD GPU"
+                exit
+            done`]
+        stdout: StdioCollector {
+            onStreamFinished: root.parseGpu(text)
+        }
+    }
+
     Timer {
         running: root.watchers > 0
         interval: 2000
         repeat: true
         triggeredOnStart: true
-        onTriggered: reader.running = true
+        onTriggered: {
+            reader.running = true;
+            gpuReader.running = true;
+        }
     }
 
     Timer {

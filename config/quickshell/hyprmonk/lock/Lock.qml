@@ -3,8 +3,10 @@
 // surface; the focused one at lock time carries the clock and the password
 // field, the rest only the frosted wallpaper. The surfaces are opaque.
 //
-// If the shell dies while locked, restarting it locks again
-// (misc.allow_session_lock_restore in look.lua).
+// If the shell dies while locked, restarting it locks again: `marker` says it
+// was, and misc.allow_session_lock_restore in look.lua lets a new lock take
+// over. The marker is named after this Hyprland session, so the next one
+// starts unlocked.
 //
 // IPC: qs -c hyprmonk ipc call lock lock
 //      qs -c hyprmonk ipc call lock preview  (the surface in a plain window,
@@ -21,7 +23,11 @@ import qs.services
 Scope {
     id: root
 
-    property string primary: ""      // the screen with the clock and the field
+    property string primary: ""      // the screen focused at lock time
+    // The one with the clock and the field: the first left if `primary` goes.
+    readonly property string mainScreen: (Quickshell.screens.find(s => s.name === primary) ?? Quickshell.screens[0])?.name ?? ""
+    readonly property string marker: Quickshell.env("XDG_RUNTIME_DIR") + "/hyprmonk-locked-"
+        + Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE")
     property string password: ""
     property bool checking: false
     property string error: ""        // why the last try failed
@@ -36,6 +42,7 @@ Scope {
         session.locked = true;
         // Set here, not from the lock's signal: it is not sent on unlock.
         Session.locked = true;
+        Quickshell.execDetached(["touch", marker]);
     }
 
     function reset(): void {
@@ -51,6 +58,14 @@ Scope {
         error = "";
         checking = pam.start();
         if (!checking) error = "Could not start the password check";
+    }
+
+    Process {
+        command: ["test", "-e", root.marker]
+        running: true
+        onExited: code => {
+            if (code === 0) root.lock();
+        }
     }
 
     WlSessionLock {
@@ -87,6 +102,7 @@ Scope {
             if (result === PamResult.Success) {
                 session.locked = false;
                 Session.locked = false;
+                Quickshell.execDetached(["rm", "-f", root.marker]);
                 root.previewing = false;
                 root.reset();
                 return;

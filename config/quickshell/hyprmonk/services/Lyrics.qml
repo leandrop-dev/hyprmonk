@@ -86,6 +86,7 @@ Singleton {
         }
         status = "loading";
         lines = [];
+        requested = key;
         const asked = key, q = query;
         const params = { artist_name: q.artist, track_name: q.title };
         if (q.album) params.album_name = q.album;
@@ -107,6 +108,7 @@ Singleton {
     // server could not answer, or took longer than `timeout` (aborted then).
     // A new request aborts the one before: its track is no longer wanted.
     property var pending: null
+    property string requested: ""  // the track `pending` is for
 
     function request(endpoint: string, params: var, done: var): void {
         const search = Object.keys(params).map(k => k + "=" + encodeURIComponent(params[k])).join("&");
@@ -152,7 +154,7 @@ Singleton {
             const xhr = root.pending;
             root.pending = null;
             xhr?.abort();
-            root.fail(root.key);
+            root.fail(root.requested);
         }
     }
 
@@ -221,7 +223,7 @@ Singleton {
     }
 
     Timer {
-        running: root.needed && root.status === "synced" && (root.player?.isPlaying ?? false)
+        running: Session.seen && root.needed && root.status === "synced" && (root.player?.isPlaying ?? false)
         interval: 1000
         repeat: true
         triggeredOnStart: true
@@ -229,7 +231,7 @@ Singleton {
     }
 
     Timer {
-        running: root.needed && root.status === "synced" && (root.player?.isPlaying ?? false)
+        running: Session.seen && root.needed && root.status === "synced" && (root.player?.isPlaying ?? false)
         interval: 100
         repeat: true
         onTriggered: {

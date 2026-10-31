@@ -1,6 +1,6 @@
 // Bluetooth state for the bar and the Bluetooth panel, from Quickshell's
-// Bluetooth (BlueZ). Only while `scanning` is set (the panel sets it while it
-// is open) does this machine let devices find it. It looks for them only for a
+// Bluetooth (BlueZ). Only while a panel is open and counted in `watchers`
+// (`scanning`) does this machine let devices find it. It looks for them only for a
 // moment, as it opens and on search(): a phone pairing from its own side never
 // got through while the adapter searched, and was at once when it did not.
 //
@@ -17,7 +17,8 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    property bool scanning: false
+    property int watchers: 0
+    readonly property bool scanning: watchers > 0
     property bool searching: false
 
     readonly property BluetoothAdapter adapter: Bluetooth.defaultAdapter
@@ -57,6 +58,7 @@ Singleton {
     }
 
     function pair(device: BluetoothDevice): void {
+        settle.stop();  // the last attempt's, or it would end this one
         pairFailed = "";
         pairing = device;
         device.pair();
@@ -150,7 +152,8 @@ Singleton {
         }
 
         function onPairingChanged(): void {
-            if (!root.pairing.pairing) settle.restart();
+            if (root.pairing.pairing) settle.stop();
+            else settle.restart();
         }
     }
 

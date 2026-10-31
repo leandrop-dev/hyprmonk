@@ -9,6 +9,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.SystemTray
+import qs
 
 Singleton {
     id: root
@@ -59,7 +60,7 @@ Singleton {
         const query = icon.indexOf("?path=");
         if (query < 0) return icon;
         const name = icon.slice(0, query);
-        return "file://" + icon.slice(query + 6) + "/" + name.slice(name.lastIndexOf("/") + 1);
+        return Theme.fileUrl(icon.slice(query + 6) + "/" + name.slice(name.lastIndexOf("/") + 1));
     }
 
     // In place of an app's icon that could not be drawn: its desktop entry's,

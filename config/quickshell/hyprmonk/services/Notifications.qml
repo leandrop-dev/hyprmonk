@@ -50,6 +50,7 @@ Singleton {
     readonly property int defaultTimeout: 10000
     readonly property int lowTimeout: 5000
     readonly property int maxPopups: 4
+    readonly property int maxHistory: 200
 
     // How long `notification` stays as a pop-up, in ms; 0 means until dismissed.
     // expireTimeout is the sender's value in milliseconds, as D-Bus sends it
@@ -74,6 +75,20 @@ Singleton {
         if (notification.transient) notification.expire();
     }
 
+    // With no card, no pop-up runs out to let a transient one go. Later: this
+    // comes while the server is still handing the notification over.
+    function neverShown(notification: Notification): void {
+        if (notification.transient) Qt.callLater(() => notification.expire());
+    }
+
+    // The oldest go first, but never a critical one.
+    function trimHistory(): void {
+        const kept = server.trackedNotifications.values;
+        const excess = kept.length - maxHistory;
+        if (excess <= 0) return;
+        kept.filter(n => n.urgency !== NotificationUrgency.Critical).slice(0, excess).forEach(n => n.expire());
+    }
+
     function clearAll(): void {
         for (const notification of server.trackedNotifications.values.slice())
             notification.dismiss();
@@ -81,8 +96,9 @@ Singleton {
 
     function ago(notification: Notification): string {
         const at = arrived[notification.id];
+        const time = now;  // read whatever happens, so the binding follows the clock
         if (!at) return "";
-        const minutes = Math.floor((now - at) / 60000);
+        const minutes = Math.floor((time - at) / 60000);
         if (minutes < 1) return "now";
         if (minutes < 60) return minutes + "m";
         if (minutes < 24 * 60) return Math.floor(minutes / 60) + "h";
@@ -100,16 +116,23 @@ Singleton {
         persistenceSupported: true
 
         onNotification: notification => {
-            notification.tracked = true;
+            // Before `tracked`: that can make the card at once, which asks for it.
             root.arrived[notification.id] = new Date();
+            notification.tracked = true;
             notification.closed.connect(() => {
                 root.hidePopup(notification);
                 delete root.arrived[notification.id];
             });
+            Qt.callLater(root.trimHistory);
             // After a shell reload the old ones come back; they already popped up.
             if (notification.lastGeneration) return;
-            if ((root.doNotDisturb || GameMode.on) && notification.urgency !== NotificationUrgency.Critical) return;
-            root.popups = [notification, ...root.popups].slice(0, root.maxPopups);
+            if ((root.doNotDisturb || GameMode.on) && notification.urgency !== NotificationUrgency.Critical) {
+                root.neverShown(notification);
+                return;
+            }
+            const popups = [notification, ...root.popups];
+            root.popups = popups.slice(0, root.maxPopups);
+            popups.slice(root.maxPopups).forEach(root.neverShown);
         }
     }
 

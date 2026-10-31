@@ -14,7 +14,7 @@ Variants {
         id: window
 
         required property ShellScreen modelData
-        readonly property string source: Wallpaper.path ? "file://" + Wallpaper.path : ""
+        readonly property string source: Wallpaper.path ? Theme.fileUrl(Wallpaper.path) : ""
 
         screen: modelData
         anchors {
@@ -33,6 +33,7 @@ Variants {
         // it has faded in; then the last one is let go (a screen-sized
         // picture held for nothing).
         onSourceChanged: {
+            fade.stop();  // or it lets go of `below` under a picture still loading
             below.source = above.source;
             above.opacity = 0;
             above.source = source;
@@ -58,6 +59,7 @@ Variants {
             NumberAnimation on opacity {
                 id: fade
                 running: false
+                from: 0
                 to: 1
                 duration: 400
                 easing.type: Easing.OutCubic

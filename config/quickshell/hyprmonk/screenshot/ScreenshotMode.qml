@@ -10,7 +10,6 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Wayland
 import qs
-import qs.services
 
 Scope {
     id: root
