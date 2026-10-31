@@ -181,7 +181,9 @@ which the repo never touches:
 
 Wallpapers come from `~/Pictures/Wallpapers`; the installer downloads the
 cosmic-noir set there and starts with `noir-anime.png`. Another folder: set
-`folder` in `~/.local/state/hyprmonk/wallpaper.json`.
+`folder` in `~/.local/state/hyprmonk/wallpaper.json`. The picker draws from
+thumbnails in `~/.cache/hyprmonk/wallpapers`, kept up to date as pictures come
+and go.
 
 ## Colours
 
@@ -211,16 +213,21 @@ choice if it has none, Vesktop's `quickCss.css`, which is left alone if it
 already holds CSS of your own, and `hyprmonk.css` in Zen's profile, with a
 `userChrome.css` and `userContent.css` that import it if you have neither.
 
+### Steam (optional)
+
 Steam takes the tone through
-[Adwaita-for-Steam](https://github.com/tkashkin/Adwaita-for-Steam), a skin
-hyprmonk does not install. With it installed, `steam.css` from the folder above
-is copied into it, and Steam shows it at its next start.
+[Adwaita-for-Steam](https://github.com/tkashkin/Adwaita-for-Steam), a skin that
+patches Steam's own files, so it stays your choice: the installer leaves it
+out. Steam has to have been opened once. Then:
 
 ```sh
-git clone --depth 1 https://github.com/tkashkin/Adwaita-for-Steam
-cd Adwaita-for-Steam
+git clone --depth 1 https://github.com/tkashkin/Adwaita-for-Steam ~/.cache/hyprmonk/adwaita-for-steam
+cd ~/.cache/hyprmonk/adwaita-for-steam
 ./install.py --custom-css ~/.local/state/hyprmonk/theme/steam.css
 ```
+
+Restart Steam to see it. From then on the shell copies each tone's `steam.css`
+into the skin, and Steam shows it at its next start.
 
 A Steam update can undo the skin; run `./install.py` the same way again.
 `./install.py --uninstall` removes it.
@@ -352,7 +359,9 @@ An open list, in no fixed order.
 - The tones in `config/quickshell/hyprmonk/Tones.qml`: palettes from
   [HANCORE-linux](https://github.com/HANCORE-linux)'s Omarchy themes (MIT,
   `assets/LICENSE-HANCORE-themes` beside it), some of which adapt earlier
-  schemes such as Kanso and Oxocarbon.
+  schemes such as Kanso.
+- Steam's optional skin: [Adwaita-for-Steam](https://github.com/tkashkin/Adwaita-for-Steam)
+  (MIT), installed by hand, not kept in this repo.
 - Synced lyrics from [LRCLIB](https://lrclib.net), looked up while the media
   panel shows them.
 - The cursor: [Bibata](https://github.com/ful1e5/Bibata_Cursor) Modern Ice
