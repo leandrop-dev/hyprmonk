@@ -54,9 +54,10 @@ can inject shell commands; no binding loops, restart loops or leaked objects.
 
 ### Cost
 
-- [ ] D-015 `Theme.qml:30`, `ThemeOutputs.qml:22,153,215`: one wallpaper change
-  rebuilds every tone up to 5 times. One colour snapshot per load, stable objects
-  for the fixed tones.
+- [x] D-015 `Theme.qml`, `ThemeOutputs.qml`: one wallpaper change rebuilt every
+  tone 5 times. Measured for one change: Wallpaper tone 87 ms to 3 ms, Noir 9 ms
+  to 0, a Tones.qml palette 0 before and after: it keeps its identity, so nothing
+  downstream ran. The colours are now read in one go, once per change.
 - [x] D-016 `services/Notifications.qml:70,102`: history has no limit, and
   transient notifications with no card stay. Expire those at once, cap history.
 - [x] D-017 `services/Hardware.qml:166`, `services/Lyrics.qml:223`,

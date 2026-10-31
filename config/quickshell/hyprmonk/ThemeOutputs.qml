@@ -19,7 +19,7 @@ import qs.services
 Scope {
     id: root
 
-    readonly property var saved: Theme.tones[Theme.savedTone] ?? Theme.tones.noir
+    readonly property var saved: Theme.toneOf(Theme.savedTone)
     readonly property string dir: Theme.stateDir + "/theme"
     readonly property string config: Quickshell.env("HOME") + "/.config"
 
@@ -151,13 +151,13 @@ Scope {
     // Plasma's kdeglobals. From the tone's own colours, or else the
     // wallpaper's.
     readonly property var qtPalette: {
-        const w = Theme.wallpaperColours;
         if (saved.accent) return {
             window: saved.background, view: Qt.darker(saved.background, 1.3), button: mix(0.09),
             header: mix(0.05), tooltip: mix(0.09), alternate: mix(0.03), text: saved.foreground, muted: mix(0.6),
             accent: saved.accent, accentText: saved.background, negative: Theme.warning,
             positive: Theme.positiveOf(saved)
         };
+        const w = Theme.wallpaperColours;
         return {
             window: w.surface, view: w.surfaceLowest, button: w.surfaceHigh, header: w.surfaceContainer,
             tooltip: w.surfaceHighest, alternate: w.surfaceLow, text: w.surfaceText, muted: w.surfaceMuted,
@@ -211,8 +211,9 @@ Scope {
     // Named after its colours: KDE apps keep a colour scheme they read by
     // its path, so new colours need a new path.
     readonly property string qtColoursPath: {
+        const text = qtColours;
         let hash = 5381;
-        for (let i = 0; i < qtColours.length; i++) hash = (hash * 33 + qtColours.charCodeAt(i)) >>> 0;
+        for (let i = 0; i < text.length; i++) hash = (hash * 33 + text.charCodeAt(i)) >>> 0;
         return `${dir}/qt-${hash.toString(16)}.colors`;
     }
 

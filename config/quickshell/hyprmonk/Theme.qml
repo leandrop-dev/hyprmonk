@@ -27,16 +27,20 @@ Singleton {
     // bring its own accent (and green) instead of the wallpaper's. A light
     // one (`light: true`) needs more card opacity, or a dark wallpaper greys
     // it. The rest of them are in Tones.qml.
-    readonly property var tones: Object.assign({
-        // From cosmic-noir-theme: charcoal, fog text, orange, sage.
-        noir:      { label: "Noir",      background: "#171717", foreground: "#ccd0cf", card: 0.88, light: false,
-                     accent: "#f25623", positive: "#88a57d", icons: "" },
-        wallpaper: { label: "Wallpaper", background: colors.surface, foreground: colors.surfaceText, card: 0.78, light: false },
-        // Having an accent, it paints apps as a tone of its own does, over
-        // matugen's dark colours.
-        wallpaperlight: { label: "Wallpaper Light", background: colors.lightSurface, foreground: colors.lightSurfaceText,
-                          card: 0.92, light: true, accent: colors.lightAccent }
-    }, Tones.list)
+    //
+    // Ask for a tone through toneOf(): a new wallpaper then only reaches what
+    // is using one of the two tones made from it.
+    // From cosmic-noir-theme: charcoal, fog text, orange, sage.
+    readonly property var noir: ({ label: "Noir", background: "#171717", foreground: "#ccd0cf", card: 0.88, light: false,
+                                   accent: "#f25623", positive: "#88a57d", icons: "" })
+    readonly property var wallpaperTone: ({ label: "Wallpaper", background: colors.surface, foreground: colors.surfaceText,
+                                            card: 0.78, light: false })
+    // Having an accent, it paints apps as a tone of its own does, over
+    // matugen's dark colours.
+    readonly property var wallpaperLightTone: ({ label: "Wallpaper Light", background: colors.lightSurface,
+                                                 foreground: colors.lightSurfaceText, card: 0.92, light: true,
+                                                 accent: colors.lightAccent })
+    readonly property var tones: Object.assign({ noir, wallpaper: wallpaperTone, wallpaperlight: wallpaperLightTone }, Tones.list)
     // Noir until the settings are read (and for a name it does not know, such
     // as a tone that was dropped).
     // A previewed tone (quick actions, while moving through them) shows
@@ -44,7 +48,13 @@ Singleton {
     readonly property string savedTone: appearance?.tone in tones ? appearance.tone : "noir"
     property string previewTone: ""
     readonly property string toneName: previewTone in tones ? previewTone : savedTone
-    readonly property var tone: tones[toneName] ?? tones.noir
+    readonly property var tone: toneOf(toneName)
+
+    function toneOf(name: string): var {
+        if (name === "wallpaper") return wallpaperTone;
+        if (name === "wallpaperlight") return wallpaperLightTone;
+        return Tones.list[name] ?? noir;
+    }
 
     function setTone(name: string): void {
         if (name in tones) appearance.tone = name;
@@ -138,25 +148,38 @@ Singleton {
         watchChanges: true
         printErrors: false
         onFileChanged: reload()
+        onLoaded: theme.readColours(text())
+    }
 
-        JsonAdapter {
-            id: colors
-            property string accent: "#ef8608"
-            property string surface: "#1e1a17"
-            property string surfaceText: "#f2ede6"  // not onSurface: that reads as a handler
-            // For apps' colour schemes (ThemeOutputs.qml): text a step back, the
-            // surface's levels from the darkest, and errors.
-            property string surfaceMuted: "#d5c3b5"
-            property string surfaceLowest: "#18120d"
-            property string surfaceLow: "#221a15"
-            property string surfaceContainer: "#261e19"
-            property string surfaceHigh: "#312823"
-            property string surfaceHighest: "#3d332d"
-            property string error: "#ffb4ab"
-            // The Wallpaper Light tone.
-            property string lightSurface: "#fff8f5"
-            property string lightSurfaceText: "#201a17"
-            property string lightAccent: "#8f4c00"
-        }
+    // matugen's colours, set in one go: one by one, each would build the
+    // tones again.
+    property var colors: ({
+        accent: "#ef8608",
+        surface: "#1e1a17",
+        surfaceText: "#f2ede6",
+        // For apps' colour schemes (ThemeOutputs.qml): text a step back, the
+        // surface's levels from the darkest, and errors.
+        surfaceMuted: "#d5c3b5",
+        surfaceLowest: "#18120d",
+        surfaceLow: "#221a15",
+        surfaceContainer: "#261e19",
+        surfaceHigh: "#312823",
+        surfaceHighest: "#3d332d",
+        error: "#ffb4ab",
+        // The Wallpaper Light tone.
+        lightSurface: "#fff8f5",
+        lightSurfaceText: "#201a17",
+        lightAccent: "#8f4c00"
+    })
+    property string colorsRead: ""
+
+    // The file comes twice for a wallpaper (the watch, matugen's reload). One
+    // that does not parse is half written: the next change brings the rest.
+    function readColours(json: string): void {
+        if (json === colorsRead) return;
+        try {
+            colors = Object.assign({}, colors, JSON.parse(json));
+            colorsRead = json;
+        } catch (error) {}
     }
 }
