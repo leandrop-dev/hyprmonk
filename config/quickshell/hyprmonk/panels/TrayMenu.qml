@@ -13,6 +13,7 @@ ColumnLayout {
     id: panel
 
     readonly property var submenu: Tray.path.length > 0 ? Tray.path[Tray.path.length - 1] : null
+    readonly property var page: submenu  // for the card's scrolling
 
     spacing: 2
 

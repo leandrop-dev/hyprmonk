@@ -10,6 +10,7 @@ can inject shell commands; no binding loops, restart loops or leaked objects.
 ## Still to try
 
 - D-005, D-024: need a second monitor.
+- D-022: the mouse wheel and a drag on a panel that really overflows.
 
 ## To fix
 
@@ -74,9 +75,9 @@ can inject shell commands; no binding loops, restart loops or leaked objects.
 - [ ] D-021 `bar/Bar.qml:71,126`, `bar/Media.qml:64`: the bar's cards overlap below
   about 1920 logical pixels, and the drawer has grown to about 870 px with the
   GPU. Derive the media text's width from the free space.
-- [ ] D-022 `bar/Bar.qml:28`, `panels/TrayMenu.qml:55`, `panels/SoundPanel.qml:48,71`,
-  `panels/BluetoothPanel.qml:207`: tall panels are cut off. Cap their height and
-  scroll the lists.
+- [x] D-022 `bar/Card.qml`: tall panels were cut off. Every panel now scrolls
+  inside its card once it is taller than the bar's window has room for, with a
+  thin marker for how far down it is. A tray submenu starts at its top.
 - [x] D-023 `wallpaper/Background.qml:17`, `lock/LockSurface.qml:36`,
   `wallpaper/Picker.qml:178`, `services/Wallpaper.qml:42`,
   `notifications/NotificationCard.qml:40`, `services/Tray.qml:62`: `#`, `?` or `%25`

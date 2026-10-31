@@ -311,7 +311,7 @@ cargo clippy --all-targets -- -D warnings
 **Next**
 
 - What is left of the 2026-10-31 review, in [docs/review.md](docs/review.md):
-  the bar and tall panels on smaller screens, and ten things to look into.
+  the bar on smaller screens, a small cleanup, and ten things to look into.
 
 **Later**
 
