@@ -1,6 +1,7 @@
 // The saved Appearance tone outside the shell: GTK and Qt apps (theme,
 // colours and icons), Hyprland's window borders, kitty, zsh's prompt and
-// highlighting, and the login screen's Desktop look. A tone with its own accent
+// highlighting, fastfetch, btop, Vesktop, and the login screen's Desktop look.
+// A tone with its own accent
 // writes its colours over the wallpaper's (which matugen writes); one without
 // writes nothing over them. Only the saved tone counts, so a preview does not
 // repaint every app.
@@ -262,7 +263,70 @@ Scope {
             `ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=${c(p.muted)}'`
         ];
         for (const name in styles) lines.push(`ZSH_HIGHLIGHT_STYLES[${name}]='fg=${styles[name]}'`);
+        // fastfetch's colours, for zshrc to pass it.
+        lines.push("hyprmonk_fastfetch=("
+            + `--color-keys '${c(p.accent)}' --color-title '${c(p.accent)}' --color-output '${c(p.text)}' `
+            + `--color-separator '${c(p.muted)}' --logo-color-1 '${c(p.accent)}' --logo-color-2 '${c(p.text)}')`);
         return lines.join("\n") + "\n";
+    }
+
+    // btop's theme (~/.config/btop/themes), on the terminal's own background,
+    // which follows the tone. Whatever measures how busy something is runs
+    // from calm to the accent to the warning colour.
+    readonly property string btop: {
+        const p = qtPalette;
+        const c = value => Qt.color(value).toString();
+        const box = mix(0.25);
+        const colours = {
+            main_fg: c(p.text), title: c(p.text), hi_fg: c(p.accent), selected_bg: c(p.accent),
+            selected_fg: c(p.accentText), inactive_fg: c(p.muted), graph_text: c(p.muted), meter_bg: c(p.button),
+            proc_misc: c(p.accent), cpu_box: box, mem_box: box, net_box: box, proc_box: box, div_line: box
+        };
+        const lines = ["# Written by the shell (ThemeOutputs.qml) for the saved tone. Do not edit.", 'theme[main_bg]=""'];
+        for (const name in colours) lines.push(`theme[${name}]="${colours[name]}"`);
+        for (const name of ["temp", "cpu", "used", "process"]) {
+            lines.push(`theme[${name}_start]="${c(p.positive)}"`, `theme[${name}_mid]="${c(p.accent)}"`,
+                       `theme[${name}_end]="${c(p.negative)}"`);
+        }
+        for (const name of ["free", "cached", "available", "download", "upload"]) {
+            lines.push(`theme[${name}_start]="${c(p.muted)}"`, `theme[${name}_mid]="${c(p.text)}"`,
+                       `theme[${name}_end]="${c(p.accent)}"`);
+        }
+        return lines.join("\n") + "\n";
+    }
+
+    // Vesktop's Quick CSS, which it applies live and needs no setting for:
+    // Discord's own colour names, the ones its code uses today, and little
+    // else. It is written only over itself or nothing, so a file with CSS of
+    // someone's own stays.
+    readonly property string vesktopMark: "/* Written by the shell (ThemeOutputs.qml)"
+    readonly property string vesktop: {
+        const p = qtPalette;
+        const c = value => Qt.color(value).toString();
+        const colours = {
+            "background-base-lowest": c(p.view), "background-base-lower": c(p.window),
+            "background-base-low": c(p.window), "chat-background-default": c(p.window),
+            "background-surface-high": c(p.button), "background-surface-higher": c(p.button),
+            "background-surface-highest": c(p.tooltip), "card-background-default": c(p.alternate),
+            "background-mod-subtle": mix(0.06), "background-mod-normal": mix(0.1), "background-mod-strong": mix(0.14),
+            "border-subtle": mix(0.08), "border-normal": mix(0.14), "border-strong": mix(0.25), "border-focus": c(p.accent),
+            "text-default": c(p.text), "text-strong": c(p.text), "text-muted": c(p.muted), "text-subtle": c(p.muted),
+            "text-link": c(p.accent), "text-brand": c(p.accent), "text-danger": c(p.negative),
+            "text-feedback-critical": c(p.negative), "brand-500": c(p.accent),
+            "interactive-icon-default": c(p.muted), "interactive-icon-hover": c(p.text),
+            "interactive-icon-active": c(p.text), "interactive-hover": c(p.text), "interactive-muted": mix(0.3),
+            "channels-default": c(p.muted), "input-background-default": c(p.alternate), "input-border-default": mix(0.14),
+            "control-primary-background-default": c(p.accent), "control-primary-background-hover": c(p.accent),
+            "control-primary-border-default": c(p.accent), "control-primary-border-hover": c(p.accent),
+            "control-primary-text-default": c(p.accentText), "control-primary-text-hover": c(p.accentText),
+            "control-secondary-background-default": c(p.button), "control-secondary-background-hover": mix(0.14),
+            "control-secondary-text-default": c(p.text), "control-secondary-text-hover": c(p.text),
+            "status-positive": c(p.positive), "status-danger": c(p.negative)
+        };
+        const lines = [root.vesktopMark + " for the saved tone. Do not edit. */",
+                       ".theme-dark, .theme-darker, .theme-midnight, .theme-light, .visual-refresh {"];
+        for (const name in colours) lines.push(`    --${name}: ${colours[name]} !important;`);
+        return lines.join("\n") + "\n}\n";
     }
 
     // The login screen's Desktop look (services/Login.qml): the astronaut
@@ -337,6 +401,8 @@ Scope {
     onLoginChanged: apply.restart()
     onStarshipChanged: apply.restart()
     onZshChanged: apply.restart()
+    onBtopChanged: apply.restart()
+    onVesktopChanged: apply.restart()
     onLoginReadyChanged: apply.restart()
     onWallpaperChanged: apply.restart()
 
@@ -351,7 +417,8 @@ Scope {
     // Written into folders a fresh install may not have yet.
     Process {
         id: folders
-        command: ["mkdir", "-p", root.dir, root.config + "/gtk-3.0", root.config + "/gtk-4.0", root.config + "/qt6ct"]
+        command: ["mkdir", "-p", root.dir, root.config + "/gtk-3.0", root.config + "/gtk-4.0", root.config + "/qt6ct",
+                  root.config + "/btop/themes", root.config + "/vesktop/settings"]
         onExited: {
             gsettings.running = true;
             kdeglobals.running = true;
@@ -363,6 +430,9 @@ Scope {
             if (!qtColoursFile.write()) qtConfigFile.write();
             if (root.starship) starshipTone.write();
             zshTone.write();
+            btopTheme.write();
+            btopConfig.running = true;
+            if (!vesktopCss.text() || vesktopCss.text().startsWith(root.vesktopMark)) vesktopCss.write();
             if (root.login && root.loginReady) loginLook.write();
             if (root.wallpaper) loginPicture.running = true;
         }
@@ -448,6 +518,38 @@ Scope {
         id: zshTone
         path: root.dir + "/zsh-tone.zsh"
         content: root.zsh
+    }
+
+    Output {
+        id: btopTheme
+        path: root.config + "/btop/themes/hyprmonk.theme"
+        content: root.btop
+        onSaved: btopReload.running = true
+    }
+
+    // Named once, for a btop that has no settings yet; after that it is
+    // btop's own to change.
+    Process {
+        id: btopConfig
+        command: ["sh", "-c", '[ -e "$1" ] || printf \'color_theme = "hyprmonk"\\ntheme_background = False\\n\' > "$1"',
+            "sh", root.config + "/btop/btop.conf"]
+    }
+
+    // btop reads its settings and theme again on USR2.
+    Process {
+        id: btopReload
+        command: ["pkill", "-USR2", "-x", "btop"]
+    }
+
+    // Read at once and kept up to date: whether it may be written depends on
+    // what it holds.
+    Output {
+        id: vesktopCss
+        path: root.config + "/vesktop/settings/quickCss.css"
+        content: root.vesktop
+        blockLoading: true
+        watchChanges: true
+        onFileChanged: reload()
     }
 
     FileView {

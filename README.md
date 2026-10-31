@@ -194,11 +194,14 @@ are two for now:
 
 The tone reaches past the shell: Hyprland's window borders, kitty (live, in
 open terminals), the starship prompt and zsh's highlighting (from the next
-prompt), GTK apps through adw-gtk3, Qt and KDE apps through qt6ct with Breeze
-and a KDE colour scheme, the Yaru icons in the nearest colour, and the login
-screen's Desktop look (the wallpaper blurred, in the tone's colours).
+prompt), fastfetch (as a terminal opens), btop (live), Vesktop through its
+Quick CSS (live), GTK apps through adw-gtk3, Qt and KDE apps through qt6ct with
+Breeze and a KDE colour scheme, the Yaru icons in the nearest colour, and the
+login screen's Desktop look (the wallpaper blurred, in the tone's colours).
 Everything generated goes to `~/.local/state/hyprmonk/theme/`, never into the
-repo.
+repo, but for three files in the apps' own folders: btop's `hyprmonk` theme,
+its first `btop.conf`, and Vesktop's `quickCss.css`, which is left alone if it
+already holds CSS of your own.
 
 ## The hyprmonk command
 
@@ -287,9 +290,8 @@ An open list, in no fixed order.
   Ideas to gather from noctalia, HANCORE-linux and Ryoku.
 - More tones, with ideas from HANCORE-linux's themes, and a panel to adjust one
   (card opacity, blur, text colour).
-- btop and fastfetch following the appearance, the Wallpaper tone included.
-- A picker for fastfetch's look, with presets like LierB/fastfetch's.
-- A simple Vesktop theme that follows the appearance.
+- A picker for fastfetch's look, with presets of our own, inspired by
+  LierB/fastfetch's.
 - Calendar events from all three sources: local, Google and CalDAV.
 - A phone module on the bar, beyond its battery: notifications, the clipboard,
   files, ringing it to find it. KDE Connect or an app of our own, still to
