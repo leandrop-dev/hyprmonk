@@ -128,7 +128,15 @@ Scope {
             icon: "\u{F050E}"
             label: "Appearance"
             value: Theme.tones[Theme.savedTone].label
-            options: Object.values(Theme.tones).map(tone => tone.label)
+            options: {
+                const tones = Object.values(Theme.tones);
+                return tones.filter(tone => !tone.light).concat(tones.filter(tone => tone.light)).map(tone => tone.label);
+            }
+            sections: {
+                const sections = {};
+                for (const tone of Object.values(Theme.tones)) sections[tone.label] = tone.light ? "Light" : "Dark";
+                return sections;
+            }
             previews: true
             onPicked: option => Theme.setTone(Object.keys(Theme.tones).find(name => Theme.tones[name].label === option))
             onPreviewed: option => Theme.previewTone = Object.keys(Theme.tones).find(name => Theme.tones[name].label === option) ?? ""
@@ -172,7 +180,7 @@ Scope {
     // The rows: the actions, or the options of the one opened.
     readonly property var items: opened
         ? opened.options.map(option => ({
-            section: opened.label,
+            section: opened.sections[option] ?? opened.label,
             icon: option === opened.value ? "\u{F043E}" : "\u{F043D}",
             label: option,
             chosen: option === opened.value,

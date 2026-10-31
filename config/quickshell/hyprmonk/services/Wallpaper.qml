@@ -19,6 +19,12 @@ Singleton {
     readonly property string folder: settings.folder || Quickshell.env("HOME") + "/Pictures/Wallpapers"
     property var files: []  // paths, by name
 
+    // A picture's small copy for the picker (`hyprmonk thumbnails`).
+    function thumbnail(file: string): string {
+        return (Quickshell.env("XDG_CACHE_HOME") || Quickshell.env("HOME") + "/.cache")
+            + "/hyprmonk/wallpapers/" + file.split("/").pop() + ".jpg";
+    }
+
     // Taken once matugen has read it: a path that is no picture changes
     // nothing, and the colours change with the picture.
     function set(file: string): void {
@@ -46,7 +52,20 @@ Singleton {
             const files = [];
             for (let i = 0; i < count; i++) files.push(get(i, "filePath"));
             root.files = files;
+            thumbnailsDue.restart();
         }
+    }
+
+    // After the folder settles; a change meanwhile waits for the run to end.
+    Timer {
+        id: thumbnailsDue
+        interval: 1000
+        onTriggered: thumbnails.running ? restart() : thumbnails.running = true
+    }
+
+    Process {
+        id: thumbnails
+        command: [Quickshell.env("HOME") + "/.local/bin/hyprmonk", "thumbnails", root.folder]
     }
 
     // matugen takes a moment; a pick made meanwhile runs after it.

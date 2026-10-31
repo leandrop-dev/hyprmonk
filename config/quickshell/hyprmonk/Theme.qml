@@ -22,16 +22,21 @@ Singleton {
 
     // Tones: the background, the text and how opaque cards are. One is in
     // use (quick actions > Appearance, kept in appearance.json); "wallpaper"
-    // takes its colours from matugen's scheme for the wallpaper. A tone may
+    // and "wallpaperlight" take their colours from matugen's schemes for the
+    // wallpaper. A tone may
     // bring its own accent (and green) instead of the wallpaper's. A light
     // one (`light: true`) needs more card opacity, or a dark wallpaper greys
-    // it; none is in the list for now, the rest below still handles one.
-    readonly property var tones: ({
+    // it. The rest of them are in Tones.qml.
+    readonly property var tones: Object.assign({
         // From cosmic-noir-theme: charcoal, fog text, orange, sage.
         noir:      { label: "Noir",      background: "#171717", foreground: "#ccd0cf", card: 0.88, light: false,
                      accent: "#f25623", positive: "#88a57d", icons: "" },
-        wallpaper: { label: "Wallpaper", background: colors.surface, foreground: colors.surfaceText, card: 0.78, light: false }
-    })
+        wallpaper: { label: "Wallpaper", background: colors.surface, foreground: colors.surfaceText, card: 0.78, light: false },
+        // Having an accent, it paints apps as a tone of its own does, over
+        // matugen's dark colours.
+        wallpaperlight: { label: "Wallpaper Light", background: colors.lightSurface, foreground: colors.lightSurfaceText,
+                          card: 0.92, light: true, accent: colors.lightAccent }
+    }, Tones.list)
     // Noir until the settings are read (and for a name it does not know, such
     // as a tone that was dropped).
     // A previewed tone (quick actions, while moving through them) shows
@@ -137,6 +142,10 @@ Singleton {
             property string surfaceHigh: "#312823"
             property string surfaceHighest: "#3d332d"
             property string error: "#ffb4ab"
+            // The Wallpaper Light tone.
+            property string lightSurface: "#fff8f5"
+            property string lightSurfaceText: "#201a17"
+            property string lightAccent: "#8f4c00"
         }
     }
 }

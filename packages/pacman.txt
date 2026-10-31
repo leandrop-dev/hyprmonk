@@ -17,6 +17,8 @@ qt6-multimedia-ffmpeg   # the theme's video backgrounds
 # Shell and theming
 quickshell
 matugen
+libvips
+jq
 qt6-imageformats   # WebP wallpapers
 ttf-jetbrains-mono-nerd
 noto-fonts   # text in apps and notifications beyond JetBrains Mono

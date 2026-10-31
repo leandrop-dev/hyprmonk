@@ -7,6 +7,7 @@ mod installer;
 mod recording;
 mod screenshot;
 mod steelseries;
+mod thumbnails;
 
 use std::io::{self, Write};
 use std::path::Path;
@@ -27,6 +28,7 @@ commands:
                                          keep the last minute, saved on SIGUSR1 (the shell runs this)
   recording-saved FILE                   offer a finished recording (the shell runs this)
   portal-picker [ARGS]                   say what to share: a recording's window, or ask (the portal runs this)
+  thumbnails FOLDER                      make the wallpaper picker's thumbnails (the shell runs this)
   bluetooth-agent                        answer BlueZ's pairing requests through the shell (the shell runs this)
 
 the installer (the repo's install.sh, found through ~/.config/hypr):
@@ -79,6 +81,9 @@ fn run(args: &[&str]) -> Result<ExitCode> {
         ["recording-saved", file] => recording::saved(Path::new(file)).map(|()| ExitCode::SUCCESS),
         ["portal-picker", args @ ..] => recording::portal_picker(args).map(|()| ExitCode::SUCCESS),
         ["bluetooth-agent"] => bluetooth::run().map(|()| ExitCode::SUCCESS),
+        ["thumbnails", folder] => {
+            thumbnails::refresh(Path::new(folder)).map(|()| ExitCode::SUCCESS)
+        }
         ["help" | "--help" | "-h"] => {
             print!("{USAGE}");
             Ok(ExitCode::SUCCESS)

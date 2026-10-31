@@ -55,6 +55,13 @@ RowLayout {
                     property bool checkerboard: false
                     readonly property bool missing: icon.status === Image.Error || checkerboard
                     readonly property bool symbolic: !missing && icon.source.toString().includes("-symbolic")
+                    // An icon in plain greys has no colour to tell it from the
+                    // bar: near the tone's background (Steam's white on a
+                    // light tone), it is drawn inverted. Its outline would not
+                    // do, Steam's being a full disc.
+                    property real shade: -1
+                    readonly property bool faint: !missing && !symbolic && shade >= 0
+                        && Math.abs(shade - Theme.background.hslLightness) < 0.3
 
                     implicitWidth: 16
                     implicitHeight: 16
@@ -63,7 +70,7 @@ RowLayout {
                         id: icon
                         anchors.fill: parent
                         source: Tray.iconSource(mod.modelData)
-                        visible: !picture.missing && !picture.symbolic
+                        visible: !picture.missing && !picture.symbolic && !picture.faint
                         layer.enabled: picture.symbolic
 
                         onStatusChanged: {
@@ -102,6 +109,44 @@ RowLayout {
                             const black = [0, 0, 0], purple = [217, 0, 216];
                             picture.checkerboard = near(0, 0, black) && near(3, 0, purple)
                                 && near(0, 3, purple) && near(3, 3, black);
+
+                            // How light the drawn pixels are, if all are grey.
+                            let sum = 0, drawn = 0, grey = true;
+                            for (let at = 0; at < data.length; at += 4) {
+                                if (data[at + 3] < 64) continue;
+                                const rgb = [data[at], data[at + 1], data[at + 2]];
+                                sum += (Math.max(...rgb) + Math.min(...rgb)) / 510;
+                                drawn++;
+                                grey = grey && Math.max(...rgb) - Math.min(...rgb) < 40;
+                            }
+                            picture.shade = grey && drawn > 0 ? sum / drawn : -1;
+                        }
+                    }
+
+                    Canvas {
+                        anchors.fill: parent
+                        visible: picture.faint
+
+                        readonly property url url: picture.faint ? icon.source : ""
+
+                        onUrlChanged: {
+                            if (url.toString() === "") return;
+                            if (isImageLoaded(url)) requestPaint();
+                            else loadImage(url);
+                        }
+                        onImageLoaded: requestPaint()
+                        onVisibleChanged: requestPaint()  // not painted while hidden
+
+                        onPaint: {
+                            if (!isImageLoaded(url)) return;
+                            const ctx = getContext("2d");
+                            ctx.reset();
+                            ctx.drawImage(url, 0, 0, width, height);
+                            ctx.globalCompositeOperation = "qt-difference";
+                            ctx.fillStyle = "white";
+                            ctx.fillRect(0, 0, width, height);
+                            ctx.globalCompositeOperation = "destination-in";  // back to the icon's shape
+                            ctx.drawImage(url, 0, 0, width, height);
                         }
                     }
 

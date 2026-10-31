@@ -185,23 +185,45 @@ cosmic-noir set there and starts with `noir-anime.png`. Another folder: set
 
 ## Colours
 
-The panels' look is a **tone**, picked in quick actions (Appearance). There
-are two for now:
+The panels' look is a **tone**, picked in quick actions (Appearance), which
+shows each one as you move through the list:
 
 - **Noir**, with its own orange accent and the cosmic-noir palette.
-- **Wallpaper**, whose colours matugen takes from the wallpaper, so a new
-  wallpaper (Super+W) recolours everything.
+- **Wallpaper** and **Wallpaper Light**, whose colours matugen takes from the
+  wallpaper, so a new wallpaper (Super+W) recolours everything.
+- Fifteen more with palettes of their own, from HANCORE-linux's themes,
+  four of them light (Harbor, Rose of Dune, The Greek, White Gold). These change
+  kitty's 16 colours too.
+
+The list keeps the dark tones and the light ones under their own headings.
 
 The tone reaches past the shell: Hyprland's window borders, kitty (live, in
 open terminals), the starship prompt and zsh's highlighting (from the next
 prompt), fastfetch (as a terminal opens), btop (live), Vesktop through its
-Quick CSS (live), GTK apps through adw-gtk3, Qt and KDE apps through qt6ct with
-Breeze and a KDE colour scheme, the Yaru icons in the nearest colour, and the
-login screen's Desktop look (the wallpaper blurred, in the tone's colours).
-Everything generated goes to `~/.local/state/hyprmonk/theme/`, never into the
-repo, but for three files in the apps' own folders: btop's `hyprmonk` theme,
-its first `btop.conf`, and Vesktop's `quickCss.css`, which is left alone if it
-already holds CSS of your own.
+Quick CSS (live), Zed (live), Zen and Heroic (at their next start), GTK apps
+through adw-gtk3, Qt and KDE apps through qt6ct with Breeze and a KDE colour
+scheme, the Yaru icons in the nearest colour, and the login screen's Desktop
+look (the wallpaper blurred, in the tone's colours). Everything generated goes
+to `~/.local/state/hyprmonk/theme/`, never into the repo, but for the files apps
+keep in their own folders: the `hyprmonk` themes of btop, Zed and Heroic, a
+first `btop.conf` and Zed `settings.json` if there is none, Heroic's theme
+choice if it has none, Vesktop's `quickCss.css`, which is left alone if it
+already holds CSS of your own, and `hyprmonk.css` in Zen's profile, with a
+`userChrome.css` and `userContent.css` that import it if you have neither.
+
+Steam takes the tone through
+[Adwaita-for-Steam](https://github.com/tkashkin/Adwaita-for-Steam), a skin
+hyprmonk does not install. With it installed, `steam.css` from the folder above
+is copied into it, and Steam shows it at its next start.
+
+```sh
+git clone --depth 1 https://github.com/tkashkin/Adwaita-for-Steam
+cd Adwaita-for-Steam
+./install.py --custom-css ~/.local/state/hyprmonk/theme/steam.css
+```
+
+A Steam update can undo the skin; run `./install.py` the same way again.
+`./install.py --uninstall` removes it.
 
 ## The hyprmonk command
 
@@ -217,6 +239,7 @@ hyprmonk replay MONITOR [--sound] [--microphone]
                                                 keeps the last minute; the shell runs it
 hyprmonk recording-saved FILE                   offers a finished recording; the shell runs it
 hyprmonk portal-picker [ARGS]                   says what to share; the portal runs it
+hyprmonk thumbnails FOLDER                      makes the wallpaper picker's thumbnails; the shell runs it
 hyprmonk bluetooth-agent                        answers BlueZ's pairing requests; the shell runs it
 hyprmonk menu | install [step...] | update | check | uninstall
 ```
@@ -287,9 +310,8 @@ An open list, in no fixed order.
 
 - A Settings app or panel for what does not fit in quick actions: display size
   and refresh rate, border sizes, window gaps, rearranging the bar's modules.
-  Ideas to gather from noctalia, HANCORE-linux and Ryoku.
-- More tones, with ideas from HANCORE-linux's themes, and a panel to adjust one
-  (card opacity, blur, text colour).
+  Ideas to gather from noctalia, HANCORE-linux's Shibumi Shell and Ryoku.
+- A panel to adjust a tone (card opacity, blur, text colour).
 - A picker for fastfetch's look, with presets of our own, inspired by
   LierB/fastfetch's.
 - Calendar events from all three sources: local, Google and CalDAV.
@@ -327,6 +349,10 @@ An open list, in no fixed order.
   [omarchy-greek-noir-theme](https://github.com/HANCORE-linux/omarchy-greek-noir-theme);
   downloaded by the installer, not kept in this repo. kitty's 16 colours are
   its terminal scheme (`cosmic-term/Noir-term.ron`).
+- The tones in `config/quickshell/hyprmonk/Tones.qml`: palettes from
+  [HANCORE-linux](https://github.com/HANCORE-linux)'s Omarchy themes (MIT,
+  `assets/LICENSE-HANCORE-themes` beside it), some of which adapt earlier
+  schemes such as Kanso and Oxocarbon.
 - Synced lyrics from [LRCLIB](https://lrclib.net), looked up while the media
   panel shows them.
 - The cursor: [Bibata](https://github.com/ful1e5/Bibata_Cursor) Modern Ice

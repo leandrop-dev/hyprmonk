@@ -171,12 +171,17 @@ Scope {
                     color: Theme.fg(0.05)
 
                     Image {
+                        // The picture itself until its thumbnail is made.
+                        property bool noThumbnail: false
+
                         anchors.fill: parent
-                        source: "file://" + tile.modelData
+                        source: "file://" + (noThumbnail ? tile.modelData : Wallpaper.thumbnail(tile.modelData))
                         sourceSize: Qt.size(width, height)
                         fillMode: Image.PreserveAspectCrop
                         asynchronous: true
                         opacity: status === Image.Ready ? 1 : 0
+
+                        onStatusChanged: if (status === Image.Error) noThumbnail = true
 
                         Behavior on opacity {
                             NumberAnimation { duration: 160 }

@@ -8,5 +8,8 @@
   "surfaceContainer": "{{colors.surface_container.default.hex}}",
   "surfaceHigh": "{{colors.surface_container_high.default.hex}}",
   "surfaceHighest": "{{colors.surface_container_highest.default.hex}}",
-  "error": "{{colors.error.default.hex}}"
+  "error": "{{colors.error.default.hex}}",
+  "lightSurface": "{{colors.surface.light.hex}}",
+  "lightSurfaceText": "{{colors.on_surface.light.hex}}",
+  "lightAccent": "{{colors.primary.light.hex}}"
 }
