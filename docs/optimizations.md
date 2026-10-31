@@ -24,7 +24,8 @@ clock still while paused). What is left:
   change. `positionChanged()` only tells bindings to read again, and
   Quickshell works the position out from what it holds, with no D-Bus call
   (read in its `player.cpp`, master, 2026-10-30). The timers run only while
-  the media drawer, its panel or the lyrics in the bar are showing.
+  the media drawer, its panel or the lyrics in the bar are showing, and rest
+  while locked or in game mode (2026-10-31).
 - **The spectrum while music plays**: measured 2026-10-30 at about 14% of a
   core for the shell. Drawing it into a framebuffer object rather than an
   image (`renderTarget`) changed nothing: 13.8%, 14.3%, then 13.5% back on
@@ -49,9 +50,11 @@ light only when the pointer moves. The lyrics have no hover at all.
 
 ## 3. Notifications and outside text
 
-Done 2026-10-29: notification bodies drop `<img>` (seen drawing a local
+Done 2026-10-29: notification bodies stop `<img>` (seen drawing a local
 file before the fix; a remote address would have been fetched the same
-way) and open only http, https and mailto links. Text other apps send
+way; escaped since 2026-10-31, as removing the tag could be bypassed; app
+icons take only file and image addresses) and open only http, https and
+mailto links. Text other apps send
 (titles, artists, lyrics, app and device names, tray menus, polkit
 messages, the launcher's apps) shows as plain text: set on `BarText`,
 `SectionLabel`, `Chip`, `OptionRow`, `Button` and each such `Text`.

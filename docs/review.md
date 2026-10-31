@@ -2,17 +2,14 @@
 
 What the Rust and QML reviews found, to fix or to look into. Ticked once fixed;
 "Still to try" lists the fixes that need a real test. QML paths are relative to
-`config/quickshell/hyprmonk`, Rust paths
-to `crates/hyprmonk/src`.
+`config/quickshell/hyprmonk`, Rust paths to `crates/hyprmonk/src`.
 
 Clean at the time: `cargo fmt`, pedantic clippy, the 26 tests; no generated file
 can inject shell commands; no binding loops, restart loops or leaked objects.
 
 ## Still to try
 
-- D-004: only a real crash while locked shows it.
 - D-005, D-024: need a second monitor.
-- D-006 to D-014, D-018: the fixes are in; each needs its own steps by hand.
 
 ## To fix
 
@@ -74,7 +71,8 @@ can inject shell commands; no binding loops, restart loops or leaked objects.
 ### Other machines
 
 - [ ] D-021 `bar/Bar.qml:71,126`, `bar/Media.qml:64`: the bar's cards overlap below
-  about 1920 logical pixels. Derive the media text's width from the free space.
+  about 1920 logical pixels, and the drawer has grown to about 870 px with the
+  GPU. Derive the media text's width from the free space.
 - [ ] D-022 `bar/Bar.qml:28`, `panels/TrayMenu.qml:55`, `panels/SoundPanel.qml:48,71`,
   `panels/BluetoothPanel.qml:207`: tall panels are cut off. Cap their height and
   scroll the lists.

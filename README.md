@@ -310,7 +310,9 @@ cargo clippy --all-targets -- -D warnings
 
 **Next**
 
-- The rest of the optimizations in [docs/optimizations.md](docs/optimizations.md).
+- What is left of the 2026-10-31 review, in [docs/review.md](docs/review.md):
+  the tone rebuilds on a wallpaper change, the bar and tall panels on smaller
+  screens, and ten things to look into.
 
 **Later**
 
@@ -326,7 +328,6 @@ An open list, in no fixed order.
   decide.
 - Screen quick actions (mirror, main screen only) and the lock screen on
   several screens.
-- The Rust and QML reviewers again, to keep it all lean.
 - Fedora, with its own package list, last of all.
 
 **Known issues**
