@@ -107,11 +107,12 @@ first if it is missing):
 | **Uninstall** | Removes the links and units and puts back what they replaced; says how to undo the rest |
 
 sudo asks for your password for packages and services, and `chsh` once for
-zsh. Then reboot, pick **Hyprland (uwsm-managed)** on the login screen, and
-finish from a terminal inside Hyprland:
+zsh. Then reboot and pick **Hyprland (uwsm-managed)** on the login screen. The
+first login opens a terminal that builds the overview (hymission) and asks for
+your password; until that is done, each login opens it again. By hand:
 
 ```bash
-hyprmonk install plugins   # the overview (hymission; compiles)
+hyprmonk install plugins
 ```
 
 **What the installer touches.** Configs already in the way are moved to

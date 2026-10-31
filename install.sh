@@ -696,7 +696,7 @@ menu() {
             gum style --foreground "$MUTED" "Steps: ${steps[*]}" "sudo asks your password for packages and services; chsh for zsh."
             gum confirm "Install?" || return 0
             run_steps "${steps[@]}"
-            [[ -z ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] && say "Reboot, log in to Hyprland, then run ./install.sh plugins"
+            [[ -z ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] && say "Reboot and log in to Hyprland: a terminal opens there to build the plugins"
             ;;
         Update) step_update ;;
         Check) step_check ;;
