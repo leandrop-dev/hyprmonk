@@ -7,6 +7,10 @@ After=graphical-session.target
 ConditionEnvironment=XDG_CURRENT_DESKTOP=Hyprland
 
 [Service]
+# NVIDIA's explicit sync (580 driver, egl-wayland 1.1.24) leaks four fences each
+# time a window shows or hides. The shell does that all day, and it froze after
+# about a day, out of file descriptors.
+Environment=__NV_DISABLE_EXPLICIT_SYNC=1
 ExecStart=/usr/bin/qs -c hyprmonk
 Restart=on-failure
 RestartSec=2
