@@ -67,9 +67,8 @@ ColumnLayout {
             Component {
                 id: separator
 
-                Rectangle {
+                Item {
                     implicitHeight: 9
-                    color: "transparent"
 
                     Rectangle {
                         anchors.centerIn: parent

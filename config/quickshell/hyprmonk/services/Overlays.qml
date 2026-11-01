@@ -1,6 +1,6 @@
 // Which centred card is open (the launcher, quick actions, the power menu,
 // the key guide, the wallpaper picker): one at a time, on the screen focused when it opened.
-// Opening one closes any bar panel.
+// Opening one closes any bar panel and the notification centre.
 //
 // A card opened while another is still folding away (quick actions running
 // "Power menu") waits until that one is gone: when a surface that held the
@@ -33,6 +33,11 @@ Singleton {
         }
         Panels.close();
         if (open !== "") close();
+        // The centre takes the keyboard too, and unmaps once a card grabs it.
+        if (Notifications.centerOpen) {
+            Notifications.centerOpen = false;
+            closedAt = Date.now();
+        }
         const wait = closedAt + fold - Date.now();
         if (wait > 0) {
             next.name = name;

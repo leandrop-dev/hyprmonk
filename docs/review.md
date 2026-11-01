@@ -95,8 +95,9 @@ can inject shell commands; no binding loops, restart loops or leaked objects.
   `bar/Media.qml:62`, `bar/Module.qml:71`, `osd/Osd.qml:200`,
   `services/Wallpaper.qml:40`; stale comments in `services/Wallpaper.qml:2`,
   `Theme.qml:11`.
-- [ ] L-001 The transparent Rectangles the linter lists (PRF-1), such as
-  `bar/Module.qml:33`.
+- [x] L-001 The linter's PRF-1 hits: only the tray's separator was always transparent,
+  now an Item. The others are hover and selected fills, which Qt does not draw while
+  transparent, or the picker's rim, so they stay Rectangles.
 
 ### Rust
 
@@ -110,13 +111,16 @@ can inject shell commands; no binding loops, restart loops or leaked objects.
 
 ## To look into
 
-- [ ] I-001 `lock/Lock.qml:105`: the hidden preview window keeps a whole lock
-  surface alive, maybe decoding the wallpaper at full size. Log
-  `wallpaper.sourceSize`, or put it in a `LazyLoader`.
+- [x] I-001 `lock/Lock.qml`: the hidden preview window kept a whole lock surface
+  alive. It is now made only while previewing, which took the shell from about
+  405 MB to about 374 MB after a start (two starts each).
 - [ ] I-002 `panels/NetworkPanel.qml:120`, `panels/BluetoothPanel.qml:241`: an
   expanded row can open below the visible area. Expand the last visible row.
-- [ ] I-003 `services/Overlays.qml:5`: overlays can lose the keyboard, and the
-  240 ms wait is a timing guess. Super+N, Super+Space, then type.
+- [ ] I-003 `services/Overlays.qml`: overlays can lose the keyboard. Opening a card
+  now closes the notification centre first, as does locking (seen unmapping as the
+  card opened); Super+N, Super+Space, then type confirms it. Left: with several
+  monitors, the OSD and pop-ups may remap as focus moves; the 240 ms wait is a
+  timing guess with no failure seen.
 - [ ] I-004 `wallpaper/Picker.qml:165`: each tile costs two offscreen textures
   while scrolling. Run the QML profiler.
 - [ ] I-005 `services/Player.qml:44`: a stream after a normal track may keep the

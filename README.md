@@ -311,7 +311,7 @@ cargo clippy --all-targets -- -D warnings
 **Next**
 
 - What is left of the 2026-10-31 review, in [docs/review.md](docs/review.md):
-  a small cleanup and ten things to look into.
+  nine things to look into.
 
 **Later**
 

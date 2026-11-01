@@ -39,6 +39,7 @@ Scope {
         reset();
         Overlays.close();
         Panels.close();
+        Notifications.centerOpen = false;
         session.locked = true;
         // Set here, not from the lock's signal: it is not sent on unlock.
         Session.locked = true;
@@ -118,28 +119,33 @@ Scope {
         }
     }
 
-    PanelWindow {
-        id: previewWindow
+    // Made only while previewing: a whole lock surface otherwise stays alive,
+    // wallpaper included, for something used now and then.
+    LazyLoader {
+        active: root.previewing
 
-        visible: root.previewing
-        color: "transparent"
-        anchors {
-            top: true
-            bottom: true
-            left: true
-            right: true
-        }
-        exclusionMode: ExclusionMode.Ignore
-        WlrLayershell.namespace: "hyprmonk-lock-preview"
-        WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.keyboardFocus: root.previewing ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+        PanelWindow {
+            id: previewWindow
 
-        LockSurface {
-            anchors.fill: parent
-            lock: root
-            screen: previewWindow.screen
-            focus: true
-            Keys.onEscapePressed: root.previewing = false
+            color: "transparent"
+            anchors {
+                top: true
+                bottom: true
+                left: true
+                right: true
+            }
+            exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.namespace: "hyprmonk-lock-preview"
+            WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+
+            LockSurface {
+                anchors.fill: parent
+                lock: root
+                screen: previewWindow.screen
+                focus: true
+                Keys.onEscapePressed: root.previewing = false
+            }
         }
     }
 
