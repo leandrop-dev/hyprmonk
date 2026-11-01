@@ -8,6 +8,7 @@ Item {
 
     property real value: 0
     property bool dim: false
+    property real step: 0.05  // a notch of the wheel
 
     signal moved(real value)
 
@@ -50,6 +51,6 @@ Item {
         cursorShape: Qt.PointingHandCursor
         onPressed: event => slider.moveTo(event.x)
         onPositionChanged: event => { if (pressed) slider.moveTo(event.x); }
-        onWheel: event => slider.moved(Math.max(0, Math.min(1, slider.value + (event.angleDelta.y > 0 ? 0.05 : -0.05))))
+        onWheel: event => slider.moved(Math.max(0, Math.min(1, slider.value + (event.angleDelta.y > 0 ? slider.step : -slider.step))))
     }
 }

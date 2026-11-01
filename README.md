@@ -312,21 +312,19 @@ cargo clippy --all-targets -- -D warnings
 
 - What is left of the 2026-10-31 review, in [docs/review.md](docs/review.md):
   the checks that need a second monitor.
+- The rest of Settings (Super+comma), in [docs/settings.md](docs/settings.md):
+  the Tone, Bar and Display pages.
 
 **Later**
 
 An open list, in no fixed order.
 
-- A Settings app or panel for what does not fit in quick actions: display size
-  and refresh rate, border sizes, window gaps, rearranging the bar's modules.
-  Ideas to gather from noctalia, HANCORE-linux's Shibumi Shell and Ryoku.
-- A panel to adjust a tone (card opacity, blur, text colour).
 - Calendar events from all three sources: local, Google and CalDAV.
+- Screen quick actions (mirror, main screen only) and the lock screen on
+  several screens.
 - A phone module on the bar, beyond its battery: notifications, the clipboard,
   files, ringing it to find it. KDE Connect or an app of our own, still to
   decide.
-- Screen quick actions (mirror, main screen only) and the lock screen on
-  several screens.
 - Fedora, with its own package list, last of all.
 
 **Known issues**

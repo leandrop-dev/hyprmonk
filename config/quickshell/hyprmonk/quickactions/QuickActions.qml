@@ -73,6 +73,12 @@ Scope {
         },
         Action {
             section: "System"
+            icon: "\u{F0493}"
+            label: "Settings"
+            onRun: Overlays.toggle("settings")
+        },
+        Action {
+            section: "System"
             icon: "\u{F0425}"
             label: "Power menu"
             onRun: Overlays.toggle("power")

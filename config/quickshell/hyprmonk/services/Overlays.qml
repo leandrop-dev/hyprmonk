@@ -11,7 +11,7 @@
 //
 // IPC: qs -c hyprmonk ipc call overlays toggle NAME | close
 //      ("launcher", "clipboard" (the launcher on that tab), "quickactions",
-//      "power", "keyguide" or "wallpapers")
+//      "power", "keyguide", "wallpapers" or "settings")
 pragma Singleton
 
 import QtQuick

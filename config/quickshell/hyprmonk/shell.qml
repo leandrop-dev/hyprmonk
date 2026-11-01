@@ -1,7 +1,7 @@
 // hyprmonk's shell: `qs -c hyprmonk`. The wallpaper and a bar per screen, the
 // notification pop-ups and centre, the OSD, the launcher, quick actions, the
-// power menu, the key guide, the wallpaper picker, the screenshot mode's
-// card, the lock screen and the polkit agent; and the Appearance tone carried
+// power menu, the key guide, the wallpaper picker, settings, the screenshot
+// mode's card, the lock screen and the polkit agent; and the Appearance tone carried
 // to GTK apps, Hyprland and kitty.
 import Quickshell
 import qs
@@ -15,6 +15,7 @@ import qs.polkit
 import qs.power
 import qs.quickactions
 import qs.screenshot
+import qs.settings
 import qs.wallpaper
 
 ShellRoot {
@@ -38,6 +39,7 @@ ShellRoot {
     PowerMenu {}
     KeyGuide {}
     Picker {}
+    SettingsCard {}
     ScreenshotMode {}
     Lock {}
     Polkit {}
