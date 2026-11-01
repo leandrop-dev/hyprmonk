@@ -13,6 +13,10 @@ Module {
     id: root
 
     readonly property var player: Player.current
+    // What the bar leaves it, at the most: the cover and its padding first.
+    property real room: Infinity
+    readonly property real textRoom: Math.min(360, room - 42)
+    readonly property bool fits: room >= 36
 
     interactive: player !== null
     dim: !player?.isPlaying
@@ -59,7 +63,8 @@ Module {
         },
 
         BarText {
-            Layout.maximumWidth: 360
+            Layout.maximumWidth: root.textRoom
+            visible: root.textRoom >= 60
             text: Lyrics.inBar && Lyrics.line !== "" ? Lyrics.line : Player.summary
             elide: Text.ElideRight
 

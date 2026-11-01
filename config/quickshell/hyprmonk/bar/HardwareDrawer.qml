@@ -11,6 +11,7 @@ RowLayout {
     id: drawer
 
     property bool open: false
+    property real room: Infinity
     property real reveal: open ? 1 : 0
 
     spacing: 2
@@ -24,6 +25,7 @@ RowLayout {
     }
 
     Runcat {
+        id: cat
         interactive: true
         active: drawer.open
         onClicked: button => { if (button === Qt.LeftButton) drawer.open = !drawer.open; }
@@ -32,7 +34,7 @@ RowLayout {
     Item {
         visible: drawer.reveal > 0
         clip: true
-        implicitWidth: modules.implicitWidth * drawer.reveal
+        implicitWidth: Math.max(0, Math.min(modules.implicitWidth * drawer.reveal, drawer.room - cat.implicitWidth - drawer.spacing))
         implicitHeight: modules.implicitHeight
 
         RowLayout {

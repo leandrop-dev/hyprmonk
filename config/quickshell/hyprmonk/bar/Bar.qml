@@ -20,6 +20,14 @@ PanelWindow {
     readonly property int baseHeight: Theme.barHeight + Theme.barGap * 2
     readonly property bool panelOpen: Panels.open !== "" && Panels.screen === screen?.name
 
+    // The strip the centre card has between the others. It stays centred while
+    // it fits there, moves aside when it does not (the drawer open on a small
+    // screen), and the media gives up its text, then itself, before overlapping.
+    readonly property int cardGap: 8
+    readonly property real freeLeft: Theme.barMargin + leftCard.baseWidth + cardGap
+    readonly property real freeRight: width - Theme.barMargin - rightCard.baseWidth - cardGap
+    readonly property real freeWidth: freeRight - freeLeft
+
     anchors {
         top: true
         left: true
@@ -59,20 +67,28 @@ PanelWindow {
         anchors.top: parent.top
         anchors.topMargin: Theme.barGap
 
-        LauncherButton {}
-        Workspaces { screen: bar.screen }
-        Overview {}
-        HardwareDrawer {}
+        LauncherButton { id: launcher }
+        Workspaces {
+            id: workspaces
+            screen: bar.screen
+        }
+        Overview { id: overview }
+        // Up to the right card: on a small screen its far end stays folded away.
+        HardwareDrawer {
+            room: bar.freeRight - Theme.barMargin - Theme.cardPadding * 2 - launcher.implicitWidth
+                - workspaces.implicitWidth - overview.implicitWidth - 6
+        }
     }
 
     Card {
         id: centreCard
 
-        anchors.horizontalCenter: parent.horizontalCenter
+        x: Math.round(Math.max(bar.freeLeft, Math.min((bar.width - width) / 2, bar.freeRight - width)))
         anchors.top: parent.top
         anchors.topMargin: Theme.barGap
         panel: mediaOpen ? mediaPanel : null
         panelWidth: 490
+        visible: bar.freeWidth >= spectrum.implicitWidth + Theme.cardPadding * 2
 
         // The spectrum stays; the media slides out beside it while hovered
         // (folding a moment after the pointer leaves), while its panel is
@@ -80,7 +96,7 @@ PanelWindow {
         readonly property bool mediaOpen: bar.panelOpen && Panels.open === "media"
         property bool pointerNear: false
         readonly property bool singing: Lyrics.inBar && Lyrics.line !== "" && (Player.current?.isPlaying ?? false)
-        readonly property bool showMedia: Player.current !== null && (pointerNear || mediaOpen || singing)
+        readonly property bool showMedia: Player.current !== null && media.fits && (pointerNear || mediaOpen || singing)
 
         onHoveredChanged: {
             if (hovered) {
@@ -97,7 +113,10 @@ PanelWindow {
             onTriggered: centreCard.pointerNear = false
         }
 
-        Spectrum { active: centreCard.mediaOpen }
+        Spectrum {
+            id: spectrum
+            active: centreCard.mediaOpen
+        }
 
         Item {
             property real reveal: centreCard.showMedia ? 1 : 0
@@ -114,6 +133,7 @@ PanelWindow {
             Media {
                 id: media
                 active: centreCard.mediaOpen
+                room: bar.freeWidth - spectrum.implicitWidth - Theme.cardPadding * 2 - 2
             }
         }
     }

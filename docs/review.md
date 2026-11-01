@@ -72,9 +72,10 @@ can inject shell commands; no binding loops, restart loops or leaked objects.
 
 ### Other machines
 
-- [ ] D-021 `bar/Bar.qml:71,126`, `bar/Media.qml:64`: the bar's cards overlap below
-  about 1920 logical pixels, and the drawer has grown to about 870 px with the
-  GPU. Derive the media text's width from the free space.
+- [x] D-021 `bar/Bar.qml`, `bar/Media.qml`, `bar/HardwareDrawer.qml`: the bar's cards
+  overlapped on smaller screens. The centre card stays centred while it fits,
+  moves aside when it does not, and the media gives up its text, then itself. The
+  drawer stops at the right card. Tried at 2560, 1920, 1366 and 1100 px wide.
 - [x] D-022 `bar/Card.qml`: tall panels were cut off. Every panel now scrolls
   inside its card once it is taller than the bar's window has room for, with a
   thin marker for how far down it is. A tray submenu starts at its top.
