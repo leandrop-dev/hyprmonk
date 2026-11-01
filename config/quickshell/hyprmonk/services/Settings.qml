@@ -3,7 +3,8 @@
 //
 // The window options reach Hyprland twice: at once through `hyprctl eval`, and
 // in settings.lua, which hyprland.lua loads after look.lua so they survive a
-// restart. Game mode turns blur and shadows off whatever these say.
+// restart. Game mode turns blur and shadows off whatever these say. A screen's
+// mode reaches settings.lua only once kept.
 pragma Singleton
 
 import QtQuick
@@ -45,6 +46,40 @@ Singleton {
     readonly property string hyprland: "-- Written by the shell (services/Settings.qml). Do not edit.\n"
         + windowOptions.filter(option => option.key in windowValues)
             .map(option => line(option, windowValues[option.key]) + "\n").join("")
+        + Object.keys(displayValues).map(name => displayLine(name, displayValues[name]) + "\n").join("")
+
+    // What Settings > Display kept, by screen (services/Display.qml). This
+    // ends up as Lua and the file can be edited by hand: only what looks right.
+    readonly property var displayValues: {
+        const values = {};
+        for (const name of Object.keys(saved.display)) {
+            const value = saved.display[name];
+            if (/^[\w.-]+$/.test(name) && /^\d+x\d+@[\d.]+$/.test(value?.mode)
+                    && /^-?\d+x-?\d+$/.test(value?.position) && Number(value?.scale) > 0)
+                values[name] = value;
+        }
+        return values;
+    }
+    property bool reloadOnSave: false  // the config has to take back a screen
+
+    function displayLine(name: string, value: var): string {
+        return `hl.monitor({ output = "${name}", mode = "${value.mode}", position = "${value.position}", scale = ${Number(value.scale)} })`;
+    }
+
+    function displayKept(name: string): bool {
+        return name in displayValues;
+    }
+
+    function setDisplay(name: string, value: var): void {
+        saved.display = Object.assign({}, saved.display, { [name]: value });
+    }
+
+    function resetDisplay(name: string): void {
+        const left = Object.assign({}, saved.display);
+        delete left[name];
+        reloadOnSave = true;
+        saved.display = left;
+    }
 
     // The bar's left and right cards, in order; the centre card stays as it
     // is. `panel` is what the module opens: it opens under the module's card.
@@ -158,6 +193,7 @@ Singleton {
             id: saved
             property var window: ({})
             property var bar: ({})
+            property var display: ({})
         }
     }
 
@@ -166,5 +202,10 @@ Singleton {
         path: Theme.stateDir + "/settings.lua"
         blockLoading: true
         printErrors: false
+        onSaved: {
+            if (!root.reloadOnSave) return;
+            root.reloadOnSave = false;
+            Quickshell.execDetached(["hyprctl", "reload", "config-only"]);
+        }
     }
 }
