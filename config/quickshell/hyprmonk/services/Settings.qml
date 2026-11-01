@@ -46,6 +46,81 @@ Singleton {
         + windowOptions.filter(option => option.key in windowValues)
             .map(option => line(option, windowValues[option.key]) + "\n").join("")
 
+    // The bar's left and right cards, in order; the centre card stays as it
+    // is. `panel` is what the module opens: it opens under the module's card.
+    // Recording and Replay only show while they run, and cannot be hidden.
+    readonly property var barModules: [
+        { key: "launcher", label: "Launcher", icon: "\u{F003B}" },
+        { key: "workspaces", label: "Workspaces", icon: "\u{F0570}" },
+        { key: "overview", label: "Overview", icon: "\u{F0F8D}" },
+        { key: "hardware", label: "Hardware", icon: "\u{F011B}" },
+        { key: "recording", label: "Recording", icon: "\u{F044A}", fixed: true },
+        { key: "replay", label: "Replay", icon: "\u{F0459}", fixed: true },
+        { key: "tray", label: "Tray", icon: "\u{F0493}", panel: "tray" },
+        { key: "network", label: "Network", icon: "\u{F05A9}", panel: "network" },
+        { key: "bluetooth", label: "Bluetooth", icon: "\u{F00AF}", panel: "bluetooth" },
+        { key: "batteries", label: "Batteries", icon: "\u{F0079}", panel: "batteries" },
+        { key: "volume", label: "Volume", icon: "\u{F057E}", panel: "sound" },
+        { key: "microphone", label: "Microphone", icon: "\u{F036C}", panel: "microphone" },
+        { key: "notifications", label: "Notifications", icon: "\u{F009A}" },
+        { key: "clock", label: "Clock", icon: "\u{F00ED}", panel: "calendar" },
+        { key: "quickactions", label: "Quick actions", icon: "\u{F1542}" },
+        { key: "power", label: "Power", icon: "\u{F0425}" }
+    ]
+    readonly property var barDefaults: ({
+        left: ["launcher", "workspaces", "overview", "hardware"],
+        right: ["recording", "replay", "tray", "network", "bluetooth", "batteries", "volume",
+                "microphone", "notifications", "clock", "quickactions", "power"],
+        hidden: []
+    })
+
+    // Each known module once, wherever it was left; one not placed yet (new
+    // since the file was written) joins its default card.
+    readonly property var bar: {
+        const seen = {};
+        const clean = (list, kept) => Array.from(list ?? []).filter(key => {
+            const take = barModule(key) !== undefined && !seen[key] && kept(barModule(key));
+            if (take) seen[key] = true;
+            return take;
+        });
+        const all = () => true;
+        const placed = {
+            left: clean(saved.bar.left, all),
+            right: clean(saved.bar.right, all),
+            hidden: clean(saved.bar.hidden, module => !module.fixed)
+        };
+        placed.left.push(...barDefaults.left.filter(key => !seen[key]));
+        placed.right.push(...barDefaults.right.filter(key => !seen[key]));
+        return placed;
+    }
+    readonly property bool barChanged: JSON.stringify(bar) !== JSON.stringify(barDefaults)
+
+    function barModule(key: string): var {
+        return barModules.find(module => module.key === key);
+    }
+
+    function barPanel(key: string): string {
+        return barModule(key)?.panel ?? "";
+    }
+
+    // Into `side` ("left", "right" or "hidden") before what is now at `index`.
+    function moveBarModule(key: string, side: string, index: int): void {
+        if (side === "hidden" && barModule(key).fixed) return;
+        const next = { left: bar.left.slice(), right: bar.right.slice(), hidden: bar.hidden.slice() };
+        for (const name of Object.keys(next)) {
+            const at = next[name].indexOf(key);
+            if (at < 0) continue;
+            next[name].splice(at, 1);
+            if (name === side && at < index) index -= 1;
+        }
+        next[side].splice(index, 0, key);
+        saved.bar = next;
+    }
+
+    function resetBar(): void {
+        saved.bar = {};
+    }
+
     function clamp(option: var, value: real): int {
         return Math.max(option.from, Math.min(option.to, Math.round(value)));
     }
@@ -82,6 +157,7 @@ Singleton {
         JsonAdapter {
             id: saved
             property var window: ({})
+            property var bar: ({})
         }
     }
 

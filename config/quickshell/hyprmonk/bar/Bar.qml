@@ -28,6 +28,20 @@ PanelWindow {
     readonly property real freeRight: width - Theme.barMargin - rightCard.baseWidth - cardGap
     readonly property real freeWidth: freeRight - freeLeft
 
+    // A panel opens under the card holding its module; the right card takes
+    // those of hidden modules (over IPC). The media's has the centre card.
+    readonly property var panels: ({
+        sound: outputPanel,
+        microphone: inputPanel,
+        network: networkPanel,
+        bluetooth: bluetoothPanel,
+        batteries: batteryPanel,
+        calendar: calendarPanel,
+        tray: trayMenu
+    })
+    readonly property Component openPanel: panelOpen ? panels[Panels.open] ?? null : null
+    readonly property bool panelOnLeft: Settings.bar.left.some(key => Settings.barPanel(key) === Panels.open)
+
     anchors {
         top: true
         left: true
@@ -66,17 +80,16 @@ PanelWindow {
         anchors.leftMargin: Theme.barMargin
         anchors.top: parent.top
         anchors.topMargin: Theme.barGap
+        visible: Settings.bar.left.length > 0
+        panel: bar.panelOnLeft ? bar.openPanel : null
 
-        LauncherButton { id: launcher }
-        Workspaces {
-            id: workspaces
+        // Up to the right card: on a small screen the hardware drawer's far
+        // end stays folded away.
+        BarModules {
+            model: Settings.bar.left
             screen: bar.screen
-        }
-        Overview { id: overview }
-        // Up to the right card: on a small screen its far end stays folded away.
-        HardwareDrawer {
-            room: bar.freeRight - Theme.barMargin - Theme.cardPadding * 2 - launcher.implicitWidth
-                - workspaces.implicitWidth - overview.implicitWidth - 6
+            panelOpen: bar.panelOpen
+            room: bar.freeRight - Theme.barMargin - Theme.cardPadding * 2
         }
     }
 
@@ -146,28 +159,15 @@ PanelWindow {
         anchors.rightMargin: Theme.barMargin
         anchors.top: parent.top
         anchors.topMargin: Theme.barGap
-        panel: !bar.panelOpen ? null
-             : Panels.open === "sound" ? outputPanel
-             : Panels.open === "microphone" ? inputPanel
-             : Panels.open === "network" ? networkPanel
-             : Panels.open === "bluetooth" ? bluetoothPanel
-             : Panels.open === "batteries" ? batteryPanel
-             : Panels.open === "calendar" ? calendarPanel
-             : Panels.open === "tray" ? trayMenu
-             : null
+        visible: Settings.bar.right.length > 0 || panel !== null
+        panel: bar.panelOnLeft ? null : bar.openPanel
 
-        Recording {}
-        Replay {}
-        TrayIcons {}
-        NetworkButton { active: bar.panelOpen && Panels.open === "network" }
-        BluetoothButton { active: bar.panelOpen && Panels.open === "bluetooth" }
-        Batteries { active: bar.panelOpen && Panels.open === "batteries" }
-        Volume { active: bar.panelOpen && Panels.open === "sound" }
-        Microphone { active: bar.panelOpen && Panels.open === "microphone" }
-        NotificationBell {}
-        Clock { active: bar.panelOpen && Panels.open === "calendar" }
-        QuickActionsButton {}
-        PowerButton {}
+        BarModules {
+            model: Settings.bar.right
+            screen: bar.screen
+            panelOpen: bar.panelOpen
+            room: bar.width - Theme.barMargin - bar.freeLeft - Theme.cardPadding * 2
+        }
     }
 
     Component {
