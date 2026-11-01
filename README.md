@@ -311,8 +311,7 @@ cargo clippy --all-targets -- -D warnings
 **Next**
 
 - What is left of the 2026-10-31 review, in [docs/review.md](docs/review.md):
-  whether a stream keeps the last track's length, and the checks that need a
-  second monitor.
+  the checks that need a second monitor.
 
 **Later**
 

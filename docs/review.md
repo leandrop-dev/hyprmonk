@@ -124,8 +124,10 @@ can inject shell commands; no binding loops, restart loops or leaked objects.
   timing guess with no failure seen.
 - [x] I-004 `wallpaper/Picker.qml:165`: each tile costs two offscreen textures
   while scrolling. Left as it is: scrolling feels smooth.
-- [ ] I-005 `services/Player.qml:44`: a stream after a normal track may keep the
-  old length. Log `track` and `reported` when switching.
+- [x] I-005 `services/Player.qml:39`: a stream showed a seek bar. Not the last
+  track's length: on each play or pause the browser sends a length for a YouTube
+  live (13:59:50 for one tried), and nothing marks it as live. Anything over 12
+  hours now counts as no length. A shorter one would still show the bar.
 - [x] I-007 `services/Apps.qml:172`: odd file names on PATH went through `sh -c`.
   A program from PATH now runs by its file name; a test file with `$(…)` in its
   name failed before and runs now, and a typed line still goes through `sh -c`.
