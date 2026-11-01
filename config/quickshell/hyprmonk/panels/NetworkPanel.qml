@@ -120,6 +120,7 @@ ColumnLayout {
         delegate: ColumnLayout {
             id: row
 
+            required property int index
             required property WifiNetwork modelData
             readonly property bool open: panel.expanded === modelData.name
             readonly property bool wantsPassword: open && !modelData.connected && Net.takesPassword(modelData)
@@ -142,6 +143,9 @@ ColumnLayout {
             spacing: 6
 
             onWantsPasswordChanged: if (wantsPassword) field.forceActiveFocus()
+            // Its actions and field stay in view as it opens. Later: the list
+            // has not taken in the new height yet.
+            onHeightChanged: if (open) Qt.callLater(ListView.view.positionViewAtIndex, index, ListView.Contain)
 
             Connections {
                 target: row.modelData

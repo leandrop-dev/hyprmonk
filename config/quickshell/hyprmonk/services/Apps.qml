@@ -167,10 +167,12 @@ Singleton {
                 ? ["uwsm", "app", "--", terminal, "-e", ...item.entry.command]
                 : ["uwsm", "app", "--", item.entry.id + ".desktop"];
         } else if (item.kind === "command") {
-            const name = item.name.split(/\s+/)[0];
+            // What is typed is a shell line; a program from PATH is a file name.
+            const name = item.typed ? item.name.split(/\s+/)[0] : item.name;
+            const run = item.typed ? ["sh", "-c", item.name] : [item.name];
             command = inTerminal
-                ? ["uwsm", "app", "-a", name, "--", terminal, "--hold", "sh", "-c", item.name]
-                : ["uwsm", "app", "-a", name, "--", "sh", "-c", item.name];
+                ? ["uwsm", "app", "-a", name, "--", terminal, "--hold", ...run]
+                : ["uwsm", "app", "-a", name, "--", ...run];
         } else {
             command = ["uwsm", "app", "-a", "ssh", "--", terminal, "-e", "ssh", item.name];
         }

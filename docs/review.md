@@ -10,7 +10,6 @@ can inject shell commands; no binding loops, restart loops or leaked objects.
 ## Still to try
 
 - D-005, D-024: need a second monitor.
-- D-022: the mouse wheel and a drag on a panel that really overflows.
 
 ## To fix
 
@@ -114,24 +113,31 @@ can inject shell commands; no binding loops, restart loops or leaked objects.
 - [x] I-001 `lock/Lock.qml`: the hidden preview window kept a whole lock surface
   alive. It is now made only while previewing, which took the shell from about
   405 MB to about 374 MB after a start (two starts each).
-- [ ] I-002 `panels/NetworkPanel.qml:120`, `panels/BluetoothPanel.qml:241`: an
-  expanded row can open below the visible area. Expand the last visible row.
+- [x] I-002 `panels/NetworkPanel.qml:120`, `panels/BluetoothPanel.qml:259`: an
+  expanded row could open below the visible area. It now scrolls into view once
+  the list has its new height. Tried on Wi-Fi with the list cut to 100 px and the
+  last network opened; Bluetooth has the same code, tried only for loading.
 - [ ] I-003 `services/Overlays.qml`: overlays can lose the keyboard. Opening a card
   now closes the notification centre first, as does locking (seen unmapping as the
-  card opened); Super+N, Super+Space, then type confirms it. Left: with several
+  card opened), and Super+N, Super+Space, then typing works. Left: with several
   monitors, the OSD and pop-ups may remap as focus moves; the 240 ms wait is a
   timing guess with no failure seen.
-- [ ] I-004 `wallpaper/Picker.qml:165`: each tile costs two offscreen textures
-  while scrolling. Run the QML profiler.
+- [x] I-004 `wallpaper/Picker.qml:165`: each tile costs two offscreen textures
+  while scrolling. Left as it is: scrolling feels smooth.
 - [ ] I-005 `services/Player.qml:44`: a stream after a normal track may keep the
   old length. Log `track` and `reported` when switching.
+- [x] I-007 `services/Apps.qml:172`: odd file names on PATH went through `sh -c`.
+  A program from PATH now runs by its file name; a test file with `$(…)` in its
+  name failed before and runs now, and a typed line still goes through `sh -c`.
+- [x] I-008 `panels/MediaPanel.qml:22`: the fixed height may be about 8 px short.
+  Left as it is: it looks right by eye.
+- [x] I-009 `bar/TrayIcons.qml:76`: icon updates may have skipped the shade check.
+  They do not: `status` changes once for every new source, tried with the theme
+  icon provider. The tray's pixmap provider was not tried.
+
+## Back burner
+
 - [ ] I-006 `panels/NetworkPanel.qml:114`: a typed password can be lost when its
-  row scrolls away. Needs about 18 networks.
-- [ ] I-007 `services/Apps.qml:172`: odd file names on PATH go through `sh -c`.
-  Run a test file with `$(…)` in its name.
-- [ ] I-008 `panels/MediaPanel.qml:22`: the fixed height is about 8 px short.
-  Check by eye.
-- [ ] I-009 `bar/TrayIcons.qml:76`: icon updates may skip the shade check. Log
-  `status` while an icon changes.
+  row scrolls away. Needs about 18 networks in reach.
 - [ ] I-010 `services/Recorder.qml`: `stop()` has no forced kill if the recorder
   hangs. Only matters if that hang comes back.

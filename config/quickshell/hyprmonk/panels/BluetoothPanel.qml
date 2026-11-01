@@ -260,12 +260,17 @@ ColumnLayout {
         ColumnLayout {
             id: row
 
+            required property int index
             required property BluetoothDevice modelData
             readonly property bool open: panel.expanded === modelData?.address
             readonly property bool busy: modelData?.pairing
                                          || modelData?.state === BluetoothDeviceState.Connecting
                                          || modelData?.state === BluetoothDeviceState.Disconnecting
             property int was: modelData?.state ?? BluetoothDeviceState.Disconnected
+
+            // Its actions stay in view as it opens (paired rows are not in a
+            // view). Later: the list has not taken in the new height yet.
+            onHeightChanged: if (open && ListView.view) Qt.callLater(ListView.view.positionViewAtIndex, index, ListView.Contain)
 
             Layout.fillWidth: true
             width: ListView.view ? ListView.view.width : implicitWidth
