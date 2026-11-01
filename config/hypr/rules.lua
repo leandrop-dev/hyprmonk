@@ -14,8 +14,11 @@ hl.window_rule({
     no_focus = true,
 })
 
--- The shell's surfaces are named hyprmonk-*: blur what is behind them.
-hl.layer_rule({ name = "hyprmonk-blur", match = { namespace = "^hyprmonk-.*" }, blur = true, ignore_alpha = 0.01 })
+-- The shell's surfaces are named hyprmonk-*: blur what is behind them, unless
+-- the tone says not to (Settings > Tone).
+if theme.cardBlur ~= false then
+    hl.layer_rule({ name = "hyprmonk-blur", match = { namespace = "^hyprmonk-.*" }, blur = true, ignore_alpha = 0.01 })
+end
 -- The screenshot mode's card leaves at once, not fading: the picture is
 -- taken right after.
 hl.layer_rule({ name = "hyprmonk-screenshot", match = { namespace = "^hyprmonk-screenshot$" }, no_anim = true })

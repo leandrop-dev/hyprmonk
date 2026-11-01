@@ -10,6 +10,7 @@ ColumnLayout {
     property int value: 0
     property int from: 0
     property int to: 100
+    property string unit: ""
 
     signal moved(real value)
 
@@ -27,7 +28,7 @@ ColumnLayout {
         }
 
         Text {
-            text: row.value
+            text: row.value + row.unit
             color: Theme.fg(Theme.dimOpacity)
             font.family: Theme.font
             font.pixelSize: Theme.smallFontSize

@@ -28,8 +28,8 @@ Singleton {
     // one (`light: true`) needs more card opacity, or a dark wallpaper greys
     // it. The rest of them are in Tones.qml.
     //
-    // Ask for a tone through toneOf(): a new wallpaper then only reaches what
-    // is using one of the two tones made from it.
+    // Ask for a tone through toneOf() or baseTone(): a new wallpaper then only
+    // reaches what is using one of the two tones made from it.
     // From cosmic-noir-theme: charcoal, fog text, orange, sage.
     readonly property var noir: ({ label: "Noir", background: "#171717", foreground: "#ccd0cf", card: 0.88, light: false,
                                    accent: "#f25623", positive: "#88a57d", icons: "" })
@@ -50,20 +50,70 @@ Singleton {
     readonly property string toneName: previewTone in tones ? previewTone : savedTone
     readonly property var tone: toneOf(toneName)
 
-    function toneOf(name: string): var {
+    function baseTone(name: string): var {
         if (name === "wallpaper") return wallpaperTone;
         if (name === "wallpaperlight") return wallpaperLightTone;
         return Tones.list[name] ?? noir;
+    }
+
+    // With the text colour Settings gave it, which apps follow too. The cards'
+    // opacity and blur stay apart: moving them does not rebuild the apps' themes.
+    function toneOf(name: string): var {
+        const text = appearance?.text?.[name] ?? "";
+        return /^#[0-9a-f]{6}$/i.test(text) ? Object.assign({}, baseTone(name), { foreground: text }) : baseTone(name);
     }
 
     function setTone(name: string): void {
         if (name in tones) appearance.tone = name;
     }
 
+    // Settings > Tone changes the saved tone; each keeps its own.
+    readonly property bool cardBlur: appearance?.blur?.[savedTone] !== false
+    readonly property bool toneAdjusted: [appearance?.opacity, appearance?.text, appearance?.blur].some(kept => kept && savedTone in kept)
+
+    function adjust(kept: var, value: var): var {
+        return Object.assign({}, kept, { [savedTone]: value });
+    }
+
+    function setCardOpacity(value: real): void {
+        appearance.opacity = adjust(appearance.opacity, value);
+    }
+
+    function setCardBlur(on: bool): void {
+        appearance.blur = adjust(appearance.blur, on);
+    }
+
+    function setTextColour(colour: string): void {
+        appearance.text = adjust(appearance.text, colour.toLowerCase());
+    }
+
+    function resetTone(): void {
+        const without = kept => {
+            const left = Object.assign({}, kept);
+            delete left[savedTone];
+            return left;
+        };
+        appearance.opacity = without(appearance.opacity);
+        appearance.text = without(appearance.text);
+        appearance.blur = without(appearance.blur);
+    }
+
+    // Whether text in this colour reads on the saved tone's background: a
+    // contrast of 3:1, the least WCAG allows for large text.
+    function readable(colour: string): bool {
+        const luminance = shade => {
+            const [r, g, b] = [shade.r, shade.g, shade.b].map(v => v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4));
+            return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        };
+        const one = luminance(Qt.color(colour));
+        const other = luminance(Qt.color(baseTone(savedTone).background));
+        return (Math.max(one, other) + 0.05) / (Math.min(one, other) + 0.05) >= 3;
+    }
+
     // Tone
     readonly property color background: tone.background
     readonly property color foreground: tone.foreground
-    readonly property real cardOpacity: tone.card
+    readonly property real cardOpacity: appearance?.opacity?.[toneName] >= 0.3 ? Math.min(1, appearance.opacity[toneName]) : tone.card
     readonly property color card: Qt.alpha(background, cardOpacity)
     readonly property color rim: tone.light ? Qt.rgba(1, 1, 1, 0.5) : fg(0.08)
     readonly property color accent: tone.accent ?? (tone.light ? Qt.darker(colors.accent, 1.5) : colors.accent)  // darker reads on light
@@ -131,14 +181,27 @@ Singleton {
         }
     }
 
+    // A write reads the file back: changes made in one go would undo each
+    // other, and a slider would write on every step.
+    Timer {
+        id: saving
+        interval: 200
+        onTriggered: appearanceFile.writeAdapter()
+    }
+
     FileView {
+        id: appearanceFile
         path: theme.stateDir + "/appearance.json"
         printErrors: false
-        onAdapterUpdated: writeAdapter()
+        onAdapterUpdated: saving.restart()
 
         JsonAdapter {
             id: appearance
             property string tone: "noir"
+            // By tone name: what Settings > Tone changed.
+            property var opacity: ({})
+            property var text: ({})
+            property var blur: ({})
         }
     }
 

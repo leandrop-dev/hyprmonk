@@ -62,9 +62,10 @@ Scope {
     }
 
     // Hyprland's window borders (theme/tone.lua, loaded after matugen's
-    // colors.lua).
+    // colors.lua), and the blur behind the shell's cards (rules.lua).
     readonly property string hyprland: "-- Written by the shell (ThemeOutputs.qml) for the saved tone. Do not edit.\n"
         + (saved.accent ? `theme.accent = "rgba(${hex(saved.accent).slice(1)}ee)"\n` : "")
+        + (Theme.cardBlur ? "" : "theme.cardBlur = false\n")
 
     // kitty's text, background, cursor and selection (theme/kitty-tone.conf,
     // after matugen's in kitty.conf), and its 16 colours if the tone has them;

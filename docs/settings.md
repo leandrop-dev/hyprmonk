@@ -4,15 +4,17 @@ A centred card (Super+comma, or quick actions > Settings) with its pages down
 the side, built a page at a time. Ideas from noctalia, Ryoku and Shibumi Shell,
 no code from them.
 
-Everything is kept in `settings.json` in the state directory, holding only what
-was changed, so the rest follows the repo's config. Hyprland options are also
+The Windows page keeps to `settings.json` in the state directory, holding only
+what was changed, so the rest follows the repo's config. Hyprland options are also
 written to `settings.lua`, loaded after `look.lua`, and applied at once with
 `hyprctl eval`.
 
 ## Pages
 
 - [x] Windows: gaps, border size, rounding, blur size and passes.
-- [ ] Tone: card opacity, blur and text colour, kept per tone, with a reset.
+- [x] Tone: card opacity, blur behind the cards on or off, and text colour, which
+  apps follow too. Kept per tone in `appearance.json`, with a reset. How strong
+  blur is stays on the Windows page: Hyprland has one strength for everything.
 - [ ] Bar: drag modules in a preview of the bar to reorder them, move them
   between the left and right cards, or hide them. The centre card stays as it
   is: its fitting rules depend on it.

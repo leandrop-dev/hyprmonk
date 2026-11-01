@@ -14,7 +14,8 @@ Overlay {
     id: window
 
     readonly property var pages: [
-        { name: "Windows", icon: "\u{F05AF}", file: "WindowsPage.qml" }
+        { name: "Windows", icon: "\u{F05AF}", file: "WindowsPage.qml" },
+        { name: "Tone", icon: "\u{F050E}", file: "TonePage.qml" }
     ]
     property int current: 0
 

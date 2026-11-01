@@ -313,7 +313,7 @@ cargo clippy --all-targets -- -D warnings
 - What is left of the 2026-10-31 review, in [docs/review.md](docs/review.md):
   the checks that need a second monitor.
 - The rest of Settings (Super+comma), in [docs/settings.md](docs/settings.md):
-  the Tone, Bar and Display pages.
+  the Bar and Display pages.
 
 **Later**
 
