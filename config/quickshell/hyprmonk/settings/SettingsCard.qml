@@ -17,7 +17,7 @@ Overlay {
         { name: "Display", icon: "\u{F0379}", file: "DisplayPage.qml" },
         { name: "Windows", icon: "\u{F05AF}", file: "WindowsPage.qml" },
         { name: "Bar", icon: "\u{F0570}", file: "BarPage.qml" },
-        { name: "Tone", icon: "\u{F050E}", file: "TonePage.qml" }
+        { name: "Appearance", icon: "\u{F050E}", file: "AppearancePage.qml" }
     ]
     property int current: 0
 

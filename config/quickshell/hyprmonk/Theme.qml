@@ -21,7 +21,7 @@ Singleton {
     readonly property string stateDir: Quickshell.env("HOME") + "/.local/state/hyprmonk"
 
     // Tones: the background, the text and how opaque cards are. One is in
-    // use (quick actions > Appearance, kept in appearance.json); "wallpaper"
+    // use (Settings > Appearance, kept in appearance.json); "wallpaper"
     // and "wallpaperlight" take their colours from matugen's schemes for the
     // wallpaper. A tone may
     // bring its own accent (and green) instead of the wallpaper's. A light
@@ -43,7 +43,7 @@ Singleton {
     readonly property var tones: Object.assign({ noir, wallpaper: wallpaperTone, wallpaperlight: wallpaperLightTone }, Tones.list)
     // Noir until the settings are read (and for a name it does not know, such
     // as a tone that was dropped).
-    // A previewed tone (quick actions, while moving through them) shows
+    // A previewed tone (Settings > Appearance, under the pointer) shows
     // without being saved.
     readonly property string savedTone: appearance?.tone in tones ? appearance.tone : "noir"
     property string previewTone: ""

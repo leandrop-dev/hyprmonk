@@ -3,7 +3,7 @@
 // (written by ThemeOutputs.qml). The theme reads the look that
 // /var/lib/hyprmonk-login/current.conf links to, a folder the installer
 // gives the user: picking one changes the link, with no password asked. It
-// shows at the next login. Read again each time quick actions open.
+// shows at the next login. Read again each time Settings > Appearance opens.
 pragma Singleton
 
 import QtQuick

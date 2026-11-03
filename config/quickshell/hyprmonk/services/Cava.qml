@@ -2,7 +2,7 @@
 // the default output plays, as ten levels from 0 to 1. Started again if it
 // stops (Pipewire restarting); stopped while nobody sees the bar (the screen
 // locked, game mode on). A line equal to the last one changes nothing. Also how the bar draws it (bar/Spectrum.qml):
-// one of `styles`, picked in quick actions > Spectrum and kept in
+// one of `styles`, picked in Settings > Appearance and kept in
 // spectrum.json.
 //
 // IPC: qs -c hyprmonk ipc call spectrum style NAME  (wave, bars, equalizer,
@@ -27,7 +27,7 @@ Singleton {
         dots: "Dots",
         mirror: "Mirror"
     })
-    // A previewed style (quick actions, while moving through them) shows
+    // A previewed style (Settings > Appearance, under the pointer) shows
     // without being saved.
     readonly property string savedStyle: settings.style in styles ? settings.style : "wave"
     property string previewStyle: ""

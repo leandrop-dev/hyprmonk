@@ -512,8 +512,8 @@ step_login() {
     fi
 
     # The look the theme reads is the one $LOGIN_LOOKS/current.conf links
-    # to, in a folder of the user's: the shell picks one there (quick
-    # actions > Login look) and writes the Desktop look, with no sudo.
+    # to, in a folder of the user's: the shell picks one there (Settings >
+    # Appearance) and writes the Desktop look, with no sudo.
     sudo install -d -o "$USER" -g "$(id -gn)" -m 755 "$LOGIN_LOOKS"
     [[ -L $LOGIN_LOOKS/current.conf ]] || ln -s "$theme/Themes/astronaut.conf" "$LOGIN_LOOKS/current.conf"
     sudo ln -sfn "$LOGIN_LOOKS/current.conf" "$theme/Themes/hyprmonk-current.conf"

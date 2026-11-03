@@ -484,7 +484,7 @@ Scope {
     // A copy of the wallpaper goes with it: SDDM cannot read the home
     // folder. Nothing until `install.sh login` has made the folder (a save
     // that fails keeps its text as the file's, so a later one would not
-    // write); then written, once Login has seen it (again as quick actions
+    // write); then written, once Login has seen it (again as Settings > Appearance
     // open).
     readonly property bool loginReady: Login.ready
     readonly property string wallpaper: Wallpaper.path

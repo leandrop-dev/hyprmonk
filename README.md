@@ -49,12 +49,13 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   temperatures, CPU, GPU and video memory, memory, disk and network.
 - A launcher for apps, commands, SSH hosts and the clipboard history.
 - Settings: each screen's resolution, refresh rate and scale, and where screens
-  sit by dragging them on a map (a change goes back by itself unless kept), gaps, borders and blur, the bar's modules by drag and
-  drop, and each tone's card opacity, blur and text colour.
-- Quick actions: appearance (the tone), wallpaper, game mode, screen recording,
-  power profile, audio output, microphone, keyboard layout, screens (extend,
-  mirror or the main one only, kept or undone in 15 s), do not disturb, the spectrum's
-  style, fastfetch's look, the login screen's look and the power menu.
+  sit by dragging them on a map (a change goes back by itself unless kept),
+  gaps, borders and blur, the bar's modules by drag and drop, and the
+  appearance: the tone with each one's card opacity, blur and text colour, the
+  spectrum's style, fastfetch's look and the login screen's look.
+- Quick actions: wallpaper, game mode, screen recording, power profile, audio
+  output, microphone, keyboard layout, screens (extend, mirror or the main one
+  only, kept or undone in 15 s), do not disturb, settings and the power menu.
 - Notifications with a notification centre, an on-screen card for what just
   changed (volume, microphone, audio output, keyboard layout, Caps and Num
   Lock, game mode, power profile), a lock screen (on a key and when idle),
@@ -192,8 +193,8 @@ and go.
 
 ## Colours
 
-The panels' look is a **tone**, picked in quick actions (Appearance), which
-shows each one as you move through the list:
+The panels' look is a **tone**, picked in Settings > Appearance, which shows
+each one while the pointer is over it:
 
 - **Noir**, with its own orange accent and the cosmic-noir palette.
 - **Wallpaper** and **Wallpaper Light**, whose colours matugen takes from the
@@ -303,7 +304,7 @@ cargo clippy --all-targets -- -D warnings
 | `config/matugen/` | Templates for Hyprland, the shell and kitty |
 | `config/kitty/` | kitty, with the Noir palette |
 | `config/zsh/`, `config/starship/` | zsh and its prompt |
-| `config/fastfetch/` | fastfetch's presets, picked in quick actions |
+| `config/fastfetch/` | fastfetch's presets, picked in Settings > Appearance |
 | `config/uwsm/env` | The session's environment (NVIDIA, cursor, toolkits, SSH agent) |
 | `config/systemd/user/` | Units for the shell, hypridle, udiskie and clipboard history; they start only under Hyprland |
 | `crates/hyprmonk/` | The `hyprmonk` command |

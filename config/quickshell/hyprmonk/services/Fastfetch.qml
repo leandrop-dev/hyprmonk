@@ -1,5 +1,5 @@
 // The look of the `fastfetch` command: one of `presets` (config/fastfetch,
-// or fastfetch's own for "default"), picked in quick actions > Fastfetch and kept
+// or fastfetch's own for "default"), picked in Settings > Appearance and kept
 // in fastfetch.json. ThemeOutputs hands it to zsh with the tone's colours, so
 // it shows from the next prompt.
 //

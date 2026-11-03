@@ -2,9 +2,10 @@
 // the switches used most, under their sections. Typing filters them (the
 // letters in order, gaps allowed: "gm" finds "Game mode"); the arrows or Tab
 // move, Enter or a click runs one and closes the card; Escape or a click
-// elsewhere closes it. An action with options (the panels' tone, the
-// spectrum's style, the login screen's look) opens them in the same card instead; Escape, or
-// Backspace with nothing typed, goes back.
+// elsewhere closes it. An action with options (the power profile, the
+// screens' layout) opens them in the same card instead; Escape, or Backspace
+// with nothing typed, goes back. The tone, the spectrum, fastfetch and the
+// login screen are in Settings > Appearance.
 //
 // IPC: qs -c hyprmonk ipc call overlays toggle quickactions
 import QtQuick
@@ -154,44 +155,6 @@ Scope {
         },
         Action {
             section: "Appearance"
-            icon: "\u{F050E}"
-            label: "Appearance"
-            value: Theme.tones[Theme.savedTone].label
-            options: {
-                const tones = Object.values(Theme.tones);
-                return tones.filter(tone => !tone.light).concat(tones.filter(tone => tone.light)).map(tone => tone.label);
-            }
-            sections: {
-                const sections = {};
-                for (const tone of Object.values(Theme.tones)) sections[tone.label] = tone.light ? "Light" : "Dark";
-                return sections;
-            }
-            previews: true
-            onPicked: option => Theme.setTone(Object.keys(Theme.tones).find(name => Theme.tones[name].label === option))
-            onPreviewed: option => Theme.previewTone = Object.keys(Theme.tones).find(name => Theme.tones[name].label === option) ?? ""
-            onUnpreviewed: Theme.previewTone = ""
-        },
-        Action {
-            section: "Appearance"
-            icon: "\u{F0128}"
-            label: "Spectrum"
-            value: Cava.styles[Cava.savedStyle]
-            options: Object.values(Cava.styles)
-            previews: true
-            onPicked: option => Cava.setStyle(Object.keys(Cava.styles).find(name => Cava.styles[name] === option))
-            onPreviewed: option => Cava.previewStyle = Object.keys(Cava.styles).find(name => Cava.styles[name] === option) ?? ""
-            onUnpreviewed: Cava.previewStyle = ""
-        },
-        Action {
-            section: "Appearance"
-            icon: "\u{F018D}"
-            label: "Fastfetch"
-            value: Fastfetch.presets[Fastfetch.saved]
-            options: Object.values(Fastfetch.presets)
-            onPicked: option => Fastfetch.set(Object.keys(Fastfetch.presets).find(name => Fastfetch.presets[name] === option))
-        },
-        Action {
-            section: "Appearance"
             icon: "\u{F0E09}"
             label: "Wallpaper"
             onRun: Overlays.toggle("wallpapers")
@@ -202,22 +165,13 @@ Scope {
             label: "Random wallpaper"
             available: Wallpaper.files.length > 1
             onRun: Wallpaper.random()
-        },
-        Action {
-            section: "Appearance"
-            icon: "\u{F0342}"
-            label: "Login look"
-            value: Login.label(Login.current)
-            options: Login.labels
-            available: Login.ready
-            onPicked: option => Login.pick(Login.looks[Login.labels.indexOf(option)])
         }
     ]
 
     // The rows: the actions, or the options of the one opened.
     readonly property var items: opened
         ? opened.options.map(option => ({
-            section: opened.sections[option] ?? opened.label,
+            section: opened.label,
             icon: option === opened.value ? "\u{F043E}" : "\u{F043D}",
             label: option,
             chosen: option === opened.value,
@@ -246,26 +200,15 @@ Scope {
         query = "";
     }
 
-    // While a list that previews is open, the option under the cursor is
-    // tried live; Enter keeps it, leaving the list puts back what was there.
-    readonly property string tried: opened?.previews ? (shown[current]?.label ?? "") : ""
-
-    onTriedChanged: if (open && opened?.previews && tried !== "") opened.previewed(tried)
-
     onOpenChanged: {
-        if (!open) {
-            opened?.unpreviewed();
-            return;
-        }
+        if (!open) return;
         pointer = Qt.point(-1, -1);
         search.forceActiveFocus();
-        Login.refresh();
         Display.refresh();
     }
 
     // Each open starts from the top of the full list, put back while hidden.
     function reset(): void {
-        opened?.unpreviewed();
         opened = null;
         clearSearch();
         current = 0;
@@ -293,8 +236,7 @@ Scope {
             if (opened.stays) back();
             else Overlays.close();
         } else if (item.options.length > 0) {
-            // `opened` last: with it set, `current` picks an option, and the
-            // action's row number would preview the wrong one.
+            // `opened` last: with it set, `current` picks an option.
             clearSearch();
             current = Math.max(0, item.options.indexOf(item.value));
             opened = item;
@@ -306,7 +248,6 @@ Scope {
 
     function back(): void {
         const from = opened;
-        from.unpreviewed();
         opened = null;
         clearSearch();
         current = Math.max(0, shown.indexOf(from));
