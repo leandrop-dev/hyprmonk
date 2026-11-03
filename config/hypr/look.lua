@@ -41,11 +41,20 @@ hl.curve("easeOutQuint", { type = "bezier", points = { {0.23, 1},  {0.32, 1} } }
 hl.curve("almostLinear", { type = "bezier", points = { {0.5, 0.5}, {0.75, 1} } })
 hl.curve("snappy",       { type = "spring", mass = 1, stiffness = 238.1191, damping = 24.21279333 })
 
-hl.animation({ leaf = "global",     enabled = true, speed = 10,   bezier = "default" })
-hl.animation({ leaf = "border",     enabled = true, speed = 5.39, bezier = "easeOutQuint" })
-hl.animation({ leaf = "windows",    enabled = true, speed = 4.79, spring = "snappy" })
-hl.animation({ leaf = "windowsIn",  enabled = true, speed = 4.1,  spring = "snappy", style = "popin 87%" })
-hl.animation({ leaf = "windowsOut", enabled = true, speed = 1.49, bezier = "almostLinear", style = "popin 87%" })
-hl.animation({ leaf = "fade",       enabled = true, speed = 3.03, bezier = "almostLinear" })
-hl.animation({ leaf = "layers",     enabled = true, speed = 3.81, bezier = "easeOutQuint" })
-hl.animation({ leaf = "workspaces", enabled = true, speed = 1.94, bezier = "almostLinear", style = "fade" })
+-- Every animation at `scale` times its time: 1 here, other speeds from
+-- Settings > Windows (settings.lua and `hyprctl eval` call it again).
+function hyprmonk_animations(scale)
+    local function animation(leaf, speed, curve)
+        curve.leaf, curve.enabled, curve.speed = leaf, true, speed * scale
+        hl.animation(curve)
+    end
+    animation("global",     10,   { bezier = "default" })
+    animation("border",     5.39, { bezier = "easeOutQuint" })
+    animation("windows",    4.79, { spring = "snappy" })
+    animation("windowsIn",  4.1,  { spring = "snappy", style = "popin 87%" })
+    animation("windowsOut", 1.49, { bezier = "almostLinear", style = "popin 87%" })
+    animation("fade",       3.03, { bezier = "almostLinear" })
+    animation("layers",     3.81, { bezier = "easeOutQuint" })
+    animation("workspaces", 1.94, { bezier = "almostLinear", style = "fade" })
+end
+hyprmonk_animations(1)

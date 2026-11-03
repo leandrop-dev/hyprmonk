@@ -42,7 +42,22 @@ Singleton {
         }
         return values;
     }
-    readonly property bool windowChanged: Object.keys(windowValues).length > 0
+    // Settings > Windows' choices beside the sliders, kept with them; the
+    // first of each is look.lua's. A speed scales every animation's time.
+    readonly property var windowChoices: ({
+        layout: ["dwindle", "master", "scrolling"],
+        shadows: [true, false],
+        animations: [true, false],
+        animationSpeed: ["normal", "fast", "slow"]
+    })
+    readonly property var animationScale: ({ normal: 1, fast: 0.6, slow: 1.5 })
+    readonly property var windowChoiceValues: {
+        const values = {};
+        for (const key of Object.keys(windowChoices))
+            if (key in saved.window && windowChoices[key].includes(saved.window[key])) values[key] = saved.window[key];
+        return values;
+    }
+    readonly property bool windowChanged: Object.keys(windowValues).length > 0 || Object.keys(windowChoiceValues).length > 0
 
     // Settings > Input. `inputDefaults` are input.lua's (adaptive is
     // libinput's own for a mouse, and Hyprland takes no empty profile back).
@@ -65,6 +80,7 @@ Singleton {
     readonly property string hyprland: "-- Written by the shell (services/Settings.qml). Do not edit.\n"
         + windowOptions.filter(option => option.key in windowValues)
             .map(option => line(option, windowValues[option.key]) + "\n").join("")
+        + Object.keys(windowChoiceValues).map(key => choiceLine(key, windowChoiceValues[key]) + "\n").join("")
         + (inputChanged ? inputLine(inputValues) + "\n" : "")
         + Object.keys(displayValues).map(name => displayLine(name, displayValues[name]) + "\n").join("")
 
@@ -233,8 +249,45 @@ Singleton {
         saved.bar = next;
     }
 
+    // How the bar's clock, workspaces and temperatures show, the first of each
+    // to begin with. `workspaces` 0 shows those in use; more always shows
+    // 1 to that many, empty ones dim.
+    readonly property var barChoices: ({
+        hours: ["24", "12"],
+        seconds: [false, true],
+        date: [true, false],
+        workspaces: [0, 5, 10],
+        temperature: ["C", "F"]
+    })
+    readonly property var barChoiceValues: {
+        const values = {};
+        const kept = saved.barLook;
+        for (const key of Object.keys(barChoices))
+            if (key in kept && barChoices[key].includes(kept[key])) values[key] = kept[key];
+        return values;
+    }
+    readonly property bool barLookChanged: Object.keys(barChoiceValues).length > 0
+
+    function barChoice(key: string): var {
+        return barChoiceValues[key] ?? barChoices[key][0];
+    }
+
+    function setBarChoice(key: string, value: var): void {
+        if (!barChoices[key].includes(value)) return;
+        const next = Object.assign({}, saved.barLook);
+        if (value === barChoices[key][0]) delete next[key];
+        else next[key] = value;
+        saved.barLook = next;
+    }
+
+    // "57°C", or in Fahrenheit when picked.
+    function degrees(celsius: real): string {
+        return barChoice("temperature") === "F" ? Math.round(celsius * 9 / 5 + 32) + "°F" : Math.round(celsius) + "°C";
+    }
+
     function resetBar(): void {
         saved.bar = {};
+        saved.barLook = {};
     }
 
     function clamp(option: var, value: real): int {
@@ -256,7 +309,40 @@ Singleton {
         Quickshell.execDetached(["hyprctl", "eval", line(option, next)]);
     }
 
+    function windowChoice(key: string): var {
+        return windowChoiceValues[key] ?? windowChoices[key][0];
+    }
+
+    // Lua for one of the choices. The speed goes through look.lua's
+    // function, left alone by a look.lua without it.
+    function choiceLine(key: string, value: var): string {
+        switch (key) {
+        case "layout": return `hl.config({ general = { layout = "${value}" } })`;
+        case "shadows": return `hl.config({ decoration = { shadow = { enabled = ${value} } } })`;
+        case "animations": return `hl.config({ animations = { enabled = ${value} } })`;
+        case "animationSpeed": return `if hyprmonk_animations then hyprmonk_animations(${animationScale[value]}) end`;
+        }
+        return "";
+    }
+
+    // Game mode holds shadows and animations off until it ends; its reload
+    // then reads settings.lua.
+    function applyChoice(key: string, value: var): void {
+        if (GameMode.on && (key === "shadows" || key === "animations")) return;
+        Quickshell.execDetached(["hyprctl", "eval", choiceLine(key, value)]);
+    }
+
+    function setWindowChoice(key: string, value: var): void {
+        if (!windowChoices[key].includes(value) || value === windowChoice(key)) return;
+        const next = Object.assign({}, saved.window);
+        if (value === windowChoices[key][0]) delete next[key];
+        else next[key] = value;
+        saved.window = next;
+        applyChoice(key, value);
+    }
+
     function resetWindow(): void {
+        for (const key of Object.keys(windowChoiceValues)) applyChoice(key, windowChoices[key][0]);
         const lines = windowOptions.filter(option => option.key in windowValues)
             .map(option => line(option, option.fallback));
         saved.window = {};
@@ -265,15 +351,25 @@ Singleton {
 
     onHyprlandChanged: output.setText(hyprland)
 
+    // A write reads the file back: resetBar()'s two changes would undo each
+    // other.
+    Timer {
+        id: saving
+        interval: 200
+        onTriggered: settingsFile.writeAdapter()
+    }
+
     FileView {
+        id: settingsFile
         path: Theme.stateDir + "/settings.json"
         printErrors: false
-        onAdapterUpdated: writeAdapter()
+        onAdapterUpdated: saving.restart()
 
         JsonAdapter {
             id: saved
             property var window: ({})
             property var bar: ({})
+            property var barLook: ({})
             property var display: ({})
             property string mainScreen: ""
             property var input: ({})

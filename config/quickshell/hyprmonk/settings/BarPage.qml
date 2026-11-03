@@ -84,6 +84,47 @@ Item {
         }
     }
 
+    component Row: RowLayout {
+        property alias text: label.text
+
+        Layout.fillWidth: true
+        spacing: 6
+
+        Text {
+            id: label
+            Layout.fillWidth: true
+            color: Theme.foreground
+            font.family: Theme.font
+            font.pixelSize: Theme.rowFontSize
+            elide: Text.ElideRight
+        }
+    }
+
+    // A chip for each of a choice's values.
+    component Choice: Repeater {
+        id: choice
+
+        property string key: ""
+        property var labels: ({})
+
+        model: Settings.barChoices[key]
+
+        Chip {
+            required property var modelData
+
+            text: choice.labels[modelData] ?? String(modelData)
+            on: modelData === Settings.barChoice(choice.key)
+            onClicked: Settings.setBarChoice(choice.key, modelData)
+        }
+    }
+
+    component Switch: Chip {
+        property string key: ""
+
+        on: Settings.barChoice(key)
+        onClicked: Settings.setBarChoice(key, !Settings.barChoice(key))
+    }
+
     ColumnLayout {
         anchors.fill: parent
         spacing: 8
@@ -175,13 +216,54 @@ Item {
             }
         }
 
+        SectionLabel {
+            text: "How they show"
+        }
+
+        Row {
+            text: "Clock"
+
+            Choice {
+                key: "hours"
+                labels: ({ "24": "24-hour", "12": "12-hour" })
+            }
+
+            Switch {
+                key: "seconds"
+                text: "Seconds"
+            }
+
+            Switch {
+                key: "date"
+                text: "Date"
+            }
+        }
+
+        Row {
+            text: "Workspaces"
+
+            Choice {
+                key: "workspaces"
+                labels: ({ 0: "In use", 5: "1 to 5", 10: "1 to 10" })
+            }
+        }
+
+        Row {
+            text: "Temperature"
+
+            Choice {
+                key: "temperature"
+                labels: ({ C: "°C", F: "°F" })
+            }
+        }
+
         Item {
             Layout.fillHeight: true
         }
 
         Button {
             Layout.alignment: Qt.AlignRight
-            enabled: Settings.barChanged
+            enabled: Settings.barChanged || Settings.barLookChanged
             text: "Back to the defaults"
             onClicked: Settings.resetBar()
         }

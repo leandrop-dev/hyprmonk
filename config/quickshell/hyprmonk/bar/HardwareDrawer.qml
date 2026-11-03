@@ -68,7 +68,7 @@ RowLayout {
 
                 visible: !isNaN(Hardware.gpuTemp)
                 icon: "\u{F08AE}"
-                label: Math.round(Hardware.gpuTemp) + "°C " + Hardware.used(Hardware.vramUsed, Hardware.vramTotal)
+                label: Settings.degrees(Hardware.gpuTemp) + " " + Hardware.used(Hardware.vramUsed, Hardware.vramTotal)
                 tooltip: Hardware.gpuName + "\nUse " + Math.round(Hardware.gpuUse) + "%"
                     + "\nVideo memory " + Hardware.human(Hardware.vramUsed) + " / " + Hardware.human(Hardware.vramTotal)
                 color: Hardware.gpuTemp >= hot ? Theme.warning : Theme.foreground

@@ -50,12 +50,13 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
 - A launcher for apps, commands, SSH hosts and the clipboard history.
 - Settings: each screen's resolution, refresh rate and scale, and where screens
   sit by dragging them on a map (a change goes back by itself unless kept),
-  gaps, borders and blur, the bar's modules by drag and drop, and the
-  appearance: the tone with each one's card opacity, blur and text colour, the
-  spectrum's style, fastfetch's look and the login screen's look; keyboard
-  layouts, the mouse and focus; when the screen locks and the screens go off;
-  what recordings hear, their quality and where they go; how long
-  notifications stay, their corner, how many show and how many are kept.
+  gaps, borders, blur, shadows, the tiling layout and animations, the bar's
+  modules by drag and drop with its clock, workspaces and temperature unit,
+  and the appearance: the tone with each one's card opacity, blur and text
+  colour, the spectrum's style, fastfetch's look and the login screen's
+  look; keyboard layouts, the mouse and focus; when the screen locks and the
+  screens go off; what recordings hear, their quality and where they go; how
+  long notifications stay, their corner, how many show and how many are kept.
 - Quick actions: wallpaper, game mode, screen recording, power profile, audio
   output, microphone, keyboard layout, screens (extend, mirror or the main one
   only, kept or undone in 15 s), do not disturb, settings and the power menu.

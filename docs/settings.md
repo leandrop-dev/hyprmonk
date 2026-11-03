@@ -11,7 +11,13 @@ config. Hyprland options are also written to `settings.lua`, loaded after
 
 ## Pages
 
-- [x] Windows: gaps, border size, rounding, blur size and passes.
+- [x] Windows: gaps, border size, rounding, blur size and passes; the tiling
+  layout (dwindle, master or scrolling; Super+J toggles a split only in
+  dwindle), shadows on or off, and animations on or off at normal, fast (0.6
+  times as long) or slow (1.5 times) speed. A speed goes through
+  `hyprmonk_animations` in `look.lua`, which sets every animation at that
+  many times its time. Game mode holds shadows and animations off whatever
+  these say.
 - [x] Appearance (was Tone, and quick actions' Appearance, Spectrum, Fastfetch
   and Login look rows): the tone, shown while the pointer is over it; the
   saved tone's card opacity, blur behind the cards on or off, and text colour,
@@ -22,7 +28,10 @@ config. Hyprland options are also written to `settings.lua`, loaded after
 - [x] Bar: drag modules to reorder them, move them between the left and right
   cards, or hide them. A panel opens under the card holding its module.
   Recording and Replay cannot be hidden, and the centre card stays as it is:
-  its fitting rules depend on it.
+  its fitting rules depend on it. Below them: the clock in 24 or 12 hours,
+  with seconds and the date or without; the workspaces in use, or always 1 to
+  5 or 1 to 10 (empty ones dim, a click opens one); temperatures in °C or °F.
+  These are kept in `barLook`, apart from the modules.
 - [x] Display: resolution, refresh rate and scale, for each screen, picked first
   and applied together. An applied change is only tried until kept, and goes
   back after 15 seconds, so a mode the screen cannot show fixes itself and a

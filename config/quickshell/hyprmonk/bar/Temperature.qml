@@ -5,6 +5,7 @@
 import QtQuick
 import Quickshell.Io
 import qs
+import qs.services
 
 Module {
     id: root
@@ -16,8 +17,8 @@ Module {
 
     visible: !isNaN(celsius)
     icon: "\u{F050F}"
-    label: Math.round(celsius) + "°C"
-    tooltip: "CPU temperature\n" + sensor + " sensor, hot from " + hot + "°C"
+    label: Settings.degrees(celsius)
+    tooltip: "CPU temperature\n" + sensor + " sensor, hot from " + Settings.degrees(hot)
     color: celsius >= hot ? Theme.warning : Theme.foreground
 
     Process {
