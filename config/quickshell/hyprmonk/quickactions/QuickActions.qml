@@ -71,6 +71,29 @@ Scope {
             available: Keyboard.layouts.length > 1
             onRun: Keyboard.next()
         },
+        // The other screens beside the main one (Settings > Display), showing
+        // what it shows, or off. Tried like a mode: Keep, or it goes back.
+        Action {
+            section: "System"
+            icon: "\u{F037A}"
+            label: "Screens"
+            readonly property var kinds: ({ "Extend": "extend", "Mirror": "mirror", "Main screen only": "main" })
+            value: Object.keys(kinds).find(name => kinds[name] === Display.layout) ?? ""
+            options: Object.keys(kinds)
+            available: Display.all.length > 1
+            stays: true
+            onPicked: option => {
+                if (kinds[option] !== Display.layout) Display.tryLayout(kinds[option]);
+            }
+        },
+        Action {
+            section: "System"
+            icon: "\u{F012C}"
+            label: "Keep this layout"
+            value: Display.left + " s"
+            available: Display.trying
+            onRun: Display.keep()
+        },
         Action {
             section: "System"
             icon: "\u{F0493}"
@@ -237,6 +260,7 @@ Scope {
         pointer = Qt.point(-1, -1);
         search.forceActiveFocus();
         Login.refresh();
+        Display.refresh();
     }
 
     // Each open starts from the top of the full list, put back while hidden.

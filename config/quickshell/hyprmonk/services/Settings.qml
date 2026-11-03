@@ -50,20 +50,41 @@ Singleton {
 
     // What Settings > Display kept, by screen (services/Display.qml). This
     // ends up as Lua and the file can be edited by hand: only what looks right.
+    // A screen mirroring another (`mirror`) or turned off (`disabled`) keeps
+    // its own mode beside that, for when it is back on its own.
     readonly property var displayValues: {
         const values = {};
         for (const name of Object.keys(saved.display)) {
             const value = saved.display[name];
             if (/^[\w.-]+$/.test(name) && /^\d+x\d+@[\d.]+$/.test(value?.mode)
-                    && /^-?\d+x-?\d+$/.test(value?.position) && Number(value?.scale) > 0)
+                    && /^(-?\d+x-?\d+|auto)$/.test(value?.position) && Number(value?.scale) > 0
+                    && (value.mirror === undefined || /^[\w.-]+$/.test(value.mirror))
+                    && (value.disabled === undefined || typeof value.disabled === "boolean"))
                 values[name] = value;
         }
         return values;
     }
     property bool reloadOnSave: false  // the config has to take back a screen
 
+    // The screen the Mirror and Main screen only layouts keep (Settings >
+    // Display); "" for none picked.
+    readonly property string mainScreen: /^[\w.-]+$/.test(saved.mainScreen) ? saved.mainScreen : ""
+
+    function setMainScreen(name: string): void {
+        saved.mainScreen = name;
+    }
+
     function displayLine(name: string, value: var): string {
-        return `hl.monitor({ output = "${name}", mode = "${value.mode}", position = "${value.position}", scale = ${Number(value.scale)} })`;
+        if (value.disabled) return `hl.monitor({ output = "${name}", disabled = true })`;
+        const mirror = value.mirror ? `, mirror = "${value.mirror}"` : "";
+        return `hl.monitor({ output = "${name}", mode = "${value.mode}", position = "${value.position}", scale = ${Number(value.scale)}${mirror} })`;
+    }
+
+    // For a change made live: Hyprland keeps a mirror or a screen turned off
+    // from before unless told otherwise.
+    function liveDisplayLine(name: string, value: var): string {
+        if (value.disabled) return displayLine(name, value);
+        return displayLine(name, value).replace(/ \}\)$/, (value.mirror ? "" : `, mirror = ""`) + ", disabled = false })");
     }
 
     function displayKept(name: string): bool {
@@ -194,6 +215,7 @@ Singleton {
             property var window: ({})
             property var bar: ({})
             property var display: ({})
+            property string mainScreen: ""
         }
     }
 

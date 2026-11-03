@@ -2,7 +2,8 @@
 // scale and where the screen sits are picked first, then tried together: that
 // reaches Hyprland but not settings.lua, and goes back by itself after 15
 // seconds unless kept, so a mode the screen cannot show fixes itself, and a
-// restart would start from the last one kept.
+// restart would start from the last one kept. Quick actions' Screens row
+// tries a layout (the others beside, mirroring or off) the same way.
 pragma Singleton
 
 import QtQuick
@@ -13,8 +14,23 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    property var monitors: []
+    property var all: []  // every screen, off or mirroring too
+    // The screens on their own: the page and its map change only these.
+    readonly property var monitors: all.filter(screen => !screen.disabled && screen.mirrorOf === "none")
     property string picked: ""  // the screen being changed
+
+    // The one the Mirror and Main screen only layouts keep: as picked on the
+    // page, else the one at the top left.
+    readonly property string mainScreen: all.some(screen => screen.name === Settings.mainScreen) ? Settings.mainScreen
+        : (monitors.find(screen => screen.x === 0 && screen.y === 0) ?? monitors[0] ?? all[0])?.name ?? ""
+    readonly property string layout: {
+        const rest = all.filter(screen => screen.name !== mainScreen);
+        if (rest.length === 0) return "";
+        const mainId = String(all.find(screen => screen.name === mainScreen)?.id);
+        if (rest.every(screen => screen.disabled)) return "main";
+        if (rest.every(screen => screen.mirrorOf === mainId)) return "mirror";
+        return "extend";
+    }
     readonly property var monitor: monitors.find(screen => screen.name === picked) ?? monitors[0] ?? null
 
     // From "2560x1080@74.99Hz". One rate twice (59.94 and 59.940) counts once.
@@ -192,35 +208,80 @@ Singleton {
         reader.running = true;
     }
 
-    function current(): var {
-        return {
-            mode: resolution + "@" + rate,
-            position: monitor.x + "x" + monitor.y,
-            scale: monitor.scale
-        };
+    // A screen's own mode, rate, place and scale: as kept, else as it is.
+    // One mirroring or turned off has no place of its own to read.
+    function ownValue(screen: var): var {
+        const kept = Settings.displayValues[screen.name];
+        if (kept) return { mode: kept.mode, position: kept.position, scale: kept.scale };
+        const size = screen.width + "x" + screen.height;
+        const rates = (screen.availableModes ?? []).map(text => /^(\d+x\d+)@([\d.]+)Hz$/.exec(text))
+            .filter(parts => parts?.[1] === size).map(parts => Number(parts[2]));
+        const rate = rates.reduce((best, rate) => Math.abs(rate - screen.refreshRate) < Math.abs(best - screen.refreshRate) ? rate : best,
+            rates[0] ?? Math.round(screen.refreshRate * 1000) / 1000);
+        const alone = !screen.disabled && screen.mirrorOf === "none";
+        return { mode: size + "@" + rate, position: alone ? screen.x + "x" + screen.y : "auto", scale: screen.scale };
     }
 
-    // What was picked, on the screen. Tried again during a try, it still goes
-    // back to where the first one started.
+    // What a screen is on now, mirror or off included.
+    function valueNow(screen: var): var {
+        const value = ownValue(screen);
+        if (screen.disabled) value.disabled = true;
+        else if (screen.mirrorOf !== "none") value.mirror = all.find(other => String(other.id) === screen.mirrorOf)?.name ?? "";
+        return value;
+    }
+
+    // Tries `next` ({ name: value }). During a try it adds to it, and still
+    // goes back to where the first change started.
+    function tryValues(next: var): void {
+        const was = {};
+        for (const name of Object.keys(next)) {
+            const screen = all.find(screen => screen.name === name);
+            if (screen) was[name] = valueNow(screen);
+        }
+        previous = {
+            was: Object.assign(was, previous?.was ?? {}),
+            next: Object.assign({}, previous?.next ?? {}, next)
+        };
+        left = 15;
+        for (const name of Object.keys(next)) apply(name, next[name]);
+    }
+
+    // What was picked on the page, on the screen.
     function tryChoice(): void {
         if (!changed) return;
-        const next = { mode: shownResolution + "@" + shownRate, position: shownPosition, scale: shownScale };
-        previous = { name: monitor.name, was: previous?.was ?? current(), next };
-        left = 15;
-        apply(monitor.name, next);
+        tryValues({ [monitor.name]: { mode: shownResolution + "@" + shownRate, position: shownPosition, scale: shownScale } });
+    }
+
+    // "extend", "mirror" or "main": every other screen beside the main one,
+    // showing what it shows, or off.
+    function tryLayout(kind: string): void {
+        const next = {};
+        for (const screen of all) {
+            if (screen.name === mainScreen) continue;
+            // During a try, from where it was before it.
+            const was = previous?.was?.[screen.name];
+            const value = was && !was.disabled && !was.mirror
+                ? { mode: was.mode, position: was.position, scale: was.scale } : ownValue(screen);
+            if (kind === "mirror") value.mirror = mainScreen;
+            else if (kind === "main") value.disabled = true;
+            next[screen.name] = value;
+        }
+        if (Object.keys(next).length > 0) tryValues(next);
     }
 
     function keep(): void {
         if (!trying) return;
-        Settings.setDisplay(previous.name, previous.next);
-        apply(previous.name, previous.next);  // a reload may have undone it meanwhile
+        for (const name of Object.keys(previous.next)) {
+            Settings.setDisplay(name, previous.next[name]);
+            apply(name, previous.next[name]);  // a reload may have undone it meanwhile
+        }
         previous = null;
         clearChoice();
     }
 
     function goBack(): void {
         if (!trying) return;
-        apply(previous.name, previous.was);
+        for (const name of Object.keys(previous.was)) apply(name, previous.was[name]);
         previous = null;
         clearChoice();
     }
@@ -231,7 +292,7 @@ Singleton {
     }
 
     function apply(name: string, value: var): void {
-        Quickshell.execDetached(["hyprctl", "eval", Settings.displayLine(name, value)]);
+        Quickshell.execDetached(["hyprctl", "eval", Settings.liveDisplayLine(name, value)]);
         rereader.restart();
     }
 
@@ -263,11 +324,11 @@ Singleton {
 
     Process {
         id: reader
-        command: ["hyprctl", "monitors", "-j"]
+        command: ["hyprctl", "monitors", "all", "-j"]
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
-                    root.monitors = JSON.parse(text);
+                    root.all = JSON.parse(text);
                 } catch (error) {}
             }
         }

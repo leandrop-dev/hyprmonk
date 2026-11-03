@@ -1,5 +1,5 @@
-// Settings > Display: where each screen sits, and the resolution, refresh rate
-// and scale of one. Nothing changes until applied; then it goes back by itself
+// Settings > Display: where each screen sits, which is the main one, and the
+// resolution, refresh rate and scale of one. Nothing changes until applied; then it goes back by itself
 // unless kept. Picking and
 // applying again during that still goes back to where it started
 // (services/Display.qml).
@@ -17,9 +17,21 @@ ColumnLayout {
     Component.onCompleted: Display.refresh()
     Component.onDestruction: Display.clearChoice()
 
-    SectionLabel {
+    RowLayout {
+        Layout.fillWidth: true
         visible: Display.monitors.length > 1
-        text: "Screens"
+
+        SectionLabel {
+            Layout.fillWidth: true
+            text: "Screens"
+        }
+
+        // The one quick actions' Mirror and Main screen only keep.
+        Chip {
+            text: "Main screen"
+            on: Display.monitor?.name === Display.mainScreen
+            onClicked: if (Display.monitor) Settings.setMainScreen(Display.monitor.name)
+        }
     }
 
     ScreenMap {

@@ -32,3 +32,8 @@ applied at once with `hyprctl eval`.
   its right or bottom edge keeps that edge where it is, and only the screen
   being changed moves. Should that overlap another screen or touch none, it
   takes the nearest place that does not.
+  "Main screen" marks the picked screen as the one quick actions' Screens row
+  keeps (until picked, the one at the top left). That row tries Extend, Mirror
+  or Main screen only for every other screen, and a Keep this layout row counts
+  down beside it. A screen kept mirroring or off keeps its own mode in
+  `settings.json`, for when it is back beside the others.

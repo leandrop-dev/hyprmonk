@@ -52,7 +52,8 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   sit by dragging them on a map (a change goes back by itself unless kept), gaps, borders and blur, the bar's modules by drag and
   drop, and each tone's card opacity, blur and text colour.
 - Quick actions: appearance (the tone), wallpaper, game mode, screen recording,
-  power profile, audio output, microphone, keyboard layout, do not disturb, the spectrum's
+  power profile, audio output, microphone, keyboard layout, screens (extend,
+  mirror or the main one only, kept or undone in 15 s), do not disturb, the spectrum's
   style, fastfetch's look, the login screen's look and the power menu.
 - Notifications with a notification centre, an on-screen card for what just
   changed (volume, microphone, audio output, keyboard layout, Caps and Num
@@ -314,8 +315,7 @@ cargo clippy --all-targets -- -D warnings
 
 **Next**
 
-- For several screens: a main screen picked in Settings > Display, and quick
-  actions to mirror it or keep only it on, tried and kept like a mode.
+- More Settings pages, taking over what quick actions does not need to hold.
 
 **Later**
 
