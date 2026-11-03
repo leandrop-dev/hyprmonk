@@ -125,11 +125,15 @@ can inject shell commands; no binding loops, restart loops or leaked objects.
   expanded row could open below the visible area. It now scrolls into view once
   the list has its new height. Tried on Wi-Fi with the list cut to 100 px and the
   last network opened; Bluetooth has the same code, tried only for loading.
-- [ ] I-003 `services/Overlays.qml`: overlays can lose the keyboard. Opening a card
+- [x] I-003 `services/Overlays.qml`: overlays can lose the keyboard. Opening a card
   now closes the notification centre first, as does locking (seen unmapping as the
-  card opened), and Super+N, Super+Space, then typing works. Left: with several
-  monitors, the OSD and pop-ups may remap as focus moves; the 240 ms wait is a
-  timing guess with no failure seen.
+  card opened), and Super+N, Super+Space, then typing works. With two screens
+  (2026-11-03, headless output): an open card lost the keyboard as soon as the
+  pointer crossed to the other screen, because the OSD and pop-ups followed
+  focus and remapped there. They, and the notification centre, now stay on
+  their screen while a card, a bar panel or the centre is open
+  (`Overlays.popupScreen`); the card then kept the keyboard. The 240 ms wait is
+  still a timing guess with no failure seen.
 - [x] I-004 `wallpaper/Picker.qml:165`: each tile costs two offscreen textures
   while scrolling. Left as it is: scrolling feels smooth.
 - [x] I-005 `services/Player.qml:39`: a stream showed a seek bar. Not the last

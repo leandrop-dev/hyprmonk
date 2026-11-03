@@ -14,7 +14,7 @@ import qs.widgets
 PanelWindow {
     id: window
 
-    screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
+    screen: Overlays.popupScreen
     visible: Notifications.centerOpen
 
     anchors {

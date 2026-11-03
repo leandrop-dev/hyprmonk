@@ -314,16 +314,14 @@ cargo clippy --all-targets -- -D warnings
 
 **Next**
 
-- What is left of the 2026-10-31 review, in [docs/review.md](docs/review.md):
-  the checks that need a second monitor.
+- For several screens: a main screen picked in Settings > Display, and quick
+  actions to mirror it or keep only it on, tried and kept like a mode.
 
 **Later**
 
 An open list, in no fixed order.
 
 - Calendar events from all three sources: local, Google and CalDAV.
-- For several screens: quick actions (mirror, main screen only) and the lock
-  screen on each.
 - A phone module on the bar, beyond its battery: notifications, the clipboard,
   files, ringing it to find it. KDE Connect or an app of our own, still to
   decide.

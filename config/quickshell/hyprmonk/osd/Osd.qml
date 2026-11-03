@@ -197,7 +197,7 @@ Scope {
     }
 
     PanelWindow {
-        screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
+        screen: Overlays.popupScreen
         // Kept mapped, empty, while a centred card is open: Hyprland hands
         // the keyboard to a window whenever a layer unmaps, even away from
         // a card that holds it (services/Overlays.qml).
