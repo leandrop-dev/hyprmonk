@@ -321,10 +321,6 @@ cargo clippy --all-targets -- -D warnings
 
 ## Roadmap
 
-**Next**
-
-- More Settings pages, taking over what quick actions does not need to hold.
-
 **Later**
 
 An open list, in no fixed order.
@@ -367,8 +363,6 @@ An open list, in no fixed order.
   schemes such as Kanso.
 - fastfetch's presets are our own, inspired by
   [LierB/fastfetch](https://github.com/LierB/fastfetch)'s; no code taken.
-- Steam's optional skin: [Adwaita-for-Steam](https://github.com/tkashkin/Adwaita-for-Steam)
-  (MIT), installed by hand, not kept in this repo.
 - Synced lyrics from [LRCLIB](https://lrclib.net), looked up while the media
   panel shows them.
 - The cursor: [Bibata](https://github.com/ful1e5/Bibata_Cursor) Modern Ice
