@@ -69,7 +69,7 @@ Singleton {
     }
     property var chosenSize: null  // the size it had when dragged there
     readonly property string shownPosition: {
-        if (!monitor) return "";
+        if (!monitor || !shownSize) return position;
         // Where it was put, at the size it had there.
         const [placedX, placedY] = (chosenPosition || position).split("x").map(Number);
         const was = chosenPosition ? Object.assign({ x: placedX, y: placedY }, chosenSize)
@@ -95,8 +95,10 @@ Singleton {
         || shownScale !== monitor.scale || shownPosition !== position)
 
     // Every screen as a box in layout pixels, the one being changed as picked.
+    // Made here, not taken from `others`: that may not have caught up yet.
     readonly property var boxes: monitors.map(screen => {
-        if (screen.name !== monitor?.name) return others.find(other => other.name === screen.name);
+        if (screen.name !== monitor?.name || !shownSize)
+            return boxOf(screen, screen.width, screen.height, screen.scale, screen.x, screen.y);
         const [x, y] = shownPosition.split("x").map(Number);
         return Object.assign({}, shownSize, { x, y });
     })
