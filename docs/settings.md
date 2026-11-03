@@ -28,3 +28,7 @@ applied at once with `hyprctl eval`.
   drag it to move it. Where it is dropped it snaps against another screen,
   sharing at least half an edge and overlapping none, lined up with that
   screen's edge or middle when close. A move waits for Apply like a mode.
+  A screen made larger or smaller keeps touching what it touched: one against
+  its right or bottom edge keeps that edge where it is, and only the screen
+  being changed moves. Should that overlap another screen or touch none, it
+  takes the nearest place that does not.

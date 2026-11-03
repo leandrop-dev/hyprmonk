@@ -54,26 +54,51 @@ Singleton {
         const wanted = chosenScale || monitor?.scale;
         return scales.includes(wanted) ? wanted : 1;
     }
-    // Where it sits, as "XxY" in layout pixels (after scale).
+    // Where it sits, as "XxY" in layout pixels (after scale). Resized, it
+    // keeps touching what it touched: a screen against its right or bottom
+    // edge keeps that edge where it is. A place that would overlap a screen
+    // or touch none moves to the nearest one that does not (placeFor).
     readonly property string position: monitor ? monitor.x + "x" + monitor.y : ""
     property string chosenPosition: ""
-    readonly property string shownPosition: chosenPosition || position
+    readonly property var others: monitors.filter(screen => screen.name !== monitor?.name)
+        .map(screen => boxOf(screen, screen.width, screen.height, screen.scale, screen.x, screen.y))
+    readonly property var shownSize: {
+        if (!monitor) return null;
+        const [width, height] = shownResolution.split("x").map(Number);
+        return boxOf(monitor, width, height, shownScale, 0, 0);
+    }
+    property var chosenSize: null  // the size it had when dragged there
+    readonly property string shownPosition: {
+        if (!monitor) return "";
+        // Where it was put, at the size it had there.
+        const [placedX, placedY] = (chosenPosition || position).split("x").map(Number);
+        const was = chosenPosition ? Object.assign({ x: placedX, y: placedY }, chosenSize)
+            : boxOf(monitor, monitor.width, monitor.height, monitor.scale, monitor.x, monitor.y);
+        if (was.width === shownSize.width && was.height === shownSize.height) return chosenPosition || position;
+        let [x, y] = [was.x, was.y];
+        const besideIt = other => other.y < was.y + was.height && other.y + other.height > was.y;
+        const aboveOrBelow = other => other.x < was.x + was.width && other.x + other.width > was.x;
+        if (others.some(other => besideIt(other) && other.x === was.x + was.width)
+                && !others.some(other => besideIt(other) && other.x + other.width === was.x))
+            x = was.x + was.width - shownSize.width;
+        if (others.some(other => aboveOrBelow(other) && other.y === was.y + was.height)
+                && !others.some(other => aboveOrBelow(other) && other.y + other.height === was.y))
+            y = was.y + was.height - shownSize.height;
+        const own = { x, y, width: shownSize.width, height: shownSize.height };
+        if (others.length > 0 && (others.some(other => overlap(own, other) > 0) || !others.some(other => touching(own, other)))) {
+            const place = placeFor(x, y, 0);
+            if (place) [x, y] = [place.x, place.y];
+        }
+        return x + "x" + y;
+    }
     readonly property bool changed: monitor !== null && (shownResolution !== resolution || shownRate !== rate
         || shownScale !== monitor.scale || shownPosition !== position)
 
     // Every screen as a box in layout pixels, the one being changed as picked.
     readonly property var boxes: monitors.map(screen => {
-        const own = screen.name === monitor?.name;
-        const [width, height] = own ? shownResolution.split("x").map(Number) : [screen.width, screen.height];
-        const [x, y] = own ? shownPosition.split("x").map(Number) : [screen.x, screen.y];
-        const scale = own ? shownScale : screen.scale;
-        const turned = screen.transform % 2 === 1;  // 90 or 270 degrees
-        return {
-            name: screen.name,
-            x, y,
-            width: Math.round((turned ? height : width) / scale),
-            height: Math.round((turned ? width : height) / scale)
-        };
+        if (screen.name !== monitor?.name) return others.find(other => other.name === screen.name);
+        const [x, y] = shownPosition.split("x").map(Number);
+        return Object.assign({}, shownSize, { x, y });
     })
 
     property var previous: null  // what a try goes back to; null when none
@@ -89,16 +114,40 @@ Singleton {
         chosenRate = 0;
         chosenScale = 0;
         chosenPosition = "";
+        chosenSize = null;
     }
 
-    // Where the picked screen lands when dropped at x, y: touching another
-    // screen along at least half an edge, overlapping none, and lined up with an edge or the
-    // middle of that screen when within `slack`. The nearest such place wins;
-    // with none, it stays where it was.
-    function placeAt(x: real, y: real, slack: real): void {
-        const own = boxes.find(box => box.name === monitor?.name);
-        const others = boxes.filter(box => box !== own);
-        if (!own || others.length === 0) return;
+    function boxOf(screen: var, width: int, height: int, scale: real, x: int, y: int): var {
+        const turned = screen.transform % 2 === 1;  // 90 or 270 degrees
+        return {
+            name: screen.name,
+            x, y,
+            width: Math.round((turned ? height : width) / scale),
+            height: Math.round((turned ? width : height) / scale)
+        };
+    }
+
+    // Area two boxes share.
+    function overlap(a: var, b: var): real {
+        return Math.max(0, Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x))
+            * Math.max(0, Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y));
+    }
+
+    // Whether two boxes share some of an edge.
+    function touching(a: var, b: var): bool {
+        const alongY = Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y);
+        const alongX = Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x);
+        return (a.x + a.width === b.x || b.x + b.width === a.x) && alongY > 0
+            || (a.y + a.height === b.y || b.y + b.height === a.y) && alongX > 0;
+    }
+
+    // The place nearest x, y for the picked screen at its shown size: touching
+    // another screen along at least half an edge, overlapping none, and lined
+    // up with an edge or the middle of that screen when within `slack`. Null
+    // when there is none.
+    function placeFor(x: real, y: real, slack: real): var {
+        if (!shownSize || others.length === 0) return null;
+        const own = shownSize;
         const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
         const lineUp = (value, targets) => {
             const near = targets.reduce((best, target) => Math.abs(target - value) < Math.abs(best - value) ? target : best);
@@ -106,7 +155,6 @@ Singleton {
         };
         const places = [];
         for (const other of others) {
-            // At least half the shorter edge is shared.
             const shareY = Math.round(Math.min(own.height, other.height) / 2);
             const shareX = Math.round(Math.min(own.width, other.width) / 2);
             const alongY = clamp(y, other.y - own.height + shareY, other.y + other.height - shareY);
@@ -118,11 +166,18 @@ Singleton {
             for (const sideY of [other.y - own.height, other.y + other.height])
                 places.push({ x: lineUp(alongX, xs), y: sideY });
         }
-        const overlaps = place => others.some(other => place.x < other.x + other.width && place.x + own.width > other.x
-            && place.y < other.y + other.height && place.y + own.height > other.y);
+        const free = place => !others.some(other => overlap(Object.assign({}, own, place), other) > 0);
         const distance = place => Math.hypot(place.x - x, place.y - y);
-        const best = places.filter(place => !overlaps(place)).sort((a, b) => distance(a) - distance(b))[0];
-        if (best) chosenPosition = best.x + "x" + best.y;
+        return places.filter(free).sort((a, b) => distance(a) - distance(b))[0] ?? null;
+    }
+
+    // Where the picked screen lands when dropped at x, y; with no place for
+    // it, it stays where it was.
+    function placeAt(x: real, y: real, slack: real): void {
+        const place = placeFor(x, y, slack);
+        if (!place) return;
+        chosenSize = { width: shownSize.width, height: shownSize.height };
+        chosenPosition = place.x + "x" + place.y;
     }
 
     // Hyprland corrects a scale that does not give a whole number of pixels.
