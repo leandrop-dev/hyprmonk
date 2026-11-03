@@ -20,7 +20,8 @@ Overlay {
         { name: "Appearance", icon: "\u{F050E}", file: "AppearancePage.qml" },
         { name: "Input", icon: "\u{F030C}", file: "InputPage.qml" },
         { name: "Power", icon: "\u{F0425}", file: "PowerPage.qml" },
-        { name: "Recording", icon: "\u{F044A}", file: "RecordingPage.qml" }
+        { name: "Recording", icon: "\u{F044A}", file: "RecordingPage.qml" },
+        { name: "Notifications", icon: "\u{F009A}", file: "NotificationsPage.qml" }
     ]
     property int current: 0
 
@@ -53,8 +54,8 @@ Overlay {
             spacing: 16
 
             ColumnLayout {
-                Layout.preferredWidth: 160
-                Layout.maximumWidth: 160
+                Layout.preferredWidth: 180
+                Layout.maximumWidth: 180
                 Layout.fillHeight: true
                 spacing: 4
 

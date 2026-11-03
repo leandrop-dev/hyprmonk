@@ -1,5 +1,6 @@
-// New notifications, stacked in the top-right corner under the bar on the
-// focused screen, newest on top.
+// New notifications, stacked in a corner of the focused screen, top right
+// under the bar to begin with (Settings > Notifications); the newest nearest
+// the corner.
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
@@ -10,6 +11,9 @@ import qs.services
 PanelWindow {
     id: window
 
+    readonly property bool atTop: Notifications.position.startsWith("top")
+    readonly property bool onLeft: Notifications.position.endsWith("left")
+
     screen: Overlays.popupScreen
     // Kept mapped, empty, while a centred card is open: Hyprland hands the
     // keyboard to a window whenever a layer unmaps, even away from a card
@@ -17,11 +21,15 @@ PanelWindow {
     visible: (Notifications.popups.length > 0 && !Notifications.centerOpen) || Overlays.open !== ""
 
     anchors {
-        top: true
-        right: true
+        top: window.atTop
+        bottom: !window.atTop
+        left: window.onLeft
+        right: !window.onLeft
     }
     margins {
         top: Theme.barGap
+        bottom: Theme.barMargin
+        left: Theme.barMargin
         right: Theme.barMargin
     }
     implicitWidth: Theme.notificationWidth
@@ -40,7 +48,7 @@ PanelWindow {
         Repeater {
             // ScriptModel keeps the existing cards (and their timers) when one is added.
             model: ScriptModel {
-                values: Notifications.popups
+                values: window.atTop ? Notifications.popups : Notifications.popups.slice().reverse()
             }
 
             NotificationCard {
@@ -53,10 +61,10 @@ PanelWindow {
                 width: stack.width
                 onTimedOut: Notifications.popupTimedOut(notification)
 
-                // Slide in from the right edge.
+                // Slide in from the screen's edge.
                 transform: Translate {
                     id: slide
-                    x: Theme.notificationWidth
+                    x: window.onLeft ? -Theme.notificationWidth : Theme.notificationWidth
                 }
                 opacity: 0
                 Component.onCompleted: enter.start()

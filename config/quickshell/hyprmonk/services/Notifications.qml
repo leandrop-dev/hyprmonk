@@ -1,6 +1,8 @@
 // The notification daemon (org.freedesktop.Notifications). Every notification
 // is kept for the centre until dismissed; new ones also pop up, unless do not
-// disturb or game mode is on (critical ones always do).
+// disturb or game mode is on (critical ones always do). How long they stay,
+// where, how many show at once and how many the centre keeps are set in
+// Settings > Notifications, kept in notifications.json.
 //
 // IPC: qs -c hyprmonk ipc call notifications toggle | clear | dnd | count | list
 pragma Singleton
@@ -46,11 +48,37 @@ Singleton {
     property var arrived: ({})
     readonly property date now: clock.date
 
-    // Milliseconds a pop-up stays when the sender does not say.
-    readonly property int defaultTimeout: 10000
-    readonly property int lowTimeout: 5000
-    readonly property int maxPopups: 4
-    readonly property int maxHistory: 200
+    // What Settings > Notifications offers.
+    readonly property var defaults: ({ seconds: 10, position: "top-right", popupCount: 4, history: 200 })
+    readonly property var choices: ({
+        seconds: [5, 10, 15, 30, 60],
+        position: ["top-right", "top-left", "bottom-right", "bottom-left"],
+        popupCount: [1, 2, 3, 4, 6],
+        history: [50, 100, 200, 500]
+    })
+    readonly property bool changed: Object.keys(defaults).some(key => chosen(key) !== defaults[key])
+
+    function chosen(key: string): var {
+        return choices[key].includes(settings[key]) ? settings[key] : defaults[key];
+    }
+    function set(key: string, value: var): void {
+        if (choices[key].includes(value)) settings[key] = value;
+    }
+    function reset(): void {
+        for (const key of Object.keys(defaults)) settings[key] = defaults[key];
+    }
+
+    // Milliseconds a pop-up stays when the sender does not say; a low one
+    // half as long.
+    readonly property int defaultTimeout: chosen("seconds") * 1000
+    readonly property int lowTimeout: defaultTimeout / 2
+    readonly property string position: chosen("position")
+    readonly property int maxPopups: chosen("popupCount")
+    readonly property int maxHistory: chosen("history")
+
+    // Fewer allowed: the newest stay. A shorter history goes at once.
+    onMaxPopupsChanged: popups = popups.slice(0, maxPopups)
+    onMaxHistoryChanged: Qt.callLater(trimHistory)
 
     // How long `notification` stays as a pop-up, in ms; 0 means until dismissed.
     // expireTimeout is the sender's value in milliseconds, as D-Bus sends it
@@ -141,15 +169,27 @@ Singleton {
         precision: SystemClock.Minutes
     }
 
-    // Do not disturb survives restarts.
+    // A write reads the file back: reset()'s changes would undo each other.
+    Timer {
+        id: saving
+        interval: 200
+        onTriggered: settingsFile.writeAdapter()
+    }
+
+    // Do not disturb and Settings > Notifications survive restarts.
     FileView {
+        id: settingsFile
         path: Theme.stateDir + "/notifications.json"
         printErrors: false
-        onAdapterUpdated: writeAdapter()
+        onAdapterUpdated: saving.restart()
 
         JsonAdapter {
             id: settings
             property bool doNotDisturb: false
+            property int seconds: 10
+            property string position: "top-right"
+            property int popupCount: 4
+            property int history: 200
         }
     }
 

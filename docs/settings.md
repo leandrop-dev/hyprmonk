@@ -60,3 +60,10 @@ config. Hyprland options are also written to `settings.lua`, loaded after
   passed to `hyprmonk record` and `hyprmonk replay` as `--sound`,
   `--microphone`, `--quality` and `--folder`. A replay that is on keeps what it
   started with.
+- [x] Notifications: how long a pop-up stays when its sender does not say (5
+  to 60 seconds, 10 to begin with; a low one half as long, an urgent one until
+  dismissed), the corner they show in (the newest nearest it), how many show
+  at once (4 to begin with; fewer drops the oldest at once) and how many the
+  centre keeps (200; urgent ones are never dropped). Kept with do not disturb,
+  which stays in quick actions, in `notifications.json`. "Send a test" shows
+  the result.
