@@ -24,3 +24,7 @@ applied at once with `hyprctl eval`.
   back after 15 seconds, so a mode the screen cannot show fixes itself and a
   restart starts from the last one kept. Only scales that give a whole number
   of pixels are offered.
+  With more than one screen, a map shows where they sit: click one to pick it,
+  drag it to move it. Where it is dropped it snaps against another screen,
+  sharing at least half an edge and overlapping none, lined up with that
+  screen's edge or middle when close. A move waits for Apply like a mode.

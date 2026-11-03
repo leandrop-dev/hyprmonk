@@ -48,8 +48,8 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   quiet, that opens a hardware drawer:
   temperatures, CPU, GPU and video memory, memory, disk and network.
 - A launcher for apps, commands, SSH hosts and the clipboard history.
-- Settings: the screen's resolution, refresh rate and scale (a change goes back
-  by itself unless kept), gaps, borders and blur, the bar's modules by drag and
+- Settings: each screen's resolution, refresh rate and scale, and where screens
+  sit by dragging them on a map (a change goes back by itself unless kept), gaps, borders and blur, the bar's modules by drag and
   drop, and each tone's card opacity, blur and text colour.
 - Quick actions: appearance (the tone), wallpaper, game mode, screen recording,
   power profile, audio output, microphone, keyboard layout, do not disturb, the spectrum's
@@ -322,9 +322,8 @@ cargo clippy --all-targets -- -D warnings
 An open list, in no fixed order.
 
 - Calendar events from all three sources: local, Google and CalDAV.
-- For several screens: a map in Settings > Display to drag them where they sit,
-  on the same apply and keep as a mode, quick actions (mirror, main screen
-  only) and the lock screen on each.
+- For several screens: quick actions (mirror, main screen only) and the lock
+  screen on each.
 - A phone module on the bar, beyond its battery: notifications, the clipboard,
   files, ringing it to find it. KDE Connect or an app of our own, still to
   decide.

@@ -1,5 +1,6 @@
-// Settings > Display: resolution, refresh rate and scale of a screen. Nothing
-// changes until applied; then it goes back by itself unless kept. Picking and
+// Settings > Display: where each screen sits, and the resolution, refresh rate
+// and scale of one. Nothing changes until applied; then it goes back by itself
+// unless kept. Picking and
 // applying again during that still goes back to where it started
 // (services/Display.qml).
 import QtQuick
@@ -18,30 +19,13 @@ ColumnLayout {
 
     SectionLabel {
         visible: Display.monitors.length > 1
-        text: "Screen"
+        text: "Screens"
     }
 
-    Flow {
+    ScreenMap {
         Layout.fillWidth: true
         Layout.bottomMargin: 12
         visible: Display.monitors.length > 1
-        spacing: 6
-
-        Repeater {
-            model: Display.monitors
-
-            Chip {
-                required property var modelData
-
-                text: modelData.name
-                on: modelData.name === Display.monitor?.name
-                onClicked: {
-                    if (Display.trying) return;
-                    Display.clearChoice();
-                    Display.picked = modelData.name;
-                }
-            }
-        }
     }
 
     SectionLabel {
