@@ -1,10 +1,11 @@
 // What Settings (Super+comma) changes, kept in settings.json in the state
 // directory. Only what was changed is kept: the rest follows the repo's config.
 //
-// The window options reach Hyprland twice: at once through `hyprctl eval`, and
-// in settings.lua, which hyprland.lua loads after look.lua so they survive a
-// restart. Game mode turns blur and shadows off whatever these say. A screen's
-// mode reaches settings.lua only once kept.
+// The window and input options reach Hyprland twice: at once through `hyprctl
+// eval`, and in settings.lua, which hyprland.lua loads after look.lua and
+// input.lua so they survive a restart. Game mode turns blur and shadows off
+// whatever these say. A screen's mode reaches settings.lua only once kept.
+// The power times go to hypridle instead (services/Idle.qml).
 pragma Singleton
 
 import QtQuick
@@ -43,10 +44,69 @@ Singleton {
     }
     readonly property bool windowChanged: Object.keys(windowValues).length > 0
 
+    // Settings > Input. `inputDefaults` are input.lua's (adaptive is
+    // libinput's own for a mouse, and Hyprland takes no empty profile back).
+    // `layouts` lists up to four XKB layouts, the first one the default.
+    readonly property var inputDefaults: ({ layouts: "pt", sensitivity: 0, accel: "adaptive", naturalScroll: false, followMouse: true })
+    readonly property var inputValues: {
+        const values = {};
+        const kept = saved.input;
+        // Typed first: a missing value would test as the text "undefined".
+        if (typeof kept.layouts === "string" && /^[a-z]+(,[a-z]+){0,3}$/.test(kept.layouts)) values.layouts = kept.layouts;
+        if (typeof kept.sensitivity === "number" && Number.isFinite(kept.sensitivity))
+            values.sensitivity = Math.round(Math.max(-1, Math.min(1, Number(kept.sensitivity))) * 100) / 100;
+        if (kept.accel === "adaptive" || kept.accel === "flat") values.accel = kept.accel;
+        for (const key of ["naturalScroll", "followMouse"])
+            if (typeof kept[key] === "boolean") values[key] = kept[key];
+        return values;
+    }
+    readonly property bool inputChanged: Object.keys(inputValues).length > 0
+
     readonly property string hyprland: "-- Written by the shell (services/Settings.qml). Do not edit.\n"
         + windowOptions.filter(option => option.key in windowValues)
             .map(option => line(option, windowValues[option.key]) + "\n").join("")
+        + (inputChanged ? inputLine(inputValues) + "\n" : "")
         + Object.keys(displayValues).map(name => displayLine(name, displayValues[name]) + "\n").join("")
+
+    function inputValue(key: string): var {
+        return inputValues[key] ?? inputDefaults[key];
+    }
+
+    // Lua for the input values given, by their keys here.
+    function inputLine(values: var): string {
+        const parts = [];
+        if ("layouts" in values) parts.push(`kb_layout = "${values.layouts}"`);
+        if ("sensitivity" in values) parts.push(`sensitivity = ${Number(values.sensitivity)}`);
+        if ("accel" in values) parts.push(`accel_profile = "${values.accel}"`);
+        if ("naturalScroll" in values) parts.push(`natural_scroll = ${values.naturalScroll ? "true" : "false"}`);
+        // Off: the keyboard follows clicks, while scrolling still follows the pointer.
+        if ("followMouse" in values) parts.push(`follow_mouse = ${values.followMouse ? 1 : 2}`);
+        return `hl.config({ input = { ${parts.join(", ")} } })`;
+    }
+
+    function setInput(key: string, value: var): void {
+        const next = Object.assign({}, saved.input);
+        if (value === inputDefaults[key]) delete next[key];
+        else next[key] = value;
+        saved.input = next;
+        Quickshell.execDetached(["hyprctl", "eval", inputLine({ [key]: value })]);
+        if (key === "layouts") Keyboard.refresh();
+    }
+
+    function resetInput(): void {
+        const back = {};
+        for (const key of Object.keys(inputValues)) back[key] = inputDefaults[key];
+        saved.input = {};
+        if (Object.keys(back).length > 0) Quickshell.execDetached(["hyprctl", "eval", inputLine(back)]);
+        if ("layouts" in back) Keyboard.refresh();
+    }
+
+    // Settings > Power, as kept; services/Idle.qml reads and checks it.
+    readonly property var power: saved.power
+
+    function setPower(values: var): void {
+        saved.power = values;
+    }
 
     // What Settings > Display kept, by screen (services/Display.qml). This
     // ends up as Lua and the file can be edited by hand: only what looks right.
@@ -216,6 +276,8 @@ Singleton {
             property var bar: ({})
             property var display: ({})
             property string mainScreen: ""
+            property var input: ({})
+            property var power: ({})
         }
     }
 

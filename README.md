@@ -52,7 +52,8 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   sit by dragging them on a map (a change goes back by itself unless kept),
   gaps, borders and blur, the bar's modules by drag and drop, and the
   appearance: the tone with each one's card opacity, blur and text colour, the
-  spectrum's style, fastfetch's look and the login screen's look.
+  spectrum's style, fastfetch's look and the login screen's look; keyboard
+  layouts, the mouse and focus; when the screen locks and the screens go off.
 - Quick actions: wallpaper, game mode, screen recording, power profile, audio
   output, microphone, keyboard layout, screens (extend, mirror or the main one
   only, kept or undone in 15 s), do not disturb, settings and the power menu.

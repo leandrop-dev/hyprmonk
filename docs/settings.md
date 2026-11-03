@@ -4,10 +4,10 @@ A centred card (Super+comma, or quick actions > Settings) with its pages down
 the side. Ideas from noctalia, Ryoku and Shibumi Shell,
 no code from them.
 
-The Display, Windows and Bar pages keep to `settings.json` in the state
-directory, holding only what was changed, so the rest follows the repo's config.
-Hyprland options are also written to `settings.lua`, loaded after `look.lua`, and
-applied at once with `hyprctl eval`.
+The Display, Windows, Bar, Input and Power pages keep to `settings.json` in the
+state directory, holding only what was changed, so the rest follows the repo's
+config. Hyprland options are also written to `settings.lua`, loaded after
+`look.lua` and `input.lua`, and applied at once with `hyprctl eval`.
 
 ## Pages
 
@@ -41,3 +41,13 @@ applied at once with `hyprctl eval`.
   or Main screen only for every other screen, and a Keep this layout row counts
   down beside it. A screen kept mirroring or off keeps its own mode in
   `settings.json`, for when it is back beside the others.
+- [x] Input: up to four keyboard layouts, found by code or name (XKB's
+  `base.lst`), the first the default; the mouse's sensitivity, acceleration
+  (adaptive or flat) and natural scroll; focus following the pointer, or a
+  click moving the keyboard while scrolling still follows the pointer.
+- [x] Power: lock after 5 minutes to an hour or never, and the screens off
+  after the lock (or after going idle, when it never locks). hypridle reads
+  its config only as it starts, so the shell writes a copy of
+  `hypr/hypridle.conf` with these times to `hypridle.conf` in the state
+  directory, which hyprmonk-idle.service reads when it is there, and restarts
+  the service when the copy changes.

@@ -7,7 +7,9 @@ After=graphical-session.target hyprmonk-shell.service
 ConditionEnvironment=XDG_CURRENT_DESKTOP=Hyprland
 
 [Service]
-ExecStart=/usr/bin/hypridle
+# The shell's copy with the times from Settings > Power, once there is one
+# (services/Idle.qml); the repo's config/hypr/hypridle.conf until then.
+ExecStart=/bin/sh -c 'conf="%h/.local/state/hyprmonk/hypridle.conf"; test -e "$conf" || conf="%h/.config/hypr/hypridle.conf"; exec /usr/bin/hypridle -c "$conf"'
 Restart=on-failure
 RestartSec=2
 

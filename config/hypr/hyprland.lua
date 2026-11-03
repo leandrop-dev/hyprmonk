@@ -28,9 +28,10 @@ hl.monitor({ output = "HDMI-A-1", mode = "2560x1080@75", position = "0x0", scale
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" })
 
 require("look")
--- What Settings changed from look.lua and the monitors above (written by the shell).
-load_optional(state .. "/settings.lua")
 require("input")
+-- What Settings changed from look.lua, input.lua and the monitors above
+-- (written by the shell).
+load_optional(state .. "/settings.lua")
 require("binds")
 require("rules")
 require("plugins")

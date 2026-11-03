@@ -1,6 +1,6 @@
 // The main keyboard's layouts as Hyprland has them: their codes ("us", "pt"),
 // the one in use and its name ("Portuguese"). Read at start, and again when
-// the layout switches or the config reloads.
+// the layout switches, the config reloads or Settings changes the layouts.
 pragma Singleton
 
 import QtQuick
@@ -19,6 +19,17 @@ Singleton {
 
     function next(): void {
         Quickshell.execDetached(["hyprctl", "switchxkblayout", "current", "next"]);
+    }
+
+    // After the layouts change without a config reload (Settings > Input).
+    function refresh(): void {
+        rereader.restart();
+    }
+
+    Timer {
+        id: rereader
+        interval: 300
+        onTriggered: reader.running = true
     }
 
     Process {

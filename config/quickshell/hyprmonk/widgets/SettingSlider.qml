@@ -1,4 +1,5 @@
 // A whole number in a range: its name and value, and a slider under them.
+// `shown`, when set, is written in place of the number and its unit.
 import QtQuick
 import QtQuick.Layouts
 import qs
@@ -11,6 +12,7 @@ ColumnLayout {
     property int from: 0
     property int to: 100
     property string unit: ""
+    property string shown: ""
 
     signal moved(real value)
 
@@ -28,7 +30,7 @@ ColumnLayout {
         }
 
         Text {
-            text: row.value + row.unit
+            text: row.shown || row.value + row.unit
             color: Theme.fg(Theme.dimOpacity)
             font.family: Theme.font
             font.pixelSize: Theme.smallFontSize

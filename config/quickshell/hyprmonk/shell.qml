@@ -3,6 +3,7 @@
 // power menu, the key guide, the wallpaper picker, settings, the screenshot
 // mode's card, the lock screen and the polkit agent; and the Appearance tone carried
 // to GTK apps, Hyprland and kitty.
+import QtQuick
 import Quickshell
 import qs
 import qs.bar
@@ -15,10 +16,13 @@ import qs.polkit
 import qs.power
 import qs.quickactions
 import qs.screenshot
+import qs.services
 import qs.settings
 import qs.wallpaper
 
 ShellRoot {
+    Component.onCompleted: Idle.start()
+
     ThemeOutputs {}
     Background {}
 
