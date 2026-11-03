@@ -1,7 +1,8 @@
 // Recording the focused screen, a region picked for each recording or the
 // focused window (`hyprmonk record`, which becomes GPU Screen Recorder), with
-// the system's sound and the microphone as set here, kept between sessions; a
-// change counts from the next recording. SIGINT ends it and saves the file;
+// the system's sound, the microphone, the quality and the folder set in
+// Settings > Recording, kept between sessions; a change counts from the next
+// recording, or the next replay. SIGINT ends it and saves the file;
 // the bar shows the time while it runs, and a notification offers the file
 // after. It is `active` from the first line it prints, so not while a region
 // is being picked; Escape there ends it with nothing printed. SIGUSR2 pauses
@@ -40,10 +41,45 @@ Singleton {
     readonly property string area: settings.area
     readonly property bool sound: settings.sound
     readonly property bool microphone: settings.microphone
+    // GPU Screen Recorder's presets; very_high is its default.
+    readonly property var qualities: [
+        { name: "medium", label: "Medium" },
+        { name: "high", label: "High" },
+        { name: "very_high", label: "Very high" },
+        { name: "ultra", label: "Ultra" }
+    ]
+    readonly property string quality: qualities.some(q => q.name === settings.quality) ? settings.quality : "very_high"
+    // An absolute path, or "" for Recordings in the Videos folder.
+    readonly property string folder: settings.folder.startsWith("/") ? settings.folder : ""
+    readonly property string defaultFolder: (videos.text.trim() || Quickshell.env("HOME") + "/Videos") + "/Recordings"
+    readonly property string savedIn: folder || defaultFolder
+    readonly property bool changed: !sound || microphone || quality !== "very_high" || folder !== ""
 
     function setArea(name: string): void { settings.area = name; }
     function setSound(on: bool): void { settings.sound = on; }
     function setMicrophone(on: bool): void { settings.microphone = on; }
+    function setQuality(name: string): void {
+        if (qualities.some(q => q.name === name)) settings.quality = name;
+    }
+    // "" for the default; a path starting with ~ is taken from home. False,
+    // and nothing kept, for a path that is not absolute.
+    function setFolder(path: string): bool {
+        let full = path.trim().replace(/^~(?=\/|$)/, Quickshell.env("HOME")).replace(/(.)\/+$/, "$1");
+        if (full !== "" && !full.startsWith("/")) return false;
+        if (full === defaultFolder) full = "";
+        settings.folder = full;
+        return true;
+    }
+    function reset(): void {
+        settings.sound = true;
+        settings.microphone = false;
+        settings.quality = "very_high";
+        settings.folder = "";
+    }
+    // Made first, as the first recording would.
+    function openFolder(): void {
+        Quickshell.execDetached(["sh", "-c", 'mkdir -p -- "$1" && exec xdg-open "$1"', "sh", savedIn]);
+    }
 
     property bool paused: false
     property int seconds: 0
@@ -78,7 +114,7 @@ Singleton {
         if (!target) return;
         file = "";
         failure = "";
-        recording.command = [hyprmonk, "record", target, ...audioFlags()];
+        recording.command = [hyprmonk, "record", target, ...options()];
         recording.running = true;
     }
 
@@ -102,7 +138,7 @@ Singleton {
         const target = Hyprland.focusedMonitor?.name;
         if (!target) return;
         replayFailure = "";
-        replay.command = [hyprmonk, "replay", target, ...audioFlags()];
+        replay.command = [hyprmonk, "replay", target, ...options()];
         replay.running = true;
         replayStarting.restart();
     }
@@ -115,8 +151,9 @@ Singleton {
         }
     }
 
-    function audioFlags(): var {
-        return [...(sound ? ["--sound"] : []), ...(microphone ? ["--microphone"] : [])];
+    function options(): var {
+        return [...(sound ? ["--sound"] : []), ...(microphone ? ["--microphone"] : []),
+                "--quality", quality, ...(folder ? ["--folder", folder] : [])];
     }
 
     function notify(summary: string, body: string): void {
@@ -198,10 +235,18 @@ Singleton {
         interval: 2000
     }
 
+    // A write reads the file back: reset()'s changes would undo each other.
+    Timer {
+        id: saving
+        interval: 200
+        onTriggered: settingsFile.writeAdapter()
+    }
+
     FileView {
+        id: settingsFile
         path: Theme.stateDir + "/recorder.json"
         printErrors: false
-        onAdapterUpdated: writeAdapter()
+        onAdapterUpdated: saving.restart()
 
         JsonAdapter {
             id: settings
@@ -209,6 +254,17 @@ Singleton {
             property string area: "Screen"
             property bool sound: true
             property bool microphone: false
+            property string quality: "very_high"
+            property string folder: ""
+        }
+    }
+
+    // The Videos folder as xdg-user-dirs names it, for the default folder.
+    Process {
+        running: true
+        command: ["xdg-user-dir", "VIDEOS"]
+        stdout: StdioCollector {
+            id: videos
         }
     }
 

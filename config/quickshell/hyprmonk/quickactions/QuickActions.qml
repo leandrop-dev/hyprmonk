@@ -125,22 +125,6 @@ Scope {
         },
         Action {
             section: "Recording"
-            icon: "\u{F04C3}"
-            label: "Record system sound"
-            on: Recorder.sound
-            stays: true
-            onRun: Recorder.setSound(!Recorder.sound)
-        },
-        Action {
-            section: "Recording"
-            icon: "\u{F036C}"
-            label: "Record microphone"
-            on: Recorder.microphone
-            stays: true
-            onRun: Recorder.setMicrophone(!Recorder.microphone)
-        },
-        Action {
-            section: "Recording"
             icon: "\u{F0459}"
             label: "Keep the last minute"
             on: Recorder.replaying

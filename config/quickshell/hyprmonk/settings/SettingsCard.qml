@@ -19,7 +19,8 @@ Overlay {
         { name: "Bar", icon: "\u{F0570}", file: "BarPage.qml" },
         { name: "Appearance", icon: "\u{F050E}", file: "AppearancePage.qml" },
         { name: "Input", icon: "\u{F030C}", file: "InputPage.qml" },
-        { name: "Power", icon: "\u{F0425}", file: "PowerPage.qml" }
+        { name: "Power", icon: "\u{F0425}", file: "PowerPage.qml" },
+        { name: "Recording", icon: "\u{F044A}", file: "RecordingPage.qml" }
     ]
     property int current: 0
 

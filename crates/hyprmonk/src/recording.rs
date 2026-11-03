@@ -16,6 +16,7 @@ use std::io::{self, Write as _};
 use std::os::unix::process::CommandExt as _;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::str::FromStr;
 use std::thread;
 use std::time::Duration;
 
@@ -55,15 +56,13 @@ pub enum Audio {
 }
 
 impl Audio {
-    /// From `record`'s flags, in any order; `None` for anything else.
-    #[must_use]
-    pub fn from_flags(flags: &[&str]) -> Option<Self> {
-        match flags {
-            [] => Some(Audio::Silent),
-            ["--sound"] => Some(Audio::Sound),
-            ["--microphone"] => Some(Audio::Microphone),
-            ["--sound", "--microphone"] | ["--microphone", "--sound"] => Some(Audio::Both),
-            _ => None,
+    /// The system's sound, the microphone, both or neither.
+    fn from_switches(sound: bool, microphone: bool) -> Self {
+        match (sound, microphone) {
+            (false, false) => Audio::Silent,
+            (true, false) => Audio::Sound,
+            (false, true) => Audio::Microphone,
+            (true, true) => Audio::Both,
         }
     }
 
@@ -78,6 +77,84 @@ impl Audio {
     }
 }
 
+/// The recorder's quality presets (`-q`), for its default constant-quality mode.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Quality {
+    Medium,
+    High,
+    /// The recorder's own default.
+    #[default]
+    VeryHigh,
+    Ultra,
+}
+
+impl Quality {
+    fn as_str(self) -> &'static str {
+        match self {
+            Quality::Medium => "medium",
+            Quality::High => "high",
+            Quality::VeryHigh => "very_high",
+            Quality::Ultra => "ultra",
+        }
+    }
+}
+
+impl FromStr for Quality {
+    type Err = anyhow::Error;
+
+    fn from_str(name: &str) -> Result<Self> {
+        match name {
+            "medium" => Ok(Quality::Medium),
+            "high" => Ok(Quality::High),
+            "very_high" => Ok(Quality::VeryHigh),
+            "ultra" => Ok(Quality::Ultra),
+            _ => bail!("unknown quality {name:?}"),
+        }
+    }
+}
+
+/// What a recording or a replay hears, how good it looks and where it goes.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Options {
+    audio: Audio,
+    quality: Quality,
+    /// Recordings/ in the Videos folder when not given.
+    folder: Option<PathBuf>,
+}
+
+impl Options {
+    /// From `record`'s and `replay`'s flags, in any order: `--sound`,
+    /// `--microphone`, `--quality NAME` and `--folder PATH` (absolute).
+    /// `None` for anything else.
+    #[must_use]
+    pub fn from_flags(flags: &[&str]) -> Option<Self> {
+        let (mut sound, mut microphone) = (false, false);
+        let mut quality = Quality::default();
+        let mut folder = None;
+        let mut flags = flags.iter();
+        while let Some(&flag) = flags.next() {
+            match flag {
+                "--sound" => sound = true,
+                "--microphone" => microphone = true,
+                "--quality" => quality = flags.next()?.parse().ok()?,
+                "--folder" => {
+                    let path = Path::new(flags.next()?);
+                    if !path.is_absolute() {
+                        return None;
+                    }
+                    folder = Some(path.to_owned());
+                }
+                _ => return None,
+            }
+        }
+        Some(Options {
+            audio: Audio::from_switches(sound, microphone),
+            quality,
+            folder,
+        })
+    }
+}
+
 /// Records `area`: a monitor's name, `region` to pick one, or `window:ADDRESS`.
 /// Prints the file it will write, then becomes the recorder. Returns only if
 /// that fails, or at once with nothing printed if the pick is cancelled.
@@ -85,7 +162,7 @@ impl Audio {
 /// # Errors
 ///
 /// Fails when the picker, the folder or the recorder fails.
-pub fn start(area: &str, audio: Audio) -> Result<()> {
+pub fn start(area: &str, options: &Options) -> Result<()> {
     let target = if area == "region" {
         thread::sleep(CARD_GONE);
         let Some(region) = screenshot::select(&["-d", "-f", "%wx%h+%x+%y"], "")? else {
@@ -101,8 +178,8 @@ pub fn start(area: &str, audio: Audio) -> Result<()> {
     };
 
     let stamp = screenshot::timestamp(screenshot::FILE_TIME)?;
-    let path = folder()?.join(format!("Recording_{stamp}.mp4"));
-    let mut recorder = recorder(&target, audio)?;
+    let path = folder(options)?.join(format!("Recording_{stamp}.mp4"));
+    let mut recorder = recorder(&target, options)?;
 
     let mut stdout = io::stdout();
     writeln!(stdout, "{}", path.display())?;
@@ -119,10 +196,10 @@ pub fn start(area: &str, audio: Audio) -> Result<()> {
 /// # Errors
 ///
 /// Fails when the folder or the recorder fails.
-pub fn replay(monitor: &str, audio: Audio) -> Result<()> {
-    let err = recorder(monitor, audio)?
+pub fn replay(monitor: &str, options: &Options) -> Result<()> {
+    let err = recorder(monitor, options)?
         .args(["-r", REPLAY_SECONDS, "-c", "mp4", "-o"])
-        .arg(folder()?)
+        .arg(folder(options)?)
         .exec();
     Err(err).with_context(|| format!("running {RECORDER}"))
 }
@@ -171,15 +248,19 @@ fn runtime_folder() -> Result<PathBuf> {
     Ok(folder)
 }
 
-/// Where recordings go, made if it is not there.
-fn folder() -> Result<PathBuf> {
-    let folder = screenshot::user_folder("VIDEOS", "Videos").join("Recordings");
+/// Where recordings go, made if it is not there: the one asked for, or
+/// Recordings/ in the Videos folder.
+fn folder(options: &Options) -> Result<PathBuf> {
+    let folder = options
+        .folder
+        .clone()
+        .unwrap_or_else(|| screenshot::user_folder("VIDEOS", "Videos").join("Recordings"));
     fs::create_dir_all(&folder).with_context(|| format!("creating {}", folder.display()))?;
     Ok(folder)
 }
 
 /// The recorder for `target`, up to where a recording and a replay differ.
-fn recorder(target: &str, audio: Audio) -> Result<Command> {
+fn recorder(target: &str, options: &Options) -> Result<Command> {
     let info = Command::new(RECORDER)
         .arg("--info")
         .output()
@@ -191,7 +272,8 @@ fn recorder(target: &str, audio: Audio) -> Result<Command> {
 
     let mut recorder = Command::new(RECORDER);
     recorder.args(["-w", target, "-f", "60", "-v", "no"]);
-    if let Some(source) = audio.source() {
+    recorder.args(["-q", options.quality.as_str()]);
+    if let Some(source) = options.audio.source() {
         recorder.args(["-a", source]);
     }
     recorder.args(encoder(&info));
@@ -255,17 +337,56 @@ mod tests {
 
     #[test]
     fn flags_say_what_is_heard() {
-        assert_eq!(Audio::from_flags(&[]), Some(Audio::Silent));
-        assert_eq!(Audio::from_flags(&["--sound"]), Some(Audio::Sound));
+        let audio = |flags: &[&str]| Options::from_flags(flags).map(|options| options.audio);
+        assert_eq!(audio(&[]), Some(Audio::Silent));
+        assert_eq!(audio(&["--sound"]), Some(Audio::Sound));
+        assert_eq!(audio(&["--microphone"]), Some(Audio::Microphone));
+        assert_eq!(audio(&["--microphone", "--sound"]), Some(Audio::Both));
+        assert_eq!(audio(&["--loud"]), None);
+    }
+
+    #[test]
+    fn nothing_asked_is_the_recorders_default() {
         assert_eq!(
-            Audio::from_flags(&["--microphone"]),
-            Some(Audio::Microphone)
+            Options::from_flags(&[]),
+            Some(Options {
+                audio: Audio::Silent,
+                quality: Quality::VeryHigh,
+                folder: None,
+            })
         );
+    }
+
+    #[test]
+    fn quality_and_folder_take_a_value() {
         assert_eq!(
-            Audio::from_flags(&["--microphone", "--sound"]),
-            Some(Audio::Both)
+            Options::from_flags(&["--quality", "ultra", "--sound", "--folder", "/tmp/clips"]),
+            Some(Options {
+                audio: Audio::Sound,
+                quality: Quality::Ultra,
+                folder: Some(PathBuf::from("/tmp/clips")),
+            })
         );
-        assert_eq!(Audio::from_flags(&["--loud"]), None);
+        assert_eq!(Options::from_flags(&["--quality"]), None, "no value");
+        assert_eq!(Options::from_flags(&["--quality", "best"]), None);
+        assert_eq!(Options::from_flags(&["--folder"]), None, "no value");
+        assert_eq!(
+            Options::from_flags(&["--folder", "clips"]),
+            None,
+            "a relative folder"
+        );
+    }
+
+    #[test]
+    fn quality_names_are_the_recorders() {
+        for quality in [
+            Quality::Medium,
+            Quality::High,
+            Quality::VeryHigh,
+            Quality::Ultra,
+        ] {
+            assert_eq!(quality.as_str().parse::<Quality>().ok(), Some(quality));
+        }
     }
 
     #[test]

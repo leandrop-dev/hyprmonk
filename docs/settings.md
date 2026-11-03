@@ -51,3 +51,12 @@ config. Hyprland options are also written to `settings.lua`, loaded after
   `hypr/hypridle.conf` with these times to `hypridle.conf` in the state
   directory, which hyprmonk-idle.service reads when it is there, and restarts
   the service when the copy changes.
+- [x] Recording (was quick actions' Record system sound and Record microphone
+  rows): the system's sound and the microphone, the quality (GPU Screen
+  Recorder's medium, high, very high or ultra presets, very high its own
+  default) and the folder, an absolute path or `~/` (empty for Recordings in
+  the Videos folder, made when first needed). They are kept with the record
+  area in `recorder.json`, which stays in quick actions beside the button, and
+  passed to `hyprmonk record` and `hyprmonk replay` as `--sound`,
+  `--microphone`, `--quality` and `--folder`. A replay that is on keeps what it
+  started with.

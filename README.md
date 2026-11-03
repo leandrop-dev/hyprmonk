@@ -53,7 +53,8 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   gaps, borders and blur, the bar's modules by drag and drop, and the
   appearance: the tone with each one's card opacity, blur and text colour, the
   spectrum's style, fastfetch's look and the login screen's look; keyboard
-  layouts, the mouse and focus; when the screen locks and the screens go off.
+  layouts, the mouse and focus; when the screen locks and the screens go off;
+  what recordings hear, their quality and where they go.
 - Quick actions: wallpaper, game mode, screen recording, power profile, audio
   output, microphone, keyboard layout, screens (extend, mirror or the main one
   only, kept or undone in 15 s), do not disturb, settings and the power menu.
@@ -247,10 +248,11 @@ need, installed to `~/.local/bin`:
 ```
 hyprmonk battery [--json]                       charge of devices UPower cannot see
 hyprmonk screenshot region|window|screen [--copy]
-hyprmonk record MONITOR|region|window:ADDRESS [--sound] [--microphone]
+hyprmonk record MONITOR|region|window:ADDRESS [OPTIONS]
                                                 records until stopped; the shell runs it
-hyprmonk replay MONITOR [--sound] [--microphone]
+hyprmonk replay MONITOR [OPTIONS]
                                                 keeps the last minute; the shell runs it
+                                                OPTIONS: --sound --microphone --quality NAME --folder PATH
 hyprmonk recording-saved FILE                   offers a finished recording; the shell runs it
 hyprmonk portal-picker [ARGS]                   says what to share; the portal runs it
 hyprmonk thumbnails FOLDER                      makes the wallpaper picker's thumbnails; the shell runs it
@@ -267,10 +269,12 @@ hyprmonk menu | install [step...] | update | check | uninstall
   notification offers Open and Show in folder.
 - `record` is GPU Screen Recorder on the focused screen, a region picked with
   the mouse or the focused window, on the cheapest encoder the machine has
-  (Vulkan when NVENC is too new for the driver). Which one, the system's sound
-  and the microphone are set in quick actions and kept between sessions: the
-  screen, sound on and the microphone off to begin with. It saves
-  to `~/Videos/Recordings`, and a notification offers Open and Show in folder.
+  (Vulkan when NVENC is too new for the driver). Which one is picked in quick
+  actions; the system's sound, the microphone, the quality (the recorder's
+  four presets) and the folder in Settings > Recording, all kept between
+  sessions: the screen, sound on, the microphone off, very high quality and
+  `~/Videos/Recordings` to begin with. A notification offers Open and Show
+  in folder.
   A right click on the bar's dot pauses it. A window's recording ends if the
   window changes size or closes, because its picture would freeze there
   ([docs/recording.md](docs/recording.md)). A window needs no dialog:
@@ -279,10 +283,10 @@ hyprmonk menu | install [step...] | update | check | uninstall
   effect from the next login.
 - `replay` keeps the last minute of the focused screen in memory, for
   `Super` `Shift` `G` to save. Keep the last minute in quick actions turns it
-  on, with the same sound settings, and an icon on the bar saves it on a click
-  and stops it on a right click. It stays off after a restart: while on it
-  costs about 17% of a core, and 220 MB of memory on a still screen, more in a
-  game.
+  on, with the same sound, quality and folder, and an icon on the bar saves
+  it on a click and stops it on a right click. It stays off after a restart:
+  while on it costs about 17% of a core, and 220 MB of memory on a still
+  screen, more in a game.
 - `bluetooth-agent` is the pairing agent Quickshell lacks: it passes what
   BlueZ asks to the shell, which shows the code in the Bluetooth panel.
 - The installer commands find the clone through `~/.config/hypr`, a link

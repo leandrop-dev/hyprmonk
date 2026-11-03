@@ -2,10 +2,10 @@
 
 Today `hyprmonk record` takes the focused screen, a region or the focused
 window (`crates/hyprmonk/src/recording.rs`), and `services/Recorder.qml`
-starts it, pauses it, stops it and keeps the area and the two sound switches,
-which sit under Recording in quick actions. `hyprmonk replay` keeps the last
-minute. What the recorder can do was read from the `gpu-screen-recorder`
-manual, version 6.1.6.
+starts it, pauses it, stops it and keeps the area, picked under Recording in
+quick actions, and the two sound switches, the quality and the folder, set in
+Settings > Recording. `hyprmonk replay` keeps the last minute. What the
+recorder can do was read from the `gpu-screen-recorder` manual, version 6.1.6.
 
 ## A window's limits
 
