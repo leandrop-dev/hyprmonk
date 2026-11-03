@@ -29,7 +29,12 @@ Rectangle {
     readonly property real panelRoom: (parent?.height ?? 0) - Theme.barGap * 2 - Theme.barHeight - 18
     readonly property var page: loader.item?.page ?? null
 
-    onPanelChanged: if (panel) shown = panel
+    // A panel given and taken back before it unfolded leaves openness at 0,
+    // so nothing would fold it away: it goes at once.
+    onPanelChanged: {
+        if (panel) shown = panel;
+        else if (openness === 0) shown = null;
+    }
     onOpennessChanged: if (openness === 0 && !panel) shown = null
     onShownChanged: scroller.contentY = 0
     onPageChanged: scroller.contentY = 0

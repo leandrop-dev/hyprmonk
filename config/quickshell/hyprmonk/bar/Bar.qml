@@ -40,7 +40,8 @@ PanelWindow {
         tray: trayMenu
     })
     readonly property Component openPanel: panelOpen ? panels[Panels.open] ?? null : null
-    readonly property bool panelOnLeft: Settings.bar.left.some(key => Settings.barPanel(key) === Panels.open)
+    // Not with none open: modules without a panel would match "".
+    readonly property bool panelOnLeft: Panels.open !== "" && Settings.bar.left.some(key => Settings.barPanel(key) === Panels.open)
 
     anchors {
         top: true

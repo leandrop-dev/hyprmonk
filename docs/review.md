@@ -9,7 +9,15 @@ can inject shell commands; no binding loops, restart loops or leaked objects.
 
 ## Still to try
 
-- D-005, D-024: need a second monitor.
+- [x] D-005, D-024: tried on 2026-11-03 with a headless output as the second
+  screen. D-005: locked with the headless screen focused, then removed it; the
+  clock and field moved to the other screen with the keyboard, and the password
+  unlocked without a click. D-024: a Wi-Fi or Bluetooth panel moved between
+  screens never turned scanning off. That test found every bar panel opening a
+  hidden second copy in the left card, which stayed until another panel opened
+  (so Wi-Fi kept scanning with no panel open): the left card took the panel for
+  a moment, since modules without one matched "" with none open, and a card
+  whose panel came and went before unfolding never folded it away. Both fixed.
 
 ## To fix
 
