@@ -18,9 +18,13 @@ Item {
     id: root
 
     required property ShellScreen screen
-    readonly property HyprlandMonitor monitor: Hyprland.monitorFor(screen)
+    readonly property HyprlandMonitor monitor: sample === null ? Hyprland.monitorFor(screen) : null
     readonly property int count: Settings.barChoice("workspaces")
-    readonly property string style: Settings.barChoice("workspaceStyle")
+    property string style: Settings.barChoice("workspaceStyle")
+    // For a preview (Settings > Bar): made-up workspaces to show instead,
+    // which stay the same objects, and the id of the active one.
+    property var sample: null
+    property int sampleActive: 1
 
     // The empty ones' stand-ins, made once each so their slots keep them.
     property var spare: ({})
@@ -30,6 +34,7 @@ Item {
     }
 
     readonly property var shown: {
+        if (root.sample !== null) return root.sample;
         const open = Hyprland.workspaces.values.filter(ws => ws.id > 0);
         const here = open.filter(ws => ws.monitor === root.monitor);
         const list = here.slice();
@@ -37,7 +42,11 @@ Item {
             if (!open.some(ws => ws.id === id)) list.push(root.spareFor(id));
         return list.sort((a, b) => a.id - b.id);
     }
-    readonly property int activeIndex: shown.findIndex(ws => ws.active)
+    readonly property int activeIndex: shown.findIndex(ws => root.isActive(ws))
+
+    function isActive(ws: var): bool {
+        return sample !== null ? ws.id === sampleActive : ws.active;
+    }
 
     implicitWidth: slots.implicitWidth + 12
     implicitHeight: Theme.barHeight - Theme.cardPadding * 2
@@ -61,7 +70,7 @@ Item {
                 id: slot
 
                 required property var modelData
-                readonly property bool active: modelData.active
+                readonly property bool active: root.isActive(modelData)
                 readonly property bool empty: modelData.empty === true
                 readonly property bool urgent: modelData.urgent
                 readonly property bool hovered: mouse.containsMouse
@@ -119,6 +128,7 @@ Item {
                 MouseArea {
                     id: mouse
                     anchors.fill: parent
+                    enabled: root.sample === null
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     // The config is Lua, so dispatches are Lua too.

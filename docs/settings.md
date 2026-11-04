@@ -36,17 +36,24 @@ config. Hyprland options are also written to `settings.lua`, loaded after
   MultiEffect mask, no shaders of our own. The picture shows at once and
   matugen's colours follow (`wallpaper transition <name>` over IPC);
   fastfetch's look; the login
-  screen's look. The page scrolls. How strong blur is stays on the Windows
+  screen's look. The tones, spectrum styles, wallpaper changes and login
+  looks show as small previews (`widgets/PreviewCard.qml`) rather than
+  names: a tone's background, a card, its text and accent; each spectrum
+  style drawn from made-up levels; each change held half way, played under
+  the pointer; each login look's background, a frame for a video one
+  (made once with ffmpeg into `~/.cache/hyprmonk/login`). The page
+  scrolls. How strong blur is stays on the Windows
   page: Hyprland has one strength for everything.
 - [x] Bar: drag modules to reorder them, move them between the left and right
-  cards, or hide them. The bar sits at the top or the bottom of the screen;
+  cards, or hide them. The options scroll, the reset button below them. The bar sits at the top or the bottom of the screen;
   a panel opens from the card holding its module, below it or above it.
   Recording and Replay cannot be hidden, and the centre card stays as it is:
   its fitting rules depend on it. Below them: the clock in 24 or 12 hours,
   with seconds and the date or without; the workspaces in use, or always 1 to
   5 or 1 to 10 (empty ones dim, a click opens one); how they look:
   pills, numbers, dots, or a chomper that goes from the active one to the
-  next, chomping; temperatures in °C or °F.
+  next, chomping, each shown on four made-up workspaces whose active one
+  moves under the pointer; temperatures in °C or °F.
   These are kept in `barLook`, apart from the modules. The window list (the
   dock's apps, at the bar's size) starts hidden, since the dock shows the same.
 - [x] Dock (`dock/`, `services/Windows.qml`): shown or not; the edge it sits

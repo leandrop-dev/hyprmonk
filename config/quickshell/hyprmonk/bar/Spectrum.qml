@@ -14,15 +14,27 @@ Module {
 
     readonly property var player: Player.current
     readonly property int step: 6  // px between bands
+    // The style drawn, and for a preview (Settings > Appearance) fixed levels
+    // to draw instead of cava's; a preview does not react to the pointer.
+    property string style: Cava.style
+    property var sample: null
 
-    interactive: player !== null
+    interactive: sample === null && player !== null
+
+    onStyleChanged: canvas.requestPaint()
+    Component.onCompleted: {
+        if (sample === null) return;
+        shown = sample;
+        peaks = sample.map(level => Math.min(1, level + 0.15));
+    }
 
     onClicked: button => {
-        if (!player) return;
+        if (!player || sample !== null) return;
         if (button === Qt.LeftButton) Panels.toggle("media");
         else if (button === Qt.RightButton && player.canTogglePlaying) player.togglePlaying();
     }
     onScrolled: steps => {
+        if (sample !== null) return;
         if (steps > 0 && player?.canGoNext) player.next();
         else if (steps < 0 && player?.canGoPrevious) player.previous();
     }
@@ -42,7 +54,7 @@ Module {
         id: easing
         interval: 33
         repeat: true
-        running: true
+        running: root.sample === null
         onTriggered: {
             let moving = false;
             const shown = root.shown.map((level, i) => {
@@ -76,6 +88,7 @@ Module {
 
     Connections {
         target: Cava
+        enabled: root.sample === null
 
         function onLevelsChanged(): void {
             easing.start();
@@ -94,7 +107,7 @@ Module {
     onLoudChanged: canvas.requestPaint()
 
     function tint(level: real): color {
-        if (Cava.silent) return Theme.fg(0.25);
+        if (sample === null && Cava.silent) return Theme.fg(0.25);
         const from = quiet, to = loud;
         return Qt.rgba(from.r + (to.r - from.r) * level, from.g + (to.g - from.g) * level,
                        from.b + (to.b - from.b) * level, from.a + (to.a - from.a) * level);
@@ -118,7 +131,7 @@ Module {
                     leds: drawLeds,
                     dots: drawDots,
                     mirror: drawMirror
-                }[Cava.style] ?? drawWave;
+                }[root.style] ?? drawWave;
                 draw(ctx, root.shown);
             }
 

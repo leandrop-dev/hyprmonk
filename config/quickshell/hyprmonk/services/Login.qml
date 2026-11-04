@@ -61,6 +61,43 @@ Singleton {
                     .filter(name => name.endsWith(".conf") && !name.startsWith("hyprmonk-"))
                     .map(name => name.slice(0, -5))
                     .concat("desktop");
+                if (!shots.running) shots.running = true;
+            }
+        }
+    }
+
+    // Each look's picture for Settings > Appearance: its background, or for
+    // a video one a frame of it, made once with ffmpeg into the cache. The
+    // desktop look shows the wallpaper the login screen was given.
+    property var pictures: ({})
+
+    Process {
+        id: shots
+        command: ["sh", "-c", `
+            cache="\${XDG_CACHE_HOME:-$HOME/.cache}/hyprmonk/login"
+            mkdir -p "$cache"
+            for conf in "$1"/Themes/*.conf; do
+                name=$(basename "$conf" .conf)
+                case $name in hyprmonk-*) continue ;; esac
+                picture=$(sed -n 's/^Background="\\{0,1\\}\\([^"]*\\)"\\{0,1\\}$/\\1/p' "$conf" | head -n 1)
+                case $picture in "") continue ;; /*) ;; *) picture="$1/$picture" ;; esac
+                case $picture in
+                    *.mp4|*.webm|*.mkv|*.mov)
+                        frame="$cache/$name.jpg"
+                        [ -f "$frame" ] || ffmpeg -loglevel error -y -ss 1 -i "$picture" -frames:v 1 -vf scale=320:-1 "$frame" </dev/null
+                        picture=$frame ;;
+                esac
+                printf '%s\\t%s\\n' "$name" "$picture"
+            done
+            printf 'desktop\\t%s\\n' "$2/wallpaper.jpg"`, "sh", root.theme, root.dir]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const pictures = {};
+                for (const line of text.trim().split("\n")) {
+                    const [name, file] = line.split("\t");
+                    if (name && file) pictures[name] = file;
+                }
+                root.pictures = pictures;
             }
         }
     }

@@ -6,6 +6,7 @@
 import QtQuick
 import QtQuick.Layouts
 import qs
+import qs.bar
 import qs.services
 import qs.widgets
 
@@ -40,33 +41,89 @@ Flickable {
         Cava.previewStyle = "";
     }
 
-    component ToneChips: Flow {
-        id: chips
+    component ToneCards: Flow {
+        id: cards
 
         property var names: []
 
         Layout.fillWidth: true
-        spacing: 6
+        spacing: 8
 
         Repeater {
-            model: chips.names
+            model: cards.names
 
-            Chip {
-                id: chip
+            // A tone in small: its background, a card on it with text in its
+            // colour (with any text colour picked for it), lines of dimmer
+            // text, and its accent. The wallpaper tones show the wallpaper's.
+            PreviewCard {
+                id: card
 
                 required property string modelData
+                readonly property var look: Theme.toneOf(modelData)
+                readonly property color accent: look.accent
+                    ?? (look.light ? Qt.darker(Theme.wallpaperAccent, 1.5) : Theme.wallpaperAccent)
 
-                text: Theme.tones[modelData].label
-                on: modelData === Theme.savedTone
+                label: look.label
+                chosen: modelData === Theme.savedTone
+                fill: look.background
+
+                // Under the pointer the shell shows it, until it leaves.
+                onHoveredChanged: {
+                    if (hovered) Theme.previewTone = modelData;
+                    else if (Theme.previewTone === modelData) Theme.previewTone = "";
+                }
                 onClicked: {
                     Theme.previewTone = "";
                     Theme.setTone(modelData);
                 }
 
-                HoverHandler {
-                    onHoveredChanged: {
-                        if (hovered) Theme.previewTone = chip.modelData;
-                        else if (Theme.previewTone === chip.modelData) Theme.previewTone = "";
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.margins: 9
+                    radius: 6
+                    color: Qt.tint(card.look.background, Qt.alpha(card.look.foreground, card.look.light ? 0.06 : 0.09))
+                    border.width: 1
+                    border.color: Qt.alpha(card.look.foreground, 0.14)
+
+                    Text {
+                        x: 7
+                        y: 3
+                        text: "Aa"
+                        color: card.look.foreground
+                        font.family: Theme.font
+                        font.pixelSize: 14
+                        font.bold: true
+                    }
+
+                    Rectangle {
+                        anchors.right: parent.right
+                        anchors.rightMargin: 7
+                        y: 8
+                        width: 18
+                        height: 8
+                        radius: 4
+                        color: card.accent
+                    }
+
+                    Column {
+                        x: 7
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 6
+                        spacing: 3
+
+                        Rectangle {
+                            width: 52
+                            height: 3
+                            radius: 1.5
+                            color: Qt.alpha(card.look.foreground, 0.5)
+                        }
+
+                        Rectangle {
+                            width: 34
+                            height: 3
+                            radius: 1.5
+                            color: Qt.alpha(card.look.foreground, 0.3)
+                        }
                     }
                 }
             }
@@ -93,7 +150,7 @@ Flickable {
             text: "Dark"
         }
 
-        ToneChips {
+        ToneCards {
             names: page.darkTones
         }
 
@@ -103,7 +160,7 @@ Flickable {
             text: "Light"
         }
 
-        ToneChips {
+        ToneCards {
             Layout.bottomMargin: 12
             visible: page.lightTones.length > 0
             names: page.lightTones
@@ -242,28 +299,34 @@ Flickable {
 
         Flow {
             Layout.fillWidth: true
-            spacing: 6
+            spacing: 8
 
             Repeater {
                 model: Object.keys(Cava.styles)
 
-                Chip {
-                    id: style
+                // Each style drawn from the same made-up levels, larger than on
+                // the bar; the bar shows it for real while the pointer is here.
+                PreviewCard {
+                    id: styleCard
 
                     required property string modelData
 
-                    text: Cava.styles[modelData]
-                    on: modelData === Cava.savedStyle
+                    label: Cava.styles[modelData]
+                    chosen: modelData === Cava.savedStyle
+                    onHoveredChanged: {
+                        if (hovered) Cava.previewStyle = modelData;
+                        else if (Cava.previewStyle === modelData) Cava.previewStyle = "";
+                    }
                     onClicked: {
                         Cava.previewStyle = "";
                         Cava.setStyle(modelData);
                     }
 
-                    HoverHandler {
-                        onHoveredChanged: {
-                            if (hovered) Cava.previewStyle = style.modelData;
-                            else if (Cava.previewStyle === style.modelData) Cava.previewStyle = "";
-                        }
+                    Spectrum {
+                        anchors.centerIn: parent
+                        scale: 1.5
+                        style: styleCard.modelData
+                        sample: [0.3, 0.65, 0.95, 0.7, 0.85, 0.5, 0.75, 0.4, 0.55, 0.25]
                     }
                 }
             }
@@ -276,17 +339,81 @@ Flickable {
 
         Flow {
             Layout.fillWidth: true
-            spacing: 6
+            spacing: 8
 
             Repeater {
                 model: Wallpaper.transitions
 
-                Chip {
-                    required property string modelData
+                // The new picture (the accent) coming in over the last, held half
+                // way; under the pointer it plays over and over. Random goes
+                // through the three in turn.
+                PreviewCard {
+                    id: change
 
-                    text: ({ fade: "Fade", wipe: "Wipe", circle: "Circle", random: "Random" })[modelData]
-                    on: modelData === Wallpaper.transition
+                    required property string modelData
+                    property real progress: 0.5
+                    property int round: 0
+                    readonly property string kind: modelData === "random" ? ["fade", "wipe", "circle"][round % 3] : modelData
+                    readonly property color picture: Qt.alpha(Theme.accent, 0.75)
+
+                    label: ({ fade: "Fade", wipe: "Wipe", circle: "Circle", random: "Random" })[modelData]
+                    chosen: modelData === Wallpaper.transition
+                    fill: Theme.fg(0.1)
                     onClicked: Wallpaper.setTransition(modelData)
+                    onHoveredChanged: {
+                        if (hovered) return;
+                        progress = 0.5;
+                        round = 0;
+                    }
+
+                    SequentialAnimation {
+                        running: change.hovered
+                        loops: Animation.Infinite
+
+                        NumberAnimation {
+                            target: change
+                            property: "progress"
+                            from: 0
+                            to: 1
+                            duration: change.kind === "fade" ? 500 : 900
+                            easing.type: Easing.InOutCubic
+                        }
+                        PauseAnimation { duration: 500 }
+                        ScriptAction { script: change.round++ }
+                    }
+
+                    Rectangle {
+                        anchors.fill: parent
+                        visible: change.kind === "fade"
+                        color: change.picture
+                        opacity: change.progress
+                    }
+
+                    Rectangle {
+                        visible: change.kind === "wipe"
+                        width: change.progress * (parent.width + 16)
+                        height: parent.height
+                        gradient: Gradient {
+                            orientation: Gradient.Horizontal
+
+                            GradientStop { position: 0; color: change.picture }
+                            GradientStop { position: Math.max(0, 1 - 16 / Math.max(16, change.progress * 128)); color: change.picture }
+                            GradientStop { position: 1; color: "transparent" }
+                        }
+                    }
+
+                    // From where a tile might have been picked.
+                    Rectangle {
+                        readonly property real size: change.progress * 2 * 125
+
+                        visible: change.kind === "circle"
+                        x: 32 - size / 2
+                        y: 40 - size / 2
+                        width: size
+                        height: size
+                        radius: size / 2
+                        color: change.picture
+                    }
                 }
             }
         }
@@ -323,17 +450,34 @@ Flickable {
             Layout.fillWidth: true
             Layout.bottomMargin: 4
             visible: Login.ready
-            spacing: 6
+            spacing: 8
 
             Repeater {
                 model: Login.looks
 
-                Chip {
+                // The look's own background (a frame of a video one).
+                PreviewCard {
+                    id: look
+
                     required property string modelData
 
-                    text: Login.label(modelData)
-                    on: modelData === Login.current
+                    label: Login.label(modelData)
+                    chosen: modelData === Login.current
                     onClicked: Login.pick(modelData)
+
+                    Image {
+                        anchors.fill: parent
+                        source: Login.pictures[look.modelData] ? Theme.fileUrl(Login.pictures[look.modelData]) : ""
+                        sourceSize: Qt.size(224, 124)
+                        fillMode: Image.PreserveAspectCrop
+                        asynchronous: true
+                        cache: false  // the desktop look's changes with the wallpaper
+                        opacity: status === Image.Ready ? 1 : 0
+
+                        Behavior on opacity {
+                            NumberAnimation { duration: 160 }
+                        }
+                    }
                 }
             }
         }

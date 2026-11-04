@@ -4,6 +4,7 @@
 import QtQuick
 import QtQuick.Layouts
 import qs
+import qs.bar
 import qs.services
 import qs.widgets
 
@@ -15,6 +16,8 @@ Item {
         { key: "right", label: "Right card" },
         { key: "hidden", label: "Hidden" }
     ]
+    // The workspaces the looks are shown on (made once, so they stay).
+    readonly property var sampleWorkspaces: [1, 2, 3, 4].map(id => ({ id, name: String(id), urgent: false, empty: id === 4 }))
     property string dragged: ""  // the module's key; "" when none
     property point pointer: Qt.point(0, 0)
     readonly property var target: dragged === "" ? null : targetAt(pointer)  // where it would land
@@ -129,154 +132,201 @@ Item {
         anchors.fill: parent
         spacing: 8
 
-        Repeater {
-            id: sections
-
-            model: page.sides
+        // The options scroll; the button stays below them.
+        Flickable {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            contentHeight: column.implicitHeight
+            boundsBehavior: Flickable.StopAtBounds
+            clip: true
 
             ColumnLayout {
-                id: section
+                id: column
 
-                required property var modelData
-                readonly property string side: modelData.key
-                readonly property alias area: area
-                readonly property alias flow: flow
-
-                function tiles(): var {
-                    return Array.from(flow.children).filter(child => child.moduleKey !== undefined);
-                }
-
-                Layout.fillWidth: true
-                Layout.bottomMargin: 8
+                width: parent.width
                 spacing: 8
-                opacity: side === "hidden" && page.dragged !== "" && Settings.barModule(page.dragged).fixed ? Theme.dimOpacity : 1
 
-                SectionLabel {
-                    text: section.modelData.label
-                }
+                Repeater {
+                    id: sections
 
-                Rectangle {
-                    id: area
+                    model: page.sides
 
-                    Layout.fillWidth: true
-                    implicitHeight: flow.implicitHeight + 16
-                    radius: Theme.moduleRadius
-                    color: Theme.fg(0.04)
-                    border.width: 1
-                    border.color: page.target?.side === section.side ? Qt.alpha(Theme.accent, 0.8) : "transparent"
+                    ColumnLayout {
+                        id: section
 
-                    Flow {
-                        id: flow
+                        required property var modelData
+                        readonly property string side: modelData.key
+                        readonly property alias area: area
+                        readonly property alias flow: flow
 
-                        x: 8
-                        y: 8
-                        width: parent.width - 16
-                        spacing: 6
+                        function tiles(): var {
+                            return Array.from(flow.children).filter(child => child.moduleKey !== undefined);
+                        }
 
-                        Repeater {
-                            model: Settings.bar[section.side]
+                        Layout.fillWidth: true
+                        Layout.bottomMargin: 8
+                        spacing: 8
+                        opacity: side === "hidden" && page.dragged !== "" && Settings.barModule(page.dragged).fixed ? Theme.dimOpacity : 1
 
-                            Tile {
-                                id: placed
+                        SectionLabel {
+                            text: section.modelData.label
+                        }
 
-                                required property string modelData
-                                readonly property string moduleKey: modelData
+                        Rectangle {
+                            id: area
 
-                                module: Settings.barModule(modelData)
-                                opacity: page.dragged === modelData ? 0.35 : 1
+                            Layout.fillWidth: true
+                            implicitHeight: flow.implicitHeight + 16
+                            radius: Theme.moduleRadius
+                            color: Theme.fg(0.04)
+                            border.width: 1
+                            border.color: page.target?.side === section.side ? Qt.alpha(Theme.accent, 0.8) : "transparent"
 
-                                MouseArea {
-                                    anchors.fill: parent
-                                    preventStealing: true
-                                    cursorShape: pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
-                                    onPositionChanged: mouse => { if (pressed) page.drag(placed.modelData, mapToItem(page, mouse.x, mouse.y)); }
-                                    onReleased: if (page.dragged !== "") page.drop()
-                                    onCanceled: page.dragged = ""
+                            Flow {
+                                id: flow
+
+                                x: 8
+                                y: 8
+                                width: parent.width - 16
+                                spacing: 6
+
+                                Repeater {
+                                    model: Settings.bar[section.side]
+
+                                    Tile {
+                                        id: placed
+
+                                        required property string modelData
+                                        readonly property string moduleKey: modelData
+
+                                        module: Settings.barModule(modelData)
+                                        opacity: page.dragged === modelData ? 0.35 : 1
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            preventStealing: true
+                                            cursorShape: pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+                                            onPositionChanged: mouse => { if (pressed) page.drag(placed.modelData, mapToItem(page, mouse.x, mouse.y)); }
+                                            onReleased: if (page.dragged !== "") page.drop()
+                                            onCanceled: page.dragged = ""
+                                        }
+                                    }
+                                }
+
+                                // Keeps an empty one tall enough to drop on.
+                                Item {
+                                    visible: Settings.bar[section.side].length === 0
+                                    width: 1
+                                    height: 30
                                 }
                             }
-                        }
 
-                        // Keeps an empty one tall enough to drop on.
-                        Item {
-                            visible: Settings.bar[section.side].length === 0
-                            width: 1
-                            height: 30
+                            Text {
+                                anchors.centerIn: parent
+                                visible: Settings.bar[section.side].length === 0
+                                text: "Drag modules here"
+                                color: Theme.fg(Theme.dimOpacity)
+                                font.family: Theme.font
+                                font.pixelSize: Theme.smallFontSize
+                            }
                         }
                     }
+                }
 
-                    Text {
-                        anchors.centerIn: parent
-                        visible: Settings.bar[section.side].length === 0
-                        text: "Drag modules here"
-                        color: Theme.fg(Theme.dimOpacity)
-                        font.family: Theme.font
-                        font.pixelSize: Theme.smallFontSize
+                SectionLabel {
+                    text: "How they show"
+                }
+
+                Row {
+                    text: "Position"
+
+                    Choice {
+                        key: "position"
+                        labels: ({ top: "Top", bottom: "Bottom" })
+                    }
+                }
+
+                Row {
+                    text: "Clock"
+
+                    Choice {
+                        key: "hours"
+                        labels: ({ "24": "24-hour", "12": "12-hour" })
+                    }
+
+                    Switch {
+                        key: "seconds"
+                        text: "Seconds"
+                    }
+
+                    Switch {
+                        key: "date"
+                        text: "Date"
+                    }
+                }
+
+                Row {
+                    text: "Workspaces"
+
+                    Choice {
+                        key: "workspaces"
+                        labels: ({ 0: "In use", 5: "1 to 5", 10: "1 to 10" })
+                    }
+                }
+
+                Row {
+                    text: "Workspaces look"
+                }
+
+                // Each look on four made-up workspaces, the fourth empty; under the
+                // pointer the active one moves about.
+                Flow {
+                    Layout.fillWidth: true
+                    Layout.bottomMargin: 4
+                    spacing: 8
+
+                    Repeater {
+                        model: Settings.barChoices.workspaceStyle
+
+                        PreviewCard {
+                            id: look
+
+                            required property string modelData
+                            property int step: 0
+                            readonly property var path: [1, 3, 2]
+
+                            label: ({ pills: "Pills", numbers: "Numbers", dots: "Dots", chomper: "Chomper" })[modelData]
+                            chosen: modelData === Settings.barChoice("workspaceStyle")
+                            onClicked: Settings.setBarChoice("workspaceStyle", modelData)
+                            onHoveredChanged: if (!hovered) step = 0
+
+                            Timer {
+                                running: look.hovered
+                                interval: 700
+                                repeat: true
+                                onTriggered: look.step++
+                            }
+
+                            Workspaces {
+                                anchors.centerIn: parent
+                                screen: null
+                                style: look.modelData
+                                sample: page.sampleWorkspaces
+                                sampleActive: look.path[look.step % look.path.length]
+                            }
+                        }
+                    }
+                }
+
+                Row {
+                    text: "Temperature"
+
+                    Choice {
+                        key: "temperature"
+                        labels: ({ C: "°C", F: "°F" })
                     }
                 }
             }
-        }
-
-        SectionLabel {
-            text: "How they show"
-        }
-
-        Row {
-            text: "Position"
-
-            Choice {
-                key: "position"
-                labels: ({ top: "Top", bottom: "Bottom" })
-            }
-        }
-
-        Row {
-            text: "Clock"
-
-            Choice {
-                key: "hours"
-                labels: ({ "24": "24-hour", "12": "12-hour" })
-            }
-
-            Switch {
-                key: "seconds"
-                text: "Seconds"
-            }
-
-            Switch {
-                key: "date"
-                text: "Date"
-            }
-        }
-
-        Row {
-            text: "Workspaces"
-
-            Choice {
-                key: "workspaces"
-                labels: ({ 0: "In use", 5: "1 to 5", 10: "1 to 10" })
-            }
-        }
-
-        Row {
-            text: "Workspaces look"
-
-            Choice {
-                key: "workspaceStyle"
-                labels: ({ pills: "Pills", numbers: "Numbers", dots: "Dots", chomper: "Chomper" })
-            }
-        }
-
-        Row {
-            text: "Temperature"
-
-            Choice {
-                key: "temperature"
-                labels: ({ C: "°C", F: "°F" })
-            }
-        }
-
-        Item {
-            Layout.fillHeight: true
         }
 
         Button {
