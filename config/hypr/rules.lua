@@ -1,14 +1,5 @@
 -- Window and layer rules.
 
--- kitty may never maximize itself: it asks as it opens, and in the Floating
--- layout would open over the whole screen (Super+F still maximizes it). Other
--- apps may only in the Floating layout (floating.lua).
-hl.window_rule({
-    name  = "suppress-maximize-kitty",
-    match = { class = "^kitty$" },
-    suppress_event = "maximize",
-})
-
 -- XWayland drag-and-drop ghosts must not take focus.
 hl.window_rule({
     name  = "xwayland-drag-ghosts",

@@ -12,7 +12,8 @@
 
 -- Most apps ask for no size and would float over the whole screen: they open
 -- at 60% by 70% of it, centred, and keep the size given them afterwards.
--- Apps still may not maximise themselves (rules.lua): kitty asks as it opens.
+-- An app asking to be maximised as it opens is (below); kitty is kept from
+-- asking (kitty.conf).
 local width, height = 0.6, 0.7
 
 local float_all = hl.window_rule({
