@@ -50,13 +50,15 @@ if bars then
         on_double_click   = maximise,
     } } })
     -- The first button sits at the far right. hyprbars draws an icon at 0.62
-    -- of its button's size. On hover (our fork's hover_color, install.sh):
-    -- close turns red as on Windows, the others take a wash of the text.
+    -- of its button's size, snapped to whole pixels: an odd size keeps the
+    -- odd-width icons on the circle's centre (24 left them half a pixel off).
+    -- On hover (our fork's hover_color, install.sh): close turns red as on
+    -- Windows, the others take a wash of the text.
     local wash = theme.text:gsub("^rgb%((%x+)%)$", "rgba(%133)")
     bars.add_button({ bg_color = "rgba(00000000)", fg_color = theme.text, hover_color = "rgb(c42b1c)",
-                      size = 24, icon = "\u{F05AD}", action = "hyprctl dispatch 'hl.dsp.window.close()'" })
+                      size = 25, icon = "\u{F05AD}", action = "hyprctl dispatch 'hl.dsp.window.close()'" })
     bars.add_button({ bg_color = "rgba(00000000)", fg_color = theme.text, hover_color = wash,
-                      size = 24, icon = "\u{F05AF}", action = maximise })
+                      size = 25, icon = "\u{F05AF}", action = maximise })
 
     hl.window_rule({
         name  = "hyprbars-own-title-bar",
