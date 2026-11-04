@@ -69,6 +69,9 @@ Singleton {
 
     // Settings > Tone changes the saved tone; each keeps its own.
     readonly property bool cardBlur: appearance?.blur?.[savedTone] !== false
+    // The saved tone's card opacity (cardOpacity follows a previewed tone).
+    readonly property real savedCardOpacity: appearance?.opacity?.[savedTone] >= 0.3
+        ? Math.min(1, appearance.opacity[savedTone]) : toneOf(savedTone).card
     readonly property bool toneAdjusted: [appearance?.opacity, appearance?.text, appearance?.blur].some(kept => kept && savedTone in kept)
 
     function adjust(kept: var, value: var): var {

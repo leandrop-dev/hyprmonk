@@ -27,6 +27,11 @@ Scope {
         return c.toString();
     }
 
+    // An opacity as two hex digits for an rgba() colour.
+    function alpha(opacity: real): string {
+        return Math.round(opacity * 255).toString(16).padStart(2, "0");
+    }
+
     // The tone's foreground over its background, at an opacity: its greys.
     function mix(alpha: real): string {
         return hex(Qt.tint(saved.background, Qt.alpha(saved.foreground, alpha)));
@@ -62,9 +67,12 @@ Scope {
     }
 
     // Hyprland's window borders (theme/tone.lua, loaded after matugen's
-    // colors.lua), and the blur behind the shell's cards (rules.lua).
+    // colors.lua), the Floating layout's title bars (floating.lua), and the
+    // blur behind the shell's cards (rules.lua).
     readonly property string hyprland: "-- Written by the shell (ThemeOutputs.qml) for the saved tone. Do not edit.\n"
         + (saved.accent ? `theme.accent = "rgba(${hex(saved.accent).slice(1)}ee)"\n` : "")
+        + `theme.surface = "rgba(${hex(saved.background).slice(1)}${alpha(Theme.savedCardOpacity)})"\n`
+        + `theme.text = "rgb(${hex(saved.foreground).slice(1)})"\n`
         + (Theme.cardBlur ? "" : "theme.cardBlur = false\n")
 
     // kitty's text, background, cursor and selection (theme/kitty-tone.conf,
@@ -91,6 +99,8 @@ Scope {
             for (const name in colours) lines.push(name.padEnd(24) + colours[name]);
             (saved.terminal ?? []).forEach((colour, index) => lines.push(`color${index}`.padEnd(24) + colour));
         }
+        // Translucent like the shell's cards (kitty.conf allows the change).
+        lines.push("background_opacity".padEnd(24) + Theme.savedCardOpacity.toFixed(2));
         return lines.join("\n") + "\n";
     }
 

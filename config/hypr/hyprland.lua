@@ -14,6 +14,9 @@ theme = {
     accent   = "rgba(89b4faee)",
     inactive = "rgba(45475aaa)",
     shadow   = "rgba(11111bee)",
+    -- The tone's background and text: the Floating layout's title bars.
+    surface  = "rgba(1e1e2ef2)",
+    text     = "rgb(cdd6f4)",
 }
 load_optional(state .. "/theme/colors.lua")
 -- The Appearance tone's own accent, if it has one (written by the shell).
@@ -29,6 +32,7 @@ hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" 
 
 require("look")
 require("input")
+require("floating")
 -- What Settings changed from look.lua, input.lua and the monitors above
 -- (written by the shell).
 load_optional(state .. "/settings.lua")

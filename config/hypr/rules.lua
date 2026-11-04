@@ -1,6 +1,7 @@
 -- Window and layer rules.
 
--- Apps asking to be maximized would fight the tiling layout.
+-- Apps asking to be maximized would fight the tiling layout, and in the
+-- Floating layout would open over the whole screen (kitty asks as it opens).
 hl.window_rule({
     name  = "suppress-maximize",
     match = { class = ".*" },
@@ -23,11 +24,13 @@ end
 -- taken right after.
 hl.layer_rule({ name = "hyprmonk-screenshot", match = { namespace = "^hyprmonk-screenshot$" }, no_anim = true })
 
--- satty (screenshots, to annotate before saving): a floating card.
+-- satty (screenshots, to annotate before saving): a floating card, which the
+-- Floating layout leaves floating when it ends.
 hl.window_rule({
     name  = "satty",
     match = { class = "^com\\.gabm\\.satty$" },
     float = true,
+    tag   = "-hyprmonk-floating",
     size  = "(monitor_w*0.7) (monitor_h*0.7)",
     center = true,
 })

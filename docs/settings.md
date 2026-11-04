@@ -13,7 +13,10 @@ config. Hyprland options are also written to `settings.lua`, loaded after
 
 - [x] Windows: gaps, border size, rounding, blur size and passes; the tiling
   layout (dwindle, master or scrolling; Super+J toggles a split only in
-  dwindle), shadows on or off, and animations on or off at normal, fast (0.6
+  dwindle) or floating (`hypr/floating.lua`: every window floats at 60% by 70%
+  of the screen, centred, and keeps the size given it; borders resize and
+  windows snap; the open windows float when it is picked and tile back when
+  it is left), shadows on or off, and animations on or off at normal, fast (0.6
   times as long) or slow (1.5 times) speed. A speed goes through
   `hyprmonk_animations` in `look.lua`, which sets every animation at that
   many times its time. Game mode holds shadows and animations off whatever

@@ -539,10 +539,16 @@ step_login() {
     echo "   enabled  sddm.service, the login screen from the next boot"
 }
 
-# name -> repository
+# "repository plugin url": the plugin enabled from that repository (hyprpm
+# names a repository after its hyprpm.toml). hyprmonk-plugins is our fork of
+# hyprwm's hyprland-plugins, with hover colours for hyprbars' buttons; of its
+# plugins only hyprbars, the Floating layout's title bars, is used.
 PLUGINS=(
-    "hymission:https://github.com/gfhdhytghd/hymission"
+    "hymission hymission https://github.com/gfhdhytghd/hymission"
+    "hyprmonk-plugins hyprbars https://github.com/leandrop-dev/hyprland-plugins"
 )
+# Repositories an earlier install added and the list above replaces.
+OLD_PLUGINS=(hyprland-plugins)
 
 # ok, failed (registered but its build failed) or missing. hyprpm has no
 # machine-readable output, so this reads `hyprpm list` without its colours.
@@ -560,20 +566,27 @@ step_plugins() {
         return 1
     fi
     hyprpm update
-    local pair name url
-    for pair in "${PLUGINS[@]}"; do
-        name=${pair%%:*} url=${pair#*:}
-        case $(plugin_state "$name") in
-            ok) echo "   ok       $name" ;;
+    local old
+    for old in "${OLD_PLUGINS[@]}"; do
+        if [[ $(plugin_state "$old") != missing ]]; then
+            echo "   remove   $old (replaced)"
+            hyprpm remove "$old"
+        fi
+    done
+    local entry repo plugin url
+    for entry in "${PLUGINS[@]}"; do
+        read -r repo plugin url <<< "$entry"
+        case $(plugin_state "$repo") in
+            ok) echo "   ok       $repo" ;;
             failed)
                 # A failed build stays registered; add again from scratch.
-                echo "   rebuild  $name (its last build failed)"
-                hyprpm remove "$name"
+                echo "   rebuild  $repo (its last build failed)"
+                hyprpm remove "$repo"
                 hyprpm add "$url"
                 ;;
             missing) hyprpm add "$url" ;;
         esac
-        hyprpm enable "$name"
+        hyprpm enable "$plugin"
     done
     hyprpm reload
 }

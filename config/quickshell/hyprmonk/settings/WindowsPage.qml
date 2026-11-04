@@ -108,7 +108,7 @@ ColumnLayout {
 
                 Choice {
                     key: "layout"
-                    labels: ({ dwindle: "Dwindle", master: "Master", scrolling: "Scrolling" })
+                    labels: ({ dwindle: "Dwindle", master: "Master", scrolling: "Scrolling", floating: "Floating" })
                 }
             }
 

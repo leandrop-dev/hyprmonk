@@ -50,7 +50,8 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
 - A launcher for apps, commands, SSH hosts and the clipboard history.
 - Settings: each screen's resolution, refresh rate and scale, and where screens
   sit by dragging them on a map (a change goes back by itself unless kept),
-  gaps, borders, blur, shadows, the tiling layout and animations, the bar's
+  gaps, borders, blur, shadows, the layout (three tiling ones, or every
+  window floating, resized from its borders) and animations, the bar's
   modules by drag and drop with its clock, workspaces and temperature unit,
   and the appearance: the tone with each one's card opacity, blur and text
   colour, the spectrum's style, fastfetch's look and the login screen's
@@ -211,8 +212,9 @@ each one while the pointer is over it:
 
 The list keeps the dark tones and the light ones under their own headings.
 
-The tone reaches past the shell: Hyprland's window borders, kitty (live, in
-open terminals), the starship prompt and zsh's highlighting (from the next
+The tone reaches past the shell: Hyprland's window borders and the Floating
+layout's title bars, kitty (live, in open terminals, and translucent at the
+tone's card opacity), the starship prompt and zsh's highlighting (from the next
 prompt), fastfetch (the same, in the look picked), btop (live), Vesktop through its
 Quick CSS (live), Zed (live), Zen and Heroic (at their next start), GTK apps
 through adw-gtk3, Qt and KDE apps through qt6ct with Breeze and a KDE colour
@@ -327,12 +329,11 @@ cargo clippy --all-targets -- -D warnings
 
 In this order.
 
-1. **A floating layout.** A fourth layout in Settings > Windows, familiar to
-   anyone coming from Windows: every window floats, with a title bar in the
-   tone's colours and close and maximise buttons (the hyprbars plugin, loaded
-   like the overview's). Windows resize from their borders and snap to the
-   screen's edges and to each other. The title bars show only in this layout.
-   Minimising still needs a way back, from the bar or the launcher.
+1. **Title bars for the floating layout.** In the Floating layout, a title
+   bar in the tone's colours with close and maximise buttons (the hyprbars
+   plugin, loaded like the overview's), on the apps that draw none of their
+   own, such as kitty and mpv. Minimising still needs a way back, from the
+   bar or the launcher.
 2. **Sound effects.** Soft sounds for clicks, switches, cards opening and
    notifications, turned on or off with their own volume in Settings >
    Appearance, and quiet in game mode and do not disturb. The sounds from a
@@ -362,6 +363,10 @@ An open list, in no fixed order.
   game launcher for every store with Proton and mods, and Cloister, a file
   manager to take over from Nautilus. hyprmonk will install them, give them
   keys and the tone (Zendo needs the tone's colours written to a file).
+- Vesktop through a theme of its own instead of Quick CSS: a theme file in
+  Vencord's themes folder, based on [Midnight](https://github.com/refact0r/midnight-discord)
+  (MIT) and recoloured by the tone, translucent through Vencord's transparent
+  window, as plasmonk-kde did it. Quick CSS is left for your own tweaks.
 - The cards' open and close animations on one shared curve and speed.
 - Apps the tone does not reach yet, starting from those serpantinum themes.
 - Fedora, with its own package list, last of all. Notes for then: some

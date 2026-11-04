@@ -45,7 +45,7 @@ Singleton {
     // Settings > Windows' choices beside the sliders, kept with them; the
     // first of each is look.lua's. A speed scales every animation's time.
     readonly property var windowChoices: ({
-        layout: ["dwindle", "master", "scrolling"],
+        layout: ["dwindle", "master", "scrolling", "floating"],
         shadows: [true, false],
         animations: [true, false],
         animationSpeed: ["normal", "fast", "slow"]
@@ -332,7 +332,11 @@ Singleton {
     // function, left alone by a look.lua without it.
     function choiceLine(key: string, value: var): string {
         switch (key) {
-        case "layout": return `hl.config({ general = { layout = "${value}" } })`;
+        // Floating is no Hyprland layout: windows float over dwindle
+        // (hypr/floating.lua).
+        case "layout": return value === "floating"
+            ? `hl.config({ general = { layout = "dwindle" } })\nhyprmonk_floating(true)`
+            : `hl.config({ general = { layout = "${value}" } })`;
         case "shadows": return `hl.config({ decoration = { shadow = { enabled = ${value} } } })`;
         case "animations": return `hl.config({ animations = { enabled = ${value} } })`;
         case "animationSpeed": return `if hyprmonk_animations then hyprmonk_animations(${animationScale[value]}) end`;
@@ -341,10 +345,12 @@ Singleton {
     }
 
     // Game mode holds shadows and animations off until it ends; its reload
-    // then reads settings.lua.
+    // then reads settings.lua. A layout change also floats the open windows
+    // or tiles back those the Floating layout floated.
     function applyChoice(key: string, value: var): void {
         if (GameMode.on && (key === "shadows" || key === "animations")) return;
-        Quickshell.execDetached(["hyprctl", "eval", choiceLine(key, value)]);
+        const floating = key === "layout" ? `\nhyprmonk_floating_switch(${value === "floating"})` : "";
+        Quickshell.execDetached(["hyprctl", "eval", choiceLine(key, value) + floating]);
     }
 
     function setWindowChoice(key: string, value: var): void {
