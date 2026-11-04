@@ -1,8 +1,8 @@
 // Settings > Appearance: the tone, its cards and text (kept with that tone;
 // only colours that read on its background are offered or taken), the
-// spectrum's style, fastfetch's look and the login screen's look. A tone or
-// a spectrum style under the pointer is shown until it leaves. The page
-// scrolls.
+// spectrum's style, how a new wallpaper comes in, fastfetch's look and the
+// login screen's look. A tone or a spectrum style under the pointer is shown
+// until it leaves. The page scrolls.
 import QtQuick
 import QtQuick.Layouts
 import qs
@@ -265,6 +265,28 @@ Flickable {
                             else if (Cava.previewStyle === style.modelData) Cava.previewStyle = "";
                         }
                     }
+                }
+            }
+        }
+
+        SectionLabel {
+            Layout.topMargin: 12
+            text: "Wallpaper changes"
+        }
+
+        Flow {
+            Layout.fillWidth: true
+            spacing: 6
+
+            Repeater {
+                model: Wallpaper.transitions
+
+                Chip {
+                    required property string modelData
+
+                    text: ({ fade: "Fade", wipe: "Wipe", circle: "Circle", random: "Random" })[modelData]
+                    on: modelData === Wallpaper.transition
+                    onClicked: Wallpaper.setTransition(modelData)
                 }
             }
         }

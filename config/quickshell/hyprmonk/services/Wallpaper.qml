@@ -3,7 +3,11 @@
 // one folder (~/Pictures/Wallpapers unless wallpaper.json names another).
 // Setting one also runs matugen on it, so the accent follows.
 //
-// IPC: qs -c hyprmonk ipc call wallpaper set PATH | random | get
+// How a new one comes in, `transition`, is kept there too (Settings >
+// Appearance): fading in, wiping across, a circle growing from where it was
+// picked, or one of those at random.
+//
+// IPC: qs -c hyprmonk ipc call wallpaper set PATH | random | get | transition NAME| random | get
 pragma Singleton
 
 import QtQuick
@@ -19,21 +23,37 @@ Singleton {
     readonly property string folder: settings.folder || Quickshell.env("HOME") + "/Pictures/Wallpapers"
     property var files: []  // paths, by name
 
+    readonly property list<string> transitions: ["fade", "wipe", "circle", "random"]
+    readonly property string transition: transitions.includes(settings.transition) ? settings.transition : "fade"
+    // Where the last pick was made, on the whole desktop (the picker's tile),
+    // or null: a circle then grows from the middle of each screen.
+    property var origin: null
+
+    function setTransition(name: string): void {
+        if (transitions.includes(name)) settings.transition = name === "fade" ? "" : name;
+    }
+
     // A picture's small copy for the picker (`hyprmonk thumbnails`).
     function thumbnail(file: string): string {
         return (Quickshell.env("XDG_CACHE_HOME") || Quickshell.env("HOME") + "/.cache")
             + "/hyprmonk/wallpapers/" + file.split("/").pop() + ".jpg";
     }
 
-    // Taken once matugen has read it: a path that is no picture changes
-    // nothing, and the colours change with the picture.
-    function set(file: string): void {
+    // Shown at once, while matugen makes its colours (up to a second for a
+    // large picture), which follow when it is done. Should matugen not read
+    // it (no picture), the last one it read comes back.
+    property string lastGood: ""
+
+    function set(file: string, from: var): void {
+        if (file === settings.path) return;
+        origin = from ?? null;
+        settings.path = file;
         colours.from(file);
     }
 
     function random(): void {
         const others = files.filter(file => file !== path);
-        if (others.length > 0) set(others[Math.floor(Math.random() * others.length)]);
+        if (others.length > 0) set(others[Math.floor(Math.random() * others.length)], null);
     }
 
     FolderListModel {
@@ -84,8 +104,12 @@ Singleton {
         }
 
         onExited: code => {
-            if (code === 0) settings.path = file;
-            else console.warn("wallpaper: matugen could not read", file);
+            if (code === 0) {
+                root.lastGood = file;
+            } else {
+                console.warn("wallpaper: matugen could not read", file);
+                if (settings.path === file && next === "") settings.path = root.lastGood;
+            }
             if (next === "") return;
             const queued = next;
             next = "";
@@ -121,6 +145,7 @@ Singleton {
         onAdapterUpdated: writeAdapter()
         onLoaded: {
             root.settingsRead = true;
+            if (root.lastGood === "") root.lastGood = settings.path;
             root.makeFirstColours();
         }
 
@@ -128,6 +153,7 @@ Singleton {
             id: settings
             property string path: ""
             property string folder: ""
+            property string transition: ""
         }
     }
 
@@ -135,7 +161,7 @@ Singleton {
         target: "wallpaper"
 
         function set(path: string): void {
-            root.set(path);
+            root.set(path, null);
         }
 
         function random(): void {
@@ -144,6 +170,10 @@ Singleton {
 
         function get(): string {
             return root.path;
+        }
+
+        function transition(name: string): void {
+            root.setTransition(name);
         }
     }
 }

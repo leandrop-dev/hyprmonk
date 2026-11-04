@@ -52,8 +52,20 @@ Scope {
         if (shown.length > 0) current = Math.max(0, Math.min(shown.length - 1, current + step));
     }
 
+    // The picked tile's middle on the screen is where a circle transition
+    // starts (wallpaper/Background.qml). The card's window is centred on its
+    // screen.
     function pick(): void {
-        if (current < shown.length) Wallpaper.set(shown[current]);
+        if (current >= shown.length) return;
+        const tile = grid.itemAtIndex(current);
+        const screen = window.screen;
+        let from = null;
+        if (tile && screen) {
+            const at = tile.mapToItem(null, tile.width / 2, tile.height / 2);
+            from = Qt.point(screen.x + (screen.width - window.width) / 2 + at.x,
+                            screen.y + (screen.height - window.height) / 2 + at.y);
+        }
+        Wallpaper.set(shown[current], from);
     }
 
     onOpenChanged: {

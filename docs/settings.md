@@ -27,7 +27,15 @@ config. Hyprland options are also written to `settings.lua`, loaded after
   and Login look rows): the tone, shown while the pointer is over it; the
   saved tone's card opacity, blur behind the cards on or off, and text colour,
   which apps follow too, kept per tone in `appearance.json` with a reset; the
-  spectrum's style, also shown under the pointer; fastfetch's look; the login
+  spectrum's style, also shown under the pointer; how a new wallpaper
+  comes in (`wallpaper/Background.qml`, kept as `transition` in
+  `wallpaper.json`): fading in (400 ms), a soft edge wiping across from one
+  of eight directions at random (900 ms), a soft circle growing from the
+  picker's tile, the same spot on every screen, or the middle when set
+  another way (1100 ms), or one of those at random; drawn through a
+  MultiEffect mask, no shaders of our own. The picture shows at once and
+  matugen's colours follow (`wallpaper transition <name>` over IPC);
+  fastfetch's look; the login
   screen's look. The page scrolls. How strong blur is stays on the Windows
   page: Hyprland has one strength for everything.
 - [x] Bar: drag modules to reorder them, move them between the left and right

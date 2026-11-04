@@ -60,7 +60,8 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   modules by drag and drop, at the top or the bottom, with its clock,
   workspaces (pills, numbers, dots or a chomper) and temperature unit, the dock (where it sits, whose windows,
   its size, hiding and growing icons), and the appearance: the tone with each one's card opacity, blur and text
-  colour, the spectrum's style, fastfetch's look and the login screen's
+  colour, the spectrum's style, how a new wallpaper comes in (fade, wipe,
+  a circle from where it was picked, or any), fastfetch's look and the login screen's
   look; the sounds (on or off, hyprmonk's set or serpantinum's, their
   volume and the notification tone); keyboard layouts, the mouse and focus; when the screen locks and the
   screens go off; what recordings hear, their quality and where they go; how
@@ -207,7 +208,8 @@ Wallpapers come from `~/Pictures/Wallpapers`; the installer downloads the
 cosmic-noir set there and starts with `noir-anime.png`. Another folder: set
 `folder` in `~/.local/state/hyprmonk/wallpaper.json`. The picker draws from
 thumbnails in `~/.cache/hyprmonk/wallpapers`, kept up to date as pictures come
-and go.
+and go. A new wallpaper shows at once, coming in as picked in Settings >
+Appearance, and the colours follow once matugen has read it.
 
 ## Colours
 
@@ -340,12 +342,9 @@ cargo clippy --all-targets -- -D warnings
 
 In this order.
 
-1. **Wallpaper transitions.** Besides today's fade, a wipe and a circle that
-   grows from where the wallpaper was picked, or one at random, picked in
-   Settings > Appearance.
-2. **Tone cards.** Settings > Appearance shows each tone as a small preview
+1. **Tone cards.** Settings > Appearance shows each tone as a small preview
    (its background, a card, the accent and the text) instead of its name.
-3. **Headset and microphone effects.** Two switches in the sound panel, with
+2. **Headset and microphone effects.** Two switches in the sound panel, with
    no EasyEffects: an equaliser preset for the headphones (AutoEQ's for the
    Arctis Nova 7 first) and noise suppression for the microphone (rnnoise).
    Each one shows as a device of its own and becomes the default while on.
