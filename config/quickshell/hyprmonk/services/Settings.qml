@@ -392,6 +392,50 @@ Singleton {
         }
     }
 
+    // Settings > Sounds (services/Sounds.qml), the first of each to begin
+    // with: sounds on or off, the set (assets/sounds/<set>), and the
+    // notification tone: the set's own, our chime, or one of serpantinum's.
+    readonly property var soundChoices: ({
+        on: [true, false],
+        set: ["hyprmonk", "serpantinum"],
+        tone: ["set", "chime", "Botanica", "Curious", "Progress", "Sine", "Sneak", "WakeUp", "Wobbly"]
+    })
+    // Their volume, in percent of the sound's own.
+    readonly property var soundVolumeRange: ({ from: 0, to: 100, value: 50 })
+    readonly property var soundChoiceValues: {
+        const values = {};
+        const kept = saved.sounds;
+        for (const key of Object.keys(soundChoices))
+            if (key in kept && soundChoices[key].includes(kept[key])) values[key] = kept[key];
+        return values;
+    }
+    readonly property int soundVolume: typeof saved.sounds.volume === "number" ? clamp(soundVolumeRange, saved.sounds.volume) : soundVolumeRange.value
+    readonly property bool soundsChanged: Object.keys(soundChoiceValues).length > 0 || soundVolume !== soundVolumeRange.value
+
+    function soundChoice(key: string): var {
+        return soundChoiceValues[key] ?? soundChoices[key][0];
+    }
+
+    function setSoundChoice(key: string, value: var): void {
+        if (!soundChoices[key]?.includes(value)) return;
+        const next = Object.assign({}, saved.sounds);
+        if (value === soundChoices[key][0]) delete next[key];
+        else next[key] = value;
+        saved.sounds = next;
+    }
+
+    function setSoundVolume(value: real): void {
+        const next = Object.assign({}, saved.sounds);
+        const volume = clamp(soundVolumeRange, value);
+        if (volume === soundVolumeRange.value) delete next.volume;
+        else next.volume = volume;
+        saved.sounds = next;
+    }
+
+    function resetSounds(): void {
+        saved.sounds = {};
+    }
+
     function clamp(option: var, value: real): int {
         return Math.max(option.from, Math.min(option.to, Math.round(value)));
     }
@@ -479,6 +523,7 @@ Singleton {
             property var bar: ({})
             property var barLook: ({})
             property var dock: ({})
+            property var sounds: ({})
             property var display: ({})
             property string mainScreen: ""
             property var input: ({})

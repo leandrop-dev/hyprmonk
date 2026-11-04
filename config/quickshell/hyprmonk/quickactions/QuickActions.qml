@@ -222,6 +222,7 @@ Scope {
 
     function run(item: var): void {
         if (!item) return;
+        Sounds.play(!opened && item.on !== undefined ? (item.on ? "off" : "on") : "click", false);
         if (opened) {
             opened.picked(item.label);
             if (opened.stays) back();
@@ -386,6 +387,7 @@ Scope {
                     visible: isSwitch || row.modelData.value !== ""
                     text: isSwitch ? (row.modelData.on ? "on" : "off") : row.modelData.value
                     on: row.modelData.on
+                    sounds: false
                     onClicked: root.run(row.modelData)
                 }
             }

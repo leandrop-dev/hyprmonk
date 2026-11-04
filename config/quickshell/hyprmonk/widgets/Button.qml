@@ -1,6 +1,7 @@
 // A button with a label: a dim fill, or the accent for the main action.
 import QtQuick
 import qs
+import qs.services
 
 Rectangle {
     id: button
@@ -37,6 +38,9 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onClicked: button.clicked()
+        onClicked: {
+            Sounds.play("click", false);
+            button.clicked();
+        }
     }
 }

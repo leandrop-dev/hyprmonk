@@ -3,6 +3,7 @@
 import QtQuick
 import QtQuick.Layouts
 import qs
+import qs.services
 
 Rectangle {
     id: option
@@ -60,6 +61,9 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onClicked: option.clicked()
+        onClicked: {
+            Sounds.play("click", false);
+            option.clicked();
+        }
     }
 }

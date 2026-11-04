@@ -19,6 +19,7 @@ Overlay {
         { name: "Bar", icon: "\u{F0570}", file: "BarPage.qml" },
         { name: "Dock", icon: "\u{F10A9}", file: "DockPage.qml" },
         { name: "Appearance", icon: "\u{F050E}", file: "AppearancePage.qml" },
+        { name: "Sounds", icon: "\u{F057E}", file: "SoundsPage.qml" },
         { name: "Input", icon: "\u{F030C}", file: "InputPage.qml" },
         { name: "Power", icon: "\u{F0425}", file: "PowerPage.qml" },
         { name: "Recording", icon: "\u{F044A}", file: "RecordingPage.qml" },

@@ -22,7 +22,12 @@ import qs.settings
 import qs.wallpaper
 
 ShellRoot {
-    Component.onCompleted: Idle.start()
+    // Sounds listens for cards, panels and devices from the start (and
+    // answers IPC), so it is loaded here rather than at the first click.
+    Component.onCompleted: {
+        Idle.start();
+        void Sounds.on;
+    }
 
     ThemeOutputs {}
     Background {}

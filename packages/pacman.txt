@@ -12,7 +12,7 @@ uwsm
 sddm   # the login screen, with sddm-astronaut-theme (install.sh login)
 qt6-svg   # the theme's icons
 qt6-virtualkeyboard   # the theme's on-screen keyboard
-qt6-multimedia-ffmpeg   # the theme's video backgrounds
+qt6-multimedia-ffmpeg   # the theme's video backgrounds, and the shell's sounds
 
 # Shell and theming
 quickshell

@@ -161,6 +161,8 @@ Singleton {
             const popups = [notification, ...root.popups];
             root.popups = popups.slice(0, root.maxPopups);
             popups.slice(root.maxPopups).forEach(root.neverShown);
+            // Shown, so heard even in do not disturb (an urgent one).
+            Sounds.play("notify", true);
         }
     }
 

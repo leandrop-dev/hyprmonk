@@ -4,7 +4,7 @@ A centred card (Super+comma, or quick actions > Settings) with its pages down
 the side. Ideas from noctalia, Ryoku and Shibumi Shell,
 no code from them.
 
-The Display, Windows, Bar, Input and Power pages keep to `settings.json` in the
+The Display, Windows, Bar, Dock, Sounds, Input and Power pages keep to `settings.json` in the
 state directory, holding only what was changed, so the rest follows the repo's
 config. Hyprland options are also written to `settings.lua`, loaded after
 `look.lua` and `input.lua`, and applied at once with `hyprctl eval`.
@@ -50,6 +50,19 @@ config. Hyprland options are also written to `settings.lua`, loaded after
   the pointer; and a dot per window. Kept in `dock`. Also over IPC: `qs -c
   hyprmonk ipc call dock set <key> <value>`, `dock toggle`, and for the bar
   `bar move <module> <left|right|hidden> <index>` and `bar set <key> <value>`.
+- [x] Sounds (`services/Sounds.qml`): sounds on or off (on to begin with);
+  the set, hyprmonk's own (`assets/sounds/hyprmonk`, sine waves made by its
+  `make.sh` with ffmpeg) or serpantinum's (copied under its AGPL, see the
+  README beside them); their volume, 0 to 100% (50), squared so the middle
+  sounds half as loud; and the notification tone: the set's own, the
+  hyprmonk chime, or one of serpantinum's seven. A click on a button, chip or
+  row clicks, a switch sounds on or off, a card or bar panel opening or
+  closing sweeps, a shown notification chimes, and the network going online
+  or off or a Bluetooth device coming or going (not as the shell starts)
+  plays connect or disconnect. Quiet in game mode and do not disturb, except
+  for a notification shown anyway. Each set is one WAV per kind, since Qt's
+  SoundEffect plays WAV. Kept in `sounds`; over IPC, `qs -c hyprmonk ipc call
+  sounds play <kind>` and `sounds set <on|set|tone|volume> <value>`.
 - [x] Display: resolution, refresh rate and scale, for each screen, picked first
   and applied together. An applied change is only tried until kept, and goes
   back after 15 seconds, so a mode the screen cannot show fixes itself and a

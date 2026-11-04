@@ -2,12 +2,14 @@
 // while on.
 import QtQuick
 import qs
+import qs.services
 
 Rectangle {
     id: chip
 
     property string text: ""
     property var on: undefined  // undefined: a plain button
+    property bool sounds: true  // false where the click is heard elsewhere
 
     signal clicked()
 
@@ -35,6 +37,9 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onClicked: chip.clicked()
+        onClicked: {
+            if (chip.sounds) Sounds.play(!chip.isSwitch ? "click" : chip.on ? "off" : "on", false);
+            chip.clicked();
+        }
     }
 }

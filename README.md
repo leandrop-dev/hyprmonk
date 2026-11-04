@@ -61,7 +61,8 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   workspaces and temperature unit, the dock (where it sits, whose windows,
   its size, hiding and growing icons), and the appearance: the tone with each one's card opacity, blur and text
   colour, the spectrum's style, fastfetch's look and the login screen's
-  look; keyboard layouts, the mouse and focus; when the screen locks and the
+  look; the sounds (on or off, hyprmonk's set or serpantinum's, their
+  volume and the notification tone); keyboard layouts, the mouse and focus; when the screen locks and the
   screens go off; what recordings hear, their quality and where they go; how
   long notifications stay, their corner, how many show and how many are kept.
 - Quick actions: wallpaper, game mode, screen recording, power profile, audio
@@ -69,6 +70,9 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   only, kept or undone in 15 s), do not disturb, stay awake (the screen
   neither locks nor goes off until it is turned off; also a cup on the bar),
   settings and the power menu.
+- Soft sounds for clicks, switches, cards and panels opening and closing,
+  notifications and devices connecting, in two sets, quiet in game mode and
+  do not disturb.
 - Notifications with a notification centre, an on-screen card for what just
   changed (volume, microphone, audio output, keyboard layout, Caps and Num
   Lock, game mode, stay awake, power profile), a lock screen (on a key and
@@ -318,7 +322,7 @@ cargo clippy --all-targets -- -D warnings
 |------|------|
 | `install.sh` | The installer: the menu and every step |
 | `config/hypr/` | Hyprland in Lua: `hyprland.lua` loads `look`, `input`, `floating`, `minimise`, `binds`, `rules`, `plugins`, `gamemode`; `hypridle.conf` |
-| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `bar/`, `dock/`, `panels/`, `launcher/`, `quickactions/`, `notifications/`, `osd/`, `lock/`, `power/`, `keyguide/`, `screenshot/`, `wallpaper/`, `polkit/`, `services/`, `widgets/` |
+| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `bar/`, `dock/`, `panels/`, `launcher/`, `quickactions/`, `notifications/`, `osd/`, `lock/`, `power/`, `keyguide/`, `screenshot/`, `wallpaper/`, `polkit/`, `services/`, `widgets/`, `assets/` (the sounds, the cat's font) |
 | `config/matugen/` | Templates for Hyprland, the shell and kitty |
 | `config/kitty/` | kitty, with the Noir palette |
 | `config/zsh/`, `config/starship/` | zsh and its prompt |
@@ -336,19 +340,15 @@ cargo clippy --all-targets -- -D warnings
 
 In this order.
 
-1. **Sound effects.** Soft sounds for clicks, switches, cards opening and
-   notifications, turned on or off with their own volume in Settings >
-   Appearance, and quiet in game mode and do not disturb. The sounds from a
-   CC0 pack, their licence kept beside them.
-2. **Workspace styles.** Settings > Bar picks how the workspaces look: pills
+1. **Workspace styles.** Settings > Bar picks how the workspaces look: pills
    as now, numbers, dots, or a pac-man that travels to the active workspace
    eating the dots on its way.
-3. **Wallpaper transitions.** Besides today's fade, a wipe and a circle that
+2. **Wallpaper transitions.** Besides today's fade, a wipe and a circle that
    grows from where the wallpaper was picked, or one at random, picked in
    Settings > Appearance.
-4. **Tone cards.** Settings > Appearance shows each tone as a small preview
+3. **Tone cards.** Settings > Appearance shows each tone as a small preview
    (its background, a card, the accent and the text) instead of its name.
-5. **Headset and microphone effects.** Two switches in the sound panel, with
+4. **Headset and microphone effects.** Two switches in the sound panel, with
    no EasyEffects: an equaliser preset for the headphones (AutoEQ's for the
    Arctis Nova 7 first) and noise suppression for the microphone (rnnoise).
    Each one shows as a device of its own and becomes the default while on.
@@ -370,6 +370,8 @@ An open list, in no fixed order.
   (MIT) and recoloured by the tone, translucent through Vencord's transparent
   window, as plasmonk-kde did it. Quick CSS is left for your own tweaks.
 - The cards' open and close animations on one shared curve and speed.
+- Settings in sub-pages where a page holds several things (Appearance >
+  Tone, Spectrum, Terminal, Login), and the sidebar grouped.
 - Apps the tone does not reach yet, starting from those serpantinum themes.
 - Fedora, with its own package list, last of all. Notes for then: some
   packages come from the Terra repository, and gpu-screen-recorder has no
@@ -396,6 +398,8 @@ An open list, in no fixed order.
   and [serpantinum](https://github.com/ilyamiro/serpantinum), and the zsh
   setup's from [Ryoku](https://github.com/Ryoku-dev/ryoku); no code taken from
   any of them.
+- The serpantinum sound set, copied under its AGPL-3.0 with a note of where
+  each file came from (`assets/sounds/serpantinum`).
 - The Rival 3 Wireless battery protocol from [rivalcfg](https://github.com/flozz/rivalcfg).
 - The running cat's font from [runcat-text](https://github.com/AlejandroMinor/runcat-text)
   (BSD-2-Clause, its licence in `config/quickshell/hyprmonk/assets/runcat/`),
