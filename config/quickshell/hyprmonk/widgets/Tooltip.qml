@@ -1,10 +1,12 @@
-// A tooltip below `target`: the first line of `text` in bold, the rest in
-// columns as given (spaces kept). A popup of the bar, so nothing blurs
+// A tooltip below `target`, or above it while the bar is at the screen's
+// bottom: the first line of `text` in bold, the rest in columns as given
+// (spaces kept). A popup of the bar, so nothing blurs
 // behind it: the card is nearly opaque.
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import qs
+import qs.services
 
 PopupWindow {
     id: tip
@@ -14,11 +16,14 @@ PopupWindow {
 
     readonly property var lines: text.split("\n")
 
+    readonly property bool above: Settings.barAtBottom
+
     anchor.item: target
+    anchor.rect.y: above ? -8 : 0
     anchor.rect.width: target.width
     anchor.rect.height: target.height + 8
-    anchor.edges: Edges.Bottom
-    anchor.gravity: Edges.Bottom
+    anchor.edges: above ? Edges.Top : Edges.Bottom
+    anchor.gravity: above ? Edges.Top : Edges.Bottom
     implicitWidth: card.implicitWidth
     implicitHeight: card.implicitHeight
     visible: true

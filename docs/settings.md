@@ -31,7 +31,8 @@ config. Hyprland options are also written to `settings.lua`, loaded after
   screen's look. The page scrolls. How strong blur is stays on the Windows
   page: Hyprland has one strength for everything.
 - [x] Bar: drag modules to reorder them, move them between the left and right
-  cards, or hide them. A panel opens under the card holding its module.
+  cards, or hide them. The bar sits at the top or the bottom of the screen;
+  a panel opens from the card holding its module, below it or above it.
   Recording and Replay cannot be hidden, and the centre card stays as it is:
   its fitting rules depend on it. Below them: the clock in 24 or 12 hours,
   with seconds and the date or without; the workspaces in use, or always 1 to
@@ -47,8 +48,8 @@ config. Hyprland options are also written to `settings.lua`, loaded after
   touches it (floating windows' places are read twice a second while that is
   picked), coming back as the pointer reaches the edge; icons growing under
   the pointer; and a dot per window. Kept in `dock`. Also over IPC: `qs -c
-  hyprmonk ipc call dock set <key> <value>`, `dock toggle`, and `bar move
-  <module> <left|right|hidden> <index>` for the bar's modules.
+  hyprmonk ipc call dock set <key> <value>`, `dock toggle`, and for the bar
+  `bar move <module> <left|right|hidden> <index>` and `bar set <key> <value>`.
 - [x] Display: resolution, refresh rate and scale, for each screen, picked first
   and applied together. An applied change is only tried until kept, and goes
   back after 15 seconds, so a mode the screen cannot show fixes itself and a

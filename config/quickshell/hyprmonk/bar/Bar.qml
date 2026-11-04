@@ -1,9 +1,11 @@
-// The bar on one screen: three floating cards (left, centre, right) on a
-// transparent strip. Only the cards are drawn, so Hyprland's blur (rules.lua,
-// namespace hyprmonk-bar) applies to them alone.
+// The bar on one screen, at its top or bottom (Settings > Bar): three floating
+// cards (left, centre, right) on a transparent strip. Only the cards are
+// drawn, so Hyprland's blur (rules.lua, namespace hyprmonk-bar) applies to
+// them alone.
 //
-// A card grows down into a panel (Panels.open), so the window always has room
-// below the cards: resizing it as a panel opens would make the animation jump.
+// A card grows into a panel (Panels.open), down from a bar at the top and up
+// from one at the bottom, so the window always has room beside the cards:
+// resizing it as a panel opens would make the animation jump.
 // Windows still keep only the bar's own height clear, and clicks reach the
 // cards alone (the mask); the rest of the window lets them through.
 import QtQuick
@@ -18,6 +20,7 @@ PanelWindow {
     id: bar
 
     readonly property int baseHeight: Theme.barHeight + Theme.barGap * 2
+    readonly property bool atBottom: Settings.barAtBottom
     readonly property bool panelOpen: Panels.open !== "" && Panels.screen === screen?.name
 
     // The strip the centre card has between the others. It stays centred while
@@ -44,7 +47,8 @@ PanelWindow {
     readonly property bool panelOnLeft: Panels.open !== "" && Settings.bar.left.some(key => Settings.barPanel(key) === Panels.open)
 
     anchors {
-        top: true
+        top: !bar.atBottom
+        bottom: bar.atBottom
         left: true
         right: true
     }
@@ -86,8 +90,10 @@ PanelWindow {
         side: Qt.AlignLeft
         anchors.left: parent.left
         anchors.leftMargin: Theme.barMargin
-        anchors.top: parent.top
-        anchors.topMargin: Theme.barGap
+        // Placed, not anchored: swapping a top anchor for a bottom one leaves
+        // the card stretched between both for good.
+        y: bar.atBottom ? bar.height - height - Theme.barGap : Theme.barGap
+        atBottom: bar.atBottom
         visible: Settings.bar.left.length > 0
         panel: bar.panelOnLeft ? bar.openPanel : null
 
@@ -105,8 +111,10 @@ PanelWindow {
         id: centreCard
 
         x: Math.round(Math.max(bar.freeLeft, Math.min((bar.width - width) / 2, bar.freeRight - width)))
-        anchors.top: parent.top
-        anchors.topMargin: Theme.barGap
+        // Placed, not anchored: swapping a top anchor for a bottom one leaves
+        // the card stretched between both for good.
+        y: bar.atBottom ? bar.height - height - Theme.barGap : Theme.barGap
+        atBottom: bar.atBottom
         panel: mediaOpen ? mediaPanel : null
         panelWidth: 490
         visible: bar.freeWidth >= spectrum.implicitWidth + Theme.cardPadding * 2
@@ -165,8 +173,10 @@ PanelWindow {
         side: Qt.AlignRight
         anchors.right: parent.right
         anchors.rightMargin: Theme.barMargin
-        anchors.top: parent.top
-        anchors.topMargin: Theme.barGap
+        // Placed, not anchored: swapping a top anchor for a bottom one leaves
+        // the card stretched between both for good.
+        y: bar.atBottom ? bar.height - height - Theme.barGap : Theme.barGap
+        atBottom: bar.atBottom
         visible: Settings.bar.right.length > 0 || panel !== null
         panel: bar.panelOnLeft ? null : bar.openPanel
 

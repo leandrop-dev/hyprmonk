@@ -221,6 +221,15 @@ Item {
         }
 
         Row {
+            text: "Position"
+
+            Choice {
+                key: "position"
+                labels: ({ top: "Top", bottom: "Bottom" })
+            }
+        }
+
+        Row {
             text: "Clock"
 
             Choice {

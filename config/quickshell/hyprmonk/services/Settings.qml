@@ -270,18 +270,26 @@ Singleton {
     }
 
     // qs -c hyprmonk ipc call bar move windows left 3  (side: left, right or hidden)
+    // qs -c hyprmonk ipc call bar set position bottom  (or hours 12, seconds true, ...)
     IpcHandler {
         target: "bar"
 
         function move(key: string, side: string, index: int): void {
             if (root.barModule(key) && ["left", "right", "hidden"].includes(side)) root.moveBarModule(key, side, index);
         }
+
+        function set(key: string, value: string): void {
+            // The clock's hours are strings, the workspaces numbers.
+            const typed = value === "true" ? true : value === "false" ? false : /^\d+$/.test(value) ? Number(value) : value;
+            root.setBarChoice(key, (root.barChoices[key] ?? []).includes(value) ? value : typed);
+        }
     }
 
-    // How the bar's clock, workspaces and temperatures show, the first of each
-    // to begin with. `workspaces` 0 shows those in use; more always shows
-    // 1 to that many, empty ones dim.
+    // Where the bar sits, and how its clock, workspaces and temperatures show,
+    // the first of each to begin with. `workspaces` 0 shows those in use; more
+    // always shows 1 to that many, empty ones dim.
     readonly property var barChoices: ({
+        position: ["top", "bottom"],
         hours: ["24", "12"],
         seconds: [false, true],
         date: [true, false],
@@ -300,6 +308,8 @@ Singleton {
     function barChoice(key: string): var {
         return barChoiceValues[key] ?? barChoices[key][0];
     }
+
+    readonly property bool barAtBottom: barChoice("position") === "bottom"
 
     function setBarChoice(key: string, value: var): void {
         if (!barChoices[key].includes(value)) return;

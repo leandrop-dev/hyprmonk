@@ -1,7 +1,8 @@
 // The window list on the bar (Settings > Bar; hidden to begin with, as the
 // dock shows the same): the open apps as the dock's buttons (dock/DockApp.qml),
 // sized to the bar, with the same clicks and the same list of windows on
-// hover, opening below. Whose windows: as Settings > Dock picks.
+// hover, opening away from the bar's edge. Whose windows: as Settings > Dock
+// picks.
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -31,7 +32,7 @@ RowLayout {
             required property string modelData
             group: list.groups.find(g => g.key === modelData) ?? null
             size: Theme.barHeight - Theme.cardPadding * 2
-            edge: Edges.Top
+            edge: Settings.barAtBottom ? Edges.Bottom : Edges.Top
             listOwner: list.listOwner
             onListWanted: who => list.listOwner = who
         }

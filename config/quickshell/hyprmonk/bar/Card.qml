@@ -21,6 +21,10 @@ Rectangle {
     // its modules (a handler given to the card would land in its row).
     readonly property alias hovered: hover.hovered
 
+    // On a bar at the screen's bottom: the modules along the card's bottom,
+    // the panel above them, unfolding upwards.
+    property bool atBottom: false
+
     // The panel being shown; kept while it folds away after `panel` clears.
     property Component shown: null
     property real openness: panel ? 1 : 0
@@ -64,7 +68,7 @@ Rectangle {
         x: card.side === Qt.AlignRight ? card.width - width - Theme.cardPadding
          : card.side === Qt.AlignLeft ? Theme.cardPadding
          : (card.width - width) / 2
-        y: (Theme.barHeight - height) / 2
+        y: (card.atBottom ? card.height - Theme.barHeight : 0) + (Theme.barHeight - height) / 2
         spacing: 2
     }
 
@@ -75,7 +79,7 @@ Rectangle {
         readonly property bool overflows: loader.implicitHeight > card.panelRoom
 
         x: 18
-        y: Theme.barHeight + 6
+        y: card.atBottom ? card.height - Theme.barHeight - 6 - height : Theme.barHeight + 6
         width: card.fullWidth - 36
         height: Math.min(loader.implicitHeight, card.panelRoom)
         contentWidth: width
