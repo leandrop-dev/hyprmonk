@@ -26,9 +26,18 @@ local float_all = hl.window_rule({
 })
 float_all:set_enabled(false)
 
+-- An app asking to be maximized (its own title bar's button, or as it opens)
+-- would fight the tiling layouts; in Floating it is welcome. Hyprland settles
+-- this as a window opens, so a window keeps the answer it opened with.
+local suppress_maximize = hl.window_rule({
+    name  = "suppress-maximize",
+    match = { class = ".*" },
+    suppress_event = "maximize",
+})
+
 -- Title bars (the hyprbars plugin, `install.sh plugins`), in the tone's
--- colours (theme/tone.lua), with close and maximise; a double click also
--- maximises. Apps that draw their own title bar get none.
+-- colours (theme/tone.lua), with close, maximise and minimise (minimise.lua);
+-- a double click also maximises. Apps that draw their own title bar get none.
 local maximise = [[hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" })']]
 local bars = hl.plugin and hl.plugin.hyprbars
 
@@ -59,6 +68,8 @@ if bars then
                       size = 25, icon = "\u{F05AD}", action = "hyprctl dispatch 'hl.dsp.window.close()'" })
     bars.add_button({ bg_color = "rgba(00000000)", fg_color = theme.text, hover_color = wash,
                       size = 25, icon = "\u{F05AF}", action = maximise })
+    bars.add_button({ bg_color = "rgba(00000000)", fg_color = theme.text, hover_color = wash,
+                      size = 25, icon = "\u{F05B0}", action = "hyprctl eval 'hyprmonk_minimise()'" })
 
     hl.window_rule({
         name  = "hyprbars-own-title-bar",
@@ -68,8 +79,32 @@ if bars then
     })
 end
 
+-- Apps drawing their own title bar (Zen, GNOME apps) take their buttons from
+-- GTK's button layout: in Floating, maximise, and minimise once the
+-- minimize-requests plugin passes it on (minimise.lua); elsewhere only close.
+-- Set once the whole config has run, since settings.lua turns Floating on
+-- after this file.
+local floating = false
+
+local function loaded(name)
+    for _, plugin in ipairs(hl.get_loaded_plugins()) do
+        if plugin.name == name then return true end
+    end
+    return false
+end
+
+hl.on("config.reloaded", function()
+    local layout = "appmenu:close"
+    if floating then
+        layout = loaded("minimize-requests") and "appmenu:minimize,maximize,close" or "appmenu:maximize,close"
+    end
+    hl.exec_cmd("gsettings set org.gnome.desktop.wm.preferences button-layout '" .. layout .. "'")
+end)
+
 function hyprmonk_floating(on)
+    floating = on
     float_all:set_enabled(on)
+    suppress_maximize:set_enabled(not on)
     hl.config({ general = { resize_on_border = on, snap = { enabled = on } } })
     if bars then hl.config({ plugin = { hyprbars = { enabled = on } } }) end
 end

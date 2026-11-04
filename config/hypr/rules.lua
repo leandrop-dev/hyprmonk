@@ -1,10 +1,11 @@
 -- Window and layer rules.
 
--- Apps asking to be maximized would fight the tiling layout, and in the
--- Floating layout would open over the whole screen (kitty asks as it opens).
+-- kitty may never maximize itself: it asks as it opens, and in the Floating
+-- layout would open over the whole screen (Super+F still maximizes it). Other
+-- apps may only in the Floating layout (floating.lua).
 hl.window_rule({
-    name  = "suppress-maximize",
-    match = { class = ".*" },
+    name  = "suppress-maximize-kitty",
+    match = { class = "^kitty$" },
     suppress_event = "maximize",
 })
 

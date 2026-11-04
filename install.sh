@@ -541,11 +541,13 @@ step_login() {
 
 # "repository plugin url": the plugin enabled from that repository (hyprpm
 # names a repository after its hyprpm.toml). hyprmonk-plugins is our fork of
-# hyprwm's hyprland-plugins, with hover colours for hyprbars' buttons; of its
-# plugins only hyprbars, the Floating layout's title bars, is used.
+# hyprwm's hyprland-plugins: hyprbars (the Floating layout's title bars, with
+# hover colours on their buttons) and minimize-requests (ours: passes an app's
+# own minimise button on to hypr/minimise.lua).
 PLUGINS=(
     "hymission hymission https://github.com/gfhdhytghd/hymission"
     "hyprmonk-plugins hyprbars https://github.com/leandrop-dev/hyprland-plugins"
+    "hyprmonk-plugins minimize-requests https://github.com/leandrop-dev/hyprland-plugins"
 )
 # Repositories an earlier install added and the list above replaces.
 OLD_PLUGINS=(hyprland-plugins)

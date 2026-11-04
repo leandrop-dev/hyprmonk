@@ -25,6 +25,8 @@ bind(mod .. " + V",         hl.dsp.window.float({ action = "toggle" }),       "T
 bind(mod .. " + F",         hl.dsp.window.fullscreen({ mode = "maximized" }), "Maximize")
 bind(mod .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = "fullscreen" }), "Fullscreen")
 bind(mod .. " + P",         hl.dsp.window.pin(),                              "Pin to every workspace")
+bind(mod .. " + M",         function() hyprmonk_minimise() end,               "Minimise")
+bind(mod .. " + SHIFT + M", function() hyprmonk_restore_last() end,           "Bring back the last minimised window")
 bind(mod .. " + J",         hl.dsp.layout("togglesplit"),                     "Toggle split direction")
 
 local directions = { { "left", "l" }, { "right", "r" }, { "up", "u" }, { "down", "d" } }

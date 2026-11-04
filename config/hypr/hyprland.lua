@@ -33,6 +33,7 @@ hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" 
 require("look")
 require("input")
 require("floating")
+require("minimise")
 -- What Settings changed from look.lua, input.lua and the monitors above
 -- (written by the shell).
 load_optional(state .. "/settings.lua")

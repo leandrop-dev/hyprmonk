@@ -329,24 +329,28 @@ cargo clippy --all-targets -- -D warnings
 
 In this order.
 
-1. **Title bars for the floating layout.** In the Floating layout, a title
-   bar in the tone's colours with close and maximise buttons (the hyprbars
-   plugin, loaded like the overview's), on the apps that draw none of their
-   own, such as kitty and mpv. Minimising still needs a way back, from the
-   bar or the launcher.
-2. **Sound effects.** Soft sounds for clicks, switches, cards opening and
+1. **Dock and minimise.** A second bar, the dock, at the bottom by default
+   (or the top, left or right), listing the open apps with a dot per window;
+   hovering an app lists its windows to pick from. Minimised windows wait,
+   faded, in the dock. Settings > Dock picks where it sits, whether it shows
+   every workspace's windows or the current one's, the icon size, hiding and
+   magnifying. The same list can go on the main bar as a module instead.
+   Minimising itself is done: Super+M, a third title-bar button in Floating,
+   and Super+Shift+M to bring the last one back.
+2. **The main bar at the top or the bottom**, picked in Settings > Bar.
+3. **Sound effects.** Soft sounds for clicks, switches, cards opening and
    notifications, turned on or off with their own volume in Settings >
    Appearance, and quiet in game mode and do not disturb. The sounds from a
    CC0 pack, their licence kept beside them.
-3. **Workspace styles.** Settings > Bar picks how the workspaces look: pills
+4. **Workspace styles.** Settings > Bar picks how the workspaces look: pills
    as now, numbers, dots, or a pac-man that travels to the active workspace
    eating the dots on its way.
-4. **Wallpaper transitions.** Besides today's fade, a wipe and a circle that
+5. **Wallpaper transitions.** Besides today's fade, a wipe and a circle that
    grows from where the wallpaper was picked, or one at random, picked in
    Settings > Appearance.
-5. **Tone cards.** Settings > Appearance shows each tone as a small preview
+6. **Tone cards.** Settings > Appearance shows each tone as a small preview
    (its background, a card, the accent and the text) instead of its name.
-6. **Headset and microphone effects.** Two switches in the sound panel, with
+7. **Headset and microphone effects.** Two switches in the sound panel, with
    no EasyEffects: an equaliser preset for the headphones (AutoEQ's for the
    Arctis Nova 7 first) and noise suppression for the microphone (rnnoise).
    Each one shows as a device of its own and becomes the default while on.
@@ -377,6 +381,11 @@ An open list, in no fixed order.
 
 - Pairing from a phone does not get through while the Bluetooth panel is
   searching, which it does for the first seconds: try again once it stops.
+- The minimise button an app draws itself (Zen, Vesktop, GNOME apps) works
+  only with our minimize-requests plugin, since Hyprland drops the request
+  without telling anyone; `./install.sh plugins` adds it. Apps' own maximise
+  and minimise buttons show and work in the Floating layout only; the tiling
+  layouts ignore them, as they would fight the tiles.
 
 **Parked**
 

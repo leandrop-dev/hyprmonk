@@ -1,5 +1,7 @@
--- hyprpm plugins: hymission (the overview, Super+Tab in binds.lua), with its
--- defaults. hyprpm loads it at every start, once it has any. Building it needs
+-- hyprpm plugins (install.sh lists them): hymission (the overview, Super+Tab
+-- in binds.lua) with its defaults, hyprbars (floating.lua) and
+-- minimize-requests (minimise.lua). hyprpm loads them at every start, once
+-- it has any. Building it needs
 -- Hyprland running, so an install from outside can only leave it for later:
 -- until its state file exists, each login opens a terminal to do it, which
 -- asks for the password.
