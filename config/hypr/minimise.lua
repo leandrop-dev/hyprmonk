@@ -37,6 +37,13 @@ function hyprmonk_minimise(selector)
     hl.dispatch(hl.dsp.window.move({ workspace = hidden, follow = false, window = target }))
 end
 
+-- Focused and in front: Hyprland's focus leaves a floating window behind
+-- the others it overlaps.
+local function bring(target)
+    hl.dispatch(hl.dsp.focus({ window = target }))
+    hl.dispatch(hl.dsp.window.alter_zorder({ mode = "top", window = target }))
+end
+
 function hyprmonk_restore(selector)
     local window = hl.get_window(selector)
     if not window then return end
@@ -47,7 +54,21 @@ function hyprmonk_restore(selector)
         hl.dispatch(hl.dsp.window.move({ workspace = to, follow = false, window = target }))
     end
     if from then hl.dispatch(hl.dsp.window.tag({ tag = "-" .. prefix .. from, window = target })) end
-    hl.dispatch(hl.dsp.focus({ window = target }))
+    bring(target)
+end
+
+-- Focus a window (restoring it if minimised) without moving the pointer: the
+-- dock's clicks, where a pointer jumping to the window's centre would be
+-- lost. Hyprland warps on every focus it is asked for, so warps are off just
+-- for this one.
+function hyprmonk_focus(selector)
+    local window = hl.get_window(selector)
+    if not window then return end
+    local no_warps = hl.get_config("cursor.no_warps")
+    hl.config({ cursor = { no_warps = true } })
+    if minimised(window) then hyprmonk_restore(selector)
+    else bring(selector) end
+    hl.config({ cursor = { no_warps = no_warps } })
 end
 
 -- The window minimised last: of the minimised ones, the one focused last.

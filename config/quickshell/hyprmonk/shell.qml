@@ -1,4 +1,4 @@
-// hyprmonk's shell: `qs -c hyprmonk`. The wallpaper and a bar per screen, the
+// hyprmonk's shell: `qs -c hyprmonk`. The wallpaper, a bar and a dock per screen, the
 // notification pop-ups and centre, the OSD, the launcher, quick actions, the
 // power menu, the key guide, the wallpaper picker, settings, the screenshot
 // mode's card, the lock screen and the polkit agent; and the Appearance tone carried
@@ -7,6 +7,7 @@ import QtQuick
 import Quickshell
 import qs
 import qs.bar
+import qs.dock
 import qs.keyguide
 import qs.launcher
 import qs.lock
@@ -30,6 +31,15 @@ ShellRoot {
         model: Quickshell.screens
 
         Bar {
+            required property ShellScreen modelData
+            screen: modelData
+        }
+    }
+
+    Variants {
+        model: Quickshell.screens
+
+        Dock {
             required property ShellScreen modelData
             screen: modelData
         }
