@@ -321,6 +321,37 @@ cargo clippy --all-targets -- -D warnings
 
 ## Roadmap
 
+**Next**
+
+In this order.
+
+1. **Stay awake.** A quick action that keeps the screen from locking or going
+   off until it is turned off again, with an icon on the bar while it is on
+   and the on-screen card at each change. A suspend picked from the power menu
+   still goes ahead.
+2. **A floating layout.** A fourth layout in Settings > Windows, familiar to
+   anyone coming from Windows: every window floats, with a title bar in the
+   tone's colours and close and maximise buttons (the hyprbars plugin, loaded
+   like the overview's). Windows resize from their borders and snap to the
+   screen's edges and to each other. The title bars show only in this layout.
+   Minimising still needs a way back, from the bar or the launcher.
+3. **Sound effects.** Soft sounds for clicks, switches, cards opening and
+   notifications, turned on or off with their own volume in Settings >
+   Appearance, and quiet in game mode and do not disturb. The sounds from a
+   CC0 pack, their licence kept beside them.
+4. **Workspace styles.** Settings > Bar picks how the workspaces look: pills
+   as now, numbers, dots, or a pac-man that travels to the active workspace
+   eating the dots on its way.
+5. **Wallpaper transitions.** Besides today's fade, a wipe and a circle that
+   grows from where the wallpaper was picked, or one at random, picked in
+   Settings > Appearance.
+6. **Tone cards.** Settings > Appearance shows each tone as a small preview
+   (its background, a card, the accent and the text) instead of its name.
+7. **Headset and microphone effects.** Two switches in the sound panel, with
+   no EasyEffects: an equaliser preset for the headphones (AutoEQ's for the
+   Arctis Nova 7 first) and noise suppression for the microphone (rnnoise).
+   Each one shows as a device of its own and becomes the default while on.
+
 **Later**
 
 An open list, in no fixed order.
@@ -329,7 +360,15 @@ An open list, in no fixed order.
 - A phone module on the bar, beyond its battery: notifications, the clipboard,
   files, ringing it to find it. KDE Connect or an app of our own, still to
   decide.
-- Fedora, with its own package list, last of all.
+- Two sister projects, each in a repo of its own and planned there: Zendo, a
+  game launcher for every store with Proton and mods, and Cloister, a file
+  manager to take over from Nautilus. hyprmonk will install them, give them
+  keys and the tone (Zendo needs the tone's colours written to a file).
+- The cards' open and close animations on one shared curve and speed.
+- Apps the tone does not reach yet, starting from those serpantinum themes.
+- Fedora, with its own package list, last of all. Notes for then: some
+  packages come from the Terra repository, and gpu-screen-recorder has no
+  Fedora package.
 
 **Known issues**
 
@@ -343,9 +382,10 @@ An open list, in no fixed order.
 
 ## Credits
 
-- Ideas from [HyprFlow-Arch](https://github.com/AlejandroMinor/HyprFlow-Arch),
-  and the zsh setup's from [Ryoku](https://github.com/Ryoku-dev/ryoku); no
-  code taken from either.
+- Ideas from [HyprFlow-Arch](https://github.com/AlejandroMinor/HyprFlow-Arch)
+  and [serpantinum](https://github.com/ilyamiro/serpantinum), and the zsh
+  setup's from [Ryoku](https://github.com/Ryoku-dev/ryoku); no code taken from
+  any of them.
 - The Rival 3 Wireless battery protocol from [rivalcfg](https://github.com/flozz/rivalcfg).
 - The running cat's font from [runcat-text](https://github.com/AlejandroMinor/runcat-text)
   (BSD-2-Clause, its licence in `config/quickshell/hyprmonk/assets/runcat/`),
