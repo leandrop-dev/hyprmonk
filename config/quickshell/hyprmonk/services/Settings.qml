@@ -305,6 +305,69 @@ Singleton {
         saved.barLook = {};
     }
 
+    // Settings > Dock (dock/Dock.qml), the first of each to begin with:
+    // whether it shows, the screen edge it sits on, whose windows it lists
+    // (every workspace's, or the current one's), when it hides (never, while
+    // a window touches it, or until the pointer reaches its edge), icons
+    // growing under the pointer, and a dot per window.
+    readonly property var dockChoices: ({
+        shown: [true, false],
+        position: ["bottom", "top", "left", "right"],
+        scope: ["all", "workspace"],
+        autohide: ["off", "touch", "always"],
+        magnify: [false, true],
+        dots: [true, false]
+    })
+    // Its buttons' size, in pixels.
+    readonly property var dockSizeRange: ({ from: 32, to: 56, value: 44 })
+    readonly property var dockChoiceValues: {
+        const values = {};
+        const kept = saved.dock;
+        for (const key of Object.keys(dockChoices))
+            if (key in kept && dockChoices[key].includes(kept[key])) values[key] = kept[key];
+        return values;
+    }
+    readonly property int dockSize: typeof saved.dock.size === "number" ? clamp(dockSizeRange, saved.dock.size) : dockSizeRange.value
+    readonly property bool dockChanged: Object.keys(dockChoiceValues).length > 0 || dockSize !== dockSizeRange.value
+
+    function dockChoice(key: string): var {
+        return dockChoiceValues[key] ?? dockChoices[key][0];
+    }
+
+    function setDockChoice(key: string, value: var): void {
+        if (!dockChoices[key]?.includes(value)) return;
+        const next = Object.assign({}, saved.dock);
+        if (value === dockChoices[key][0]) delete next[key];
+        else next[key] = value;
+        saved.dock = next;
+    }
+
+    function setDockSize(value: real): void {
+        const next = Object.assign({}, saved.dock);
+        const size = clamp(dockSizeRange, value);
+        if (size === dockSizeRange.value) delete next.size;
+        else next.size = size;
+        saved.dock = next;
+    }
+
+    function resetDock(): void {
+        saved.dock = {};
+    }
+
+    // qs -c hyprmonk ipc call dock set position left  (or shown false, size 52, ...)
+    IpcHandler {
+        target: "dock"
+
+        function set(key: string, value: string): void {
+            if (key === "size") root.setDockSize(Number(value));
+            else root.setDockChoice(key, value === "true" ? true : value === "false" ? false : value);
+        }
+
+        function toggle(): void {
+            root.setDockChoice("shown", !root.dockChoice("shown"));
+        }
+    }
+
     function clamp(option: var, value: real): int {
         return Math.max(option.from, Math.min(option.to, Math.round(value)));
     }
@@ -391,6 +454,7 @@ Singleton {
             property var window: ({})
             property var bar: ({})
             property var barLook: ({})
+            property var dock: ({})
             property var display: ({})
             property string mainScreen: ""
             property var input: ({})

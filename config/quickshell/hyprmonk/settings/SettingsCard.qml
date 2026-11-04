@@ -17,6 +17,7 @@ Overlay {
         { name: "Display", icon: "\u{F0379}", file: "DisplayPage.qml" },
         { name: "Windows", icon: "\u{F05AF}", file: "WindowsPage.qml" },
         { name: "Bar", icon: "\u{F0570}", file: "BarPage.qml" },
+        { name: "Dock", icon: "\u{F10A9}", file: "DockPage.qml" },
         { name: "Appearance", icon: "\u{F050E}", file: "AppearancePage.qml" },
         { name: "Input", icon: "\u{F030C}", file: "InputPage.qml" },
         { name: "Power", icon: "\u{F0425}", file: "PowerPage.qml" },
