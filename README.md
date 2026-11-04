@@ -59,12 +59,14 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   long notifications stay, their corner, how many show and how many are kept.
 - Quick actions: wallpaper, game mode, screen recording, power profile, audio
   output, microphone, keyboard layout, screens (extend, mirror or the main one
-  only, kept or undone in 15 s), do not disturb, settings and the power menu.
+  only, kept or undone in 15 s), do not disturb, stay awake (the screen
+  neither locks nor goes off until it is turned off; also a cup on the bar),
+  settings and the power menu.
 - Notifications with a notification centre, an on-screen card for what just
   changed (volume, microphone, audio output, keyboard layout, Caps and Num
-  Lock, game mode, power profile), a lock screen (on a key and when idle),
-  a power menu, a key guide built from the bindings themselves, and the
-  polkit agent for password prompts.
+  Lock, game mode, stay awake, power profile), a lock screen (on a key and
+  when idle), a power menu, a key guide built from the bindings themselves,
+  and the polkit agent for password prompts.
 - An overview of every workspace (the hymission plugin).
 
 **The desktop around it**
@@ -325,29 +327,25 @@ cargo clippy --all-targets -- -D warnings
 
 In this order.
 
-1. **Stay awake.** A quick action that keeps the screen from locking or going
-   off until it is turned off again, with an icon on the bar while it is on
-   and the on-screen card at each change. A suspend picked from the power menu
-   still goes ahead.
-2. **A floating layout.** A fourth layout in Settings > Windows, familiar to
+1. **A floating layout.** A fourth layout in Settings > Windows, familiar to
    anyone coming from Windows: every window floats, with a title bar in the
    tone's colours and close and maximise buttons (the hyprbars plugin, loaded
    like the overview's). Windows resize from their borders and snap to the
    screen's edges and to each other. The title bars show only in this layout.
    Minimising still needs a way back, from the bar or the launcher.
-3. **Sound effects.** Soft sounds for clicks, switches, cards opening and
+2. **Sound effects.** Soft sounds for clicks, switches, cards opening and
    notifications, turned on or off with their own volume in Settings >
    Appearance, and quiet in game mode and do not disturb. The sounds from a
    CC0 pack, their licence kept beside them.
-4. **Workspace styles.** Settings > Bar picks how the workspaces look: pills
+3. **Workspace styles.** Settings > Bar picks how the workspaces look: pills
    as now, numbers, dots, or a pac-man that travels to the active workspace
    eating the dots on its way.
-5. **Wallpaper transitions.** Besides today's fade, a wipe and a circle that
+4. **Wallpaper transitions.** Besides today's fade, a wipe and a circle that
    grows from where the wallpaper was picked, or one at random, picked in
    Settings > Appearance.
-6. **Tone cards.** Settings > Appearance shows each tone as a small preview
+5. **Tone cards.** Settings > Appearance shows each tone as a small preview
    (its background, a card, the accent and the text) instead of its name.
-7. **Headset and microphone effects.** Two switches in the sound panel, with
+6. **Headset and microphone effects.** Two switches in the sound panel, with
    no EasyEffects: an equaliser preset for the headphones (AutoEQ's for the
    Arctis Nova 7 first) and noise suppression for the microphone (rnnoise).
    Each one shows as a device of its own and becomes the default while on.

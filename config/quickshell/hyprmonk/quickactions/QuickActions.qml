@@ -58,6 +58,13 @@ Scope {
         },
         Action {
             section: "System"
+            icon: "\u{F0176}"
+            label: "Stay awake"
+            on: Awake.on
+            onRun: Awake.toggle()
+        },
+        Action {
+            section: "System"
             icon: "\u{F04C5}"
             label: "Power profile"
             value: Power.profileName

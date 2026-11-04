@@ -55,6 +55,10 @@ Repeater {
             Replay {}
         }
         DelegateChoice {
+            roleValue: "awake"
+            StayAwake {}
+        }
+        DelegateChoice {
             roleValue: "tray"
             TrayIcons {}
         }

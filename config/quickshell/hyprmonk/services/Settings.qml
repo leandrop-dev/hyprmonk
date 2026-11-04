@@ -185,6 +185,7 @@ Singleton {
         { key: "launcher", label: "Launcher", icon: "\u{F003B}" },
         { key: "workspaces", label: "Workspaces", icon: "\u{F0570}" },
         { key: "overview", label: "Overview", icon: "\u{F0F8D}" },
+        { key: "awake", label: "Stay awake", icon: "\u{F0176}" },
         { key: "hardware", label: "Hardware", icon: "\u{F011B}" },
         { key: "recording", label: "Recording", icon: "\u{F044A}", fixed: true },
         { key: "replay", label: "Replay", icon: "\u{F0459}", fixed: true },
@@ -200,14 +201,15 @@ Singleton {
         { key: "power", label: "Power", icon: "\u{F0425}" }
     ]
     readonly property var barDefaults: ({
-        left: ["launcher", "workspaces", "overview", "hardware"],
+        left: ["launcher", "workspaces", "overview", "awake", "hardware"],
         right: ["recording", "replay", "tray", "network", "bluetooth", "batteries", "volume",
                 "microphone", "notifications", "clock", "quickactions", "power"],
         hidden: []
     })
 
     // Each known module once, wherever it was left; one not placed yet (new
-    // since the file was written) joins its default card.
+    // since the file was written) joins its default card, after the module it
+    // follows there, or first when none of those is on that card.
     readonly property var bar: {
         const seen = {};
         const clean = (list, kept) => Array.from(list ?? []).filter(key => {
@@ -221,8 +223,21 @@ Singleton {
             right: clean(saved.bar.right, all),
             hidden: clean(saved.bar.hidden, module => !module.fixed)
         };
-        placed.left.push(...barDefaults.left.filter(key => !seen[key]));
-        placed.right.push(...barDefaults.right.filter(key => !seen[key]));
+        for (const side of ["left", "right"]) {
+            const defaults = barDefaults[side];
+            defaults.forEach((key, i) => {
+                if (seen[key]) return;
+                let at = 0;
+                for (let j = i - 1; j >= 0; j--) {
+                    const found = placed[side].indexOf(defaults[j]);
+                    if (found >= 0) {
+                        at = found + 1;
+                        break;
+                    }
+                }
+                placed[side].splice(at, 0, key);
+            });
+        }
         return placed;
     }
     readonly property bool barChanged: JSON.stringify(bar) !== JSON.stringify(barDefaults)

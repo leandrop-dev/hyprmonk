@@ -68,6 +68,13 @@ PanelWindow {
         onCleared: Panels.close()
     }
 
+    // Stay awake (services/Awake.qml): each bar holds the inhibitor, so it
+    // lasts while any screen has its bar.
+    IdleInhibitor {
+        window: bar
+        enabled: Awake.on
+    }
+
     Item {
         focus: bar.panelOpen
         Keys.onEscapePressed: Panels.close()

@@ -159,6 +159,14 @@ Scope {
         }
     }
 
+    Connections {
+        target: Awake
+
+        function onOnChanged(): void {
+            root.show(Awake.on ? "\u{F0176}" : "\u{F0FAA}", "Stay awake", Awake.on ? "On" : "Off", -1);
+        }
+    }
+
     // Game mode also switches the power profile: say game mode, not both.
     Connections {
         target: GameMode
