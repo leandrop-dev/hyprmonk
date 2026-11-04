@@ -187,6 +187,7 @@ Singleton {
         { key: "overview", label: "Overview", icon: "\u{F0F8D}" },
         { key: "awake", label: "Stay awake", icon: "\u{F0176}" },
         { key: "hardware", label: "Hardware", icon: "\u{F011B}" },
+        { key: "windows", label: "Window list", icon: "\u{F08C6}" },
         { key: "recording", label: "Recording", icon: "\u{F044A}", fixed: true },
         { key: "replay", label: "Replay", icon: "\u{F0459}", fixed: true },
         { key: "tray", label: "Tray", icon: "\u{F0493}", panel: "tray" },
@@ -204,12 +205,14 @@ Singleton {
         left: ["launcher", "workspaces", "overview", "awake", "hardware"],
         right: ["recording", "replay", "tray", "network", "bluetooth", "batteries", "volume",
                 "microphone", "notifications", "clock", "quickactions", "power"],
-        hidden: []
+        // The dock shows the same as the window list.
+        hidden: ["windows"]
     })
 
     // Each known module once, wherever it was left; one not placed yet (new
     // since the file was written) joins its default card, after the module it
-    // follows there, or first when none of those is on that card.
+    // follows there, or first when none of those is on that card, or the
+    // hidden ones when hidden to begin with.
     readonly property var bar: {
         const seen = {};
         const clean = (list, kept) => Array.from(list ?? []).filter(key => {
@@ -238,6 +241,8 @@ Singleton {
                 placed[side].splice(at, 0, key);
             });
         }
+        for (const key of barDefaults.hidden)
+            if (!seen[key]) placed.hidden.push(key);
         return placed;
     }
     readonly property bool barChanged: JSON.stringify(bar) !== JSON.stringify(barDefaults)
@@ -262,6 +267,15 @@ Singleton {
         }
         next[side].splice(index, 0, key);
         saved.bar = next;
+    }
+
+    // qs -c hyprmonk ipc call bar move windows left 3  (side: left, right or hidden)
+    IpcHandler {
+        target: "bar"
+
+        function move(key: string, side: string, index: int): void {
+            if (root.barModule(key) && ["left", "right", "hidden"].includes(side)) root.moveBarModule(key, side, index);
+        }
     }
 
     // How the bar's clock, workspaces and temperatures show, the first of each

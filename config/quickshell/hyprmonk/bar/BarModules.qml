@@ -59,6 +59,10 @@ Repeater {
             StayAwake {}
         }
         DelegateChoice {
+            roleValue: "windows"
+            WindowList { screen: list.screen }
+        }
+        DelegateChoice {
             roleValue: "tray"
             TrayIcons {}
         }

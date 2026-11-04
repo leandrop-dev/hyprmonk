@@ -44,6 +44,11 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
 - Panels from the bar: Wi-Fi (networks, passwords, the connection editor for
   the rest), Bluetooth (pairing, connecting, batteries), sound (outputs,
   inputs, a mixer), batteries, a calendar, and media with synced lyrics.
+- A dock at the bottom (or any other edge) with the open apps and a dot per
+  window: a click focuses an app, goes through its windows or minimises it,
+  and hovering lists its windows to pick or close. It can hide, list only the
+  current workspace's windows, or give way to the same list on the bar.
+  Minimised windows wait in it, faded (Super+M, or a title bar's button).
 - A running cat, faster the busier the CPU and resting when the machine is
   quiet, that opens a hardware drawer:
   temperatures, CPU, GPU and video memory, memory, disk and network.
@@ -53,7 +58,8 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   gaps, borders, blur, shadows, the layout (three tiling ones, or every
   window floating, resized from its borders) and animations, the bar's
   modules by drag and drop with its clock, workspaces and temperature unit,
-  and the appearance: the tone with each one's card opacity, blur and text
+  the dock (where it sits, whose windows, its size, hiding and growing
+  icons), and the appearance: the tone with each one's card opacity, blur and text
   colour, the spectrum's style, fastfetch's look and the login screen's
   look; keyboard layouts, the mouse and focus; when the screen locks and the
   screens go off; what recordings hear, their quality and where they go; how
@@ -156,6 +162,7 @@ this is only the start.
 | `Super` `Q` | Close window |
 | `Super` `F` / `Super` `Shift` `F` | Maximize / fullscreen |
 | `Super` `V` | Toggle floating |
+| `Super` `M` / `Super` `Shift` `M` | Minimise / bring back the last minimised window |
 | `Super` `1`-`0` / `Super` `Shift` `1`-`0` | Go to / move to a workspace |
 | `Super` `S` | Scratchpad |
 | `Print`, then `R`, `W` or `S` | Screenshot of a region, a window or the screen (`Shift` copies it) |
@@ -310,8 +317,8 @@ cargo clippy --all-targets -- -D warnings
 | Path | What |
 |------|------|
 | `install.sh` | The installer: the menu and every step |
-| `config/hypr/` | Hyprland in Lua: `hyprland.lua` loads `look`, `input`, `binds`, `rules`, `plugins`, `gamemode`; `hypridle.conf` |
-| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `bar/`, `panels/`, `launcher/`, `quickactions/`, `notifications/`, `osd/`, `lock/`, `power/`, `keyguide/`, `screenshot/`, `wallpaper/`, `polkit/`, `services/`, `widgets/` |
+| `config/hypr/` | Hyprland in Lua: `hyprland.lua` loads `look`, `input`, `floating`, `minimise`, `binds`, `rules`, `plugins`, `gamemode`; `hypridle.conf` |
+| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `bar/`, `dock/`, `panels/`, `launcher/`, `quickactions/`, `notifications/`, `osd/`, `lock/`, `power/`, `keyguide/`, `screenshot/`, `wallpaper/`, `polkit/`, `services/`, `widgets/` |
 | `config/matugen/` | Templates for Hyprland, the shell and kitty |
 | `config/kitty/` | kitty, with the Noir palette |
 | `config/zsh/`, `config/starship/` | zsh and its prompt |
@@ -329,28 +336,20 @@ cargo clippy --all-targets -- -D warnings
 
 In this order.
 
-1. **Dock and minimise.** A second bar, the dock, at the bottom by default
-   (or the top, left or right), listing the open apps with a dot per window;
-   hovering an app lists its windows to pick from. Minimised windows wait,
-   faded, in the dock. Settings > Dock picks where it sits, whether it shows
-   every workspace's windows or the current one's, the icon size, hiding and
-   magnifying. The same list can go on the main bar as a module instead.
-   Minimising itself is done: Super+M, a third title-bar button in Floating,
-   and Super+Shift+M to bring the last one back.
-2. **The main bar at the top or the bottom**, picked in Settings > Bar.
-3. **Sound effects.** Soft sounds for clicks, switches, cards opening and
+1. **The main bar at the top or the bottom**, picked in Settings > Bar.
+2. **Sound effects.** Soft sounds for clicks, switches, cards opening and
    notifications, turned on or off with their own volume in Settings >
    Appearance, and quiet in game mode and do not disturb. The sounds from a
    CC0 pack, their licence kept beside them.
-4. **Workspace styles.** Settings > Bar picks how the workspaces look: pills
+3. **Workspace styles.** Settings > Bar picks how the workspaces look: pills
    as now, numbers, dots, or a pac-man that travels to the active workspace
    eating the dots on its way.
-5. **Wallpaper transitions.** Besides today's fade, a wipe and a circle that
+4. **Wallpaper transitions.** Besides today's fade, a wipe and a circle that
    grows from where the wallpaper was picked, or one at random, picked in
    Settings > Appearance.
-6. **Tone cards.** Settings > Appearance shows each tone as a small preview
+5. **Tone cards.** Settings > Appearance shows each tone as a small preview
    (its background, a card, the accent and the text) instead of its name.
-7. **Headset and microphone effects.** Two switches in the sound panel, with
+6. **Headset and microphone effects.** Two switches in the sound panel, with
    no EasyEffects: an equaliser preset for the headphones (AutoEQ's for the
    Arctis Nova 7 first) and noise suppression for the microphone (rnnoise).
    Each one shows as a device of its own and becomes the default while on.

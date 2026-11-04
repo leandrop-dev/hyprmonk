@@ -36,7 +36,19 @@ config. Hyprland options are also written to `settings.lua`, loaded after
   its fitting rules depend on it. Below them: the clock in 24 or 12 hours,
   with seconds and the date or without; the workspaces in use, or always 1 to
   5 or 1 to 10 (empty ones dim, a click opens one); temperatures in °C or °F.
-  These are kept in `barLook`, apart from the modules.
+  These are kept in `barLook`, apart from the modules. The window list (the
+  dock's apps, at the bar's size) starts hidden, since the dock shows the same.
+- [x] Dock (`dock/`, `services/Windows.qml`): shown or not; the edge it sits
+  on (bottom, top, left or right, upright on the sides); whose windows it
+  lists, every workspace's or the current one's (minimised ones by the
+  workspace they came from, `hyprmonk-from-<id>`), which the bar's window list
+  follows too; its buttons' size, 32 to 56 pixels; hiding: never (it keeps
+  its space), always, or while a window of the workspace on its screen
+  touches it (floating windows' places are read twice a second while that is
+  picked), coming back as the pointer reaches the edge; icons growing under
+  the pointer; and a dot per window. Kept in `dock`. Also over IPC: `qs -c
+  hyprmonk ipc call dock set <key> <value>`, `dock toggle`, and `bar move
+  <module> <left|right|hidden> <index>` for the bar's modules.
 - [x] Display: resolution, refresh rate and scale, for each screen, picked first
   and applied together. An applied change is only tried until kept, and goes
   back after 15 seconds, so a mode the screen cannot show fixes itself and a
