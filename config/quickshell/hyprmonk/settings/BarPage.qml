@@ -258,6 +258,15 @@ Item {
         }
 
         Row {
+            text: "Workspaces look"
+
+            Choice {
+                key: "workspaceStyle"
+                labels: ({ pills: "Pills", numbers: "Numbers", dots: "Dots", chomper: "Chomper" })
+            }
+        }
+
+        Row {
             text: "Temperature"
 
             Choice {

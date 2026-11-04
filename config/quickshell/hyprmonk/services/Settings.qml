@@ -287,13 +287,15 @@ Singleton {
 
     // Where the bar sits, and how its clock, workspaces and temperatures show,
     // the first of each to begin with. `workspaces` 0 shows those in use; more
-    // always shows 1 to that many, empty ones dim.
+    // always shows 1 to that many, empty ones dim; `workspaceStyle` is how
+    // they look (bar/Workspaces.qml).
     readonly property var barChoices: ({
         position: ["top", "bottom"],
         hours: ["24", "12"],
         seconds: [false, true],
         date: [true, false],
         workspaces: [0, 5, 10],
+        workspaceStyle: ["pills", "numbers", "dots", "chomper"],
         temperature: ["C", "F"]
     })
     readonly property var barChoiceValues: {

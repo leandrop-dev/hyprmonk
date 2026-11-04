@@ -36,7 +36,9 @@ config. Hyprland options are also written to `settings.lua`, loaded after
   Recording and Replay cannot be hidden, and the centre card stays as it is:
   its fitting rules depend on it. Below them: the clock in 24 or 12 hours,
   with seconds and the date or without; the workspaces in use, or always 1 to
-  5 or 1 to 10 (empty ones dim, a click opens one); temperatures in °C or °F.
+  5 or 1 to 10 (empty ones dim, a click opens one); how they look:
+  pills, numbers, dots, or a chomper that goes from the active one to the
+  next, chomping; temperatures in °C or °F.
   These are kept in `barLook`, apart from the modules. The window list (the
   dock's apps, at the bar's size) starts hidden, since the dock shows the same.
 - [x] Dock (`dock/`, `services/Windows.qml`): shown or not; the edge it sits

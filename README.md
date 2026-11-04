@@ -58,7 +58,7 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   gaps, borders, blur, shadows, the layout (three tiling ones, or every
   window floating, resized from its borders) and animations, the bar's
   modules by drag and drop, at the top or the bottom, with its clock,
-  workspaces and temperature unit, the dock (where it sits, whose windows,
+  workspaces (pills, numbers, dots or a chomper) and temperature unit, the dock (where it sits, whose windows,
   its size, hiding and growing icons), and the appearance: the tone with each one's card opacity, blur and text
   colour, the spectrum's style, fastfetch's look and the login screen's
   look; the sounds (on or off, hyprmonk's set or serpantinum's, their
@@ -340,15 +340,12 @@ cargo clippy --all-targets -- -D warnings
 
 In this order.
 
-1. **Workspace styles.** Settings > Bar picks how the workspaces look: pills
-   as now, numbers, dots, or a pac-man that travels to the active workspace
-   eating the dots on its way.
-2. **Wallpaper transitions.** Besides today's fade, a wipe and a circle that
+1. **Wallpaper transitions.** Besides today's fade, a wipe and a circle that
    grows from where the wallpaper was picked, or one at random, picked in
    Settings > Appearance.
-3. **Tone cards.** Settings > Appearance shows each tone as a small preview
+2. **Tone cards.** Settings > Appearance shows each tone as a small preview
    (its background, a card, the accent and the text) instead of its name.
-4. **Headset and microphone effects.** Two switches in the sound panel, with
+3. **Headset and microphone effects.** Two switches in the sound panel, with
    no EasyEffects: an equaliser preset for the headphones (AutoEQ's for the
    Arctis Nova 7 first) and noise suppression for the microphone (rnnoise).
    Each one shows as a device of its own and becomes the default while on.
