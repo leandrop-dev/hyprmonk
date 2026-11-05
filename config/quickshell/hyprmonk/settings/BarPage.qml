@@ -1,6 +1,8 @@
 // Settings > Bar: the modules of the bar's left and right cards, as tiles to
 // drag within a card, to the other card, or to Hidden. A line shows where one
 // will land, and the bar changes on release. The centre card stays as it is.
+// A second sub-page, Look, has where the bar sits, the clock, the workspaces
+// and the temperature unit.
 import QtQuick
 import QtQuick.Layouts
 import qs
@@ -10,6 +12,9 @@ import qs.widgets
 
 Item {
     id: page
+
+    // The sub-page shown (SettingsCard.qml): modules or look.
+    property string section: "modules"
 
     readonly property var sides: [
         { key: "left", label: "Left card" },
@@ -21,6 +26,8 @@ Item {
     property string dragged: ""  // the module's key; "" when none
     property point pointer: Qt.point(0, 0)
     readonly property var target: dragged === "" ? null : targetAt(pointer)  // where it would land
+
+    onSectionChanged: flick.contentY = 0
 
     // The side and index under `at`, and where the line goes, in the page.
     function targetAt(at: point): var {
@@ -134,6 +141,8 @@ Item {
 
         // The options scroll; the button stays below them.
         Flickable {
+            id: flick
+
             Layout.fillWidth: true
             Layout.fillHeight: true
             contentHeight: column.implicitHeight
@@ -158,6 +167,7 @@ Item {
                         readonly property string side: modelData.key
                         readonly property alias area: area
                         readonly property alias flow: flow
+                        visible: page.section === "modules"
 
                         function tiles(): var {
                             return Array.from(flow.children).filter(child => child.moduleKey !== undefined);
@@ -234,10 +244,12 @@ Item {
                 }
 
                 SectionLabel {
-                    text: "How they show"
+                    visible: page.section === "look"
+                    text: "How it looks"
                 }
 
                 Row {
+                    visible: page.section === "look"
                     text: "Position"
 
                     Choice {
@@ -247,6 +259,7 @@ Item {
                 }
 
                 Row {
+                    visible: page.section === "look"
                     text: "Clock"
 
                     Choice {
@@ -266,6 +279,7 @@ Item {
                 }
 
                 Row {
+                    visible: page.section === "look"
                     text: "Workspaces"
 
                     Choice {
@@ -275,12 +289,14 @@ Item {
                 }
 
                 Row {
+                    visible: page.section === "look"
                     text: "Workspaces look"
                 }
 
                 // Each look on four made-up workspaces, the fourth empty; under the
                 // pointer the active one moves about.
                 Flow {
+                    visible: page.section === "look"
                     Layout.fillWidth: true
                     Layout.bottomMargin: 4
                     spacing: 8
@@ -319,6 +335,7 @@ Item {
                 }
 
                 Row {
+                    visible: page.section === "look"
                     text: "Temperature"
 
                     Choice {
@@ -327,6 +344,10 @@ Item {
                     }
                 }
             }
+        }
+
+        MoreBelow {
+            flickable: flick
         }
 
         Button {

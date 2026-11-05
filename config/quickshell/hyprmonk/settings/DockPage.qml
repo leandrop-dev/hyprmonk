@@ -54,6 +54,8 @@ ColumnLayout {
 
     // The options scroll; the button stays below them.
     Flickable {
+        id: flick
+
         Layout.fillWidth: true
         Layout.fillHeight: true
         contentHeight: column.implicitHeight
@@ -135,6 +137,10 @@ ColumnLayout {
                 }
             }
         }
+    }
+
+    MoreBelow {
+        flickable: flick
     }
 
     Button {

@@ -53,7 +53,8 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   quiet, that opens a hardware drawer:
   temperatures, CPU, GPU and video memory, memory, disk and network.
 - A launcher for apps, commands, SSH hosts and the clipboard history.
-- Settings: each screen's resolution, refresh rate and scale, and where screens
+- Settings, in three groups, the longer pages split into sub-pages: each
+  screen's resolution, refresh rate and scale, and where screens
   sit by dragging them on a map (a change goes back by itself unless kept),
   gaps, borders, blur, shadows, the layout (three tiling ones, or every
   window floating, resized from its borders) and animations, the bar's
@@ -352,18 +353,18 @@ cargo clippy --all-targets -- -D warnings
 
 In this order.
 
-1. **Settings, tidied.** Pages grouped into sections with sub-pages (say,
-   Appearance > Theme), so each holds less and things are easier to find,
-   with a plain note where a name needs one (Night mode).
-2. **A larger Settings window.** More room and less scrolling, and where a
-   page still scrolls, a sign that there is more below.
-3. **The hardware drawer as a panel.** A second way to show it, picked in
+1. **The hardware drawer as a panel.** A second way to show it, picked in
    Settings: a panel under the cat with a horizontal bar for each reading,
    its name and value inside, filling as it changes (serpantinum has
    vertical ones).
-4. **Night light.** Warmer colours between set times, or off.
-5. **Brightness and gamma.** For each screen, in Settings > Display, with
+2. **Night light.** Warmer colours between set times, or off.
+3. **Brightness and gamma.** For each screen, in Settings > Display, with
    ideas from [serpantinum-gamma](https://github.com/ilyamiro/serpantinum-gamma).
+4. **A font for everything.** One font picked in Settings for the shell,
+   GTK and Qt apps and the terminal, starting from the set serpantinum has:
+   its freely licensed ones (Nerd Fonts, JetBrains Mono, Fira Code, Roboto
+   and the like), installed from the repos rather than copied. Its SF Pro
+   and TT Commons are not free to pass on.
 
 **Later**
 

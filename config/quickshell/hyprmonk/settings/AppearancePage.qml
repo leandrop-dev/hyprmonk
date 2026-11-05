@@ -1,8 +1,9 @@
 // Settings > Appearance: the tone, its cards and text (kept with that tone;
 // only colours that read on its background are offered or taken), the
 // spectrum's style, how a new wallpaper comes in, fastfetch's look and the
-// login screen's look. A tone or a spectrum style under the pointer is shown
-// until it leaves. The page scrolls.
+// login screen's look, in four sub-pages: Theme, Motion (the spectrum and
+// wallpaper changes), Terminal and Login screen. A tone or a spectrum style
+// under the pointer is shown until it leaves. The page scrolls.
 import QtQuick
 import QtQuick.Layouts
 import qs
@@ -10,8 +11,11 @@ import qs.bar
 import qs.services
 import qs.widgets
 
-Flickable {
+Item {
     id: page
+
+    // The sub-page shown (SettingsCard.qml): theme, motion, terminal or login.
+    property string section: "theme"
 
     readonly property var tone: Theme.toneOf(Theme.savedTone)
     readonly property string colour: String(tone.foreground).toLowerCase()
@@ -30,11 +34,8 @@ Flickable {
         if (/^#[0-9a-f]{6}$/i.test(text) && Theme.readable(text)) Theme.setTextColour(text);
     }
 
-    contentHeight: column.implicitHeight
-    boundsBehavior: Flickable.StopAtBounds
-    clip: true
-
     onColourChanged: field.text = colour
+    onSectionChanged: flick.contentY = 0
     Component.onCompleted: Login.refresh()
     Component.onDestruction: {
         Theme.previewTone = "";
@@ -136,350 +137,375 @@ Flickable {
         font.pixelSize: Theme.smallFontSize
     }
 
-    ColumnLayout {
-        id: column
+    Flickable {
+        id: flick
 
-        width: page.width
-        spacing: 8
+        anchors.fill: parent
+        contentHeight: column.implicitHeight
+        boundsBehavior: Flickable.StopAtBounds
+        clip: true
 
-        SectionLabel {
-            text: "Tone"
-        }
+        ColumnLayout {
+            id: column
 
-        Note {
-            text: "Dark"
-        }
-
-        ToneCards {
-            names: page.darkTones
-        }
-
-        Note {
-            Layout.topMargin: 4
-            visible: page.lightTones.length > 0
-            text: "Light"
-        }
-
-        ToneCards {
-            Layout.bottomMargin: 12
-            visible: page.lightTones.length > 0
-            names: page.lightTones
-        }
-
-        SectionLabel {
-            Layout.bottomMargin: 2
-            text: Theme.tones[Theme.savedTone].label
-        }
-
-        Note {
-            Layout.bottomMargin: 6
-            text: "Its cards and text. Changes stay with this tone."
-        }
-
-        SettingSlider {
-            Layout.fillWidth: true
-            Layout.topMargin: 2
-            label: "Card opacity"
-            from: 30
-            to: 100
-            unit: "%"
-            value: Math.round(Theme.cardOpacity * 100)
-            onMoved: value => Theme.setCardOpacity(Math.round(value) / 100)
-        }
-
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.topMargin: 4
-            Layout.bottomMargin: 6
-
-            Text {
-                Layout.fillWidth: true
-                text: "Blur behind the cards"
-                color: Theme.foreground
-                font.family: Theme.font
-                font.pixelSize: Theme.rowFontSize
-            }
-
-            Chip {
-                text: Theme.cardBlur ? "on" : "off"
-                on: Theme.cardBlur
-                onClicked: Theme.setCardBlur(!Theme.cardBlur)
-            }
-        }
-
-        RowLayout {
-            Layout.topMargin: 2
+            width: page.width
             spacing: 8
 
-            Repeater {
-                model: page.swatches
-
-                Rectangle {
-                    id: swatch
-
-                    required property string modelData
-
-                    implicitWidth: 34
-                    implicitHeight: 34
-                    radius: Theme.moduleRadius
-                    color: page.tone.background
-                    border.width: modelData === page.colour ? 2 : 1
-                    border.color: modelData === page.colour ? Theme.accent : Theme.rim
-
-                    Text {
-                        anchors.centerIn: parent
-                        text: "A"
-                        color: swatch.modelData
-                        font.family: Theme.font
-                        font.pixelSize: Theme.fontSize
-                        font.bold: true
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: Theme.setTextColour(swatch.modelData)
-                    }
-                }
+            SectionLabel {
+                visible: page.section === "theme"
+                text: "Tone"
             }
-        }
 
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.topMargin: 4
-            spacing: 12
+            Note {
+                visible: page.section === "theme"
+                text: "Dark"
+            }
 
-            Rectangle {
-                implicitWidth: 110
-                implicitHeight: 30
-                radius: Theme.moduleRadius
-                color: Theme.fg(0.06)
-                border.width: 1
-                border.color: field.activeFocus ? Qt.alpha(Theme.accent, 0.8) : Theme.rim
+            ToneCards {
+                visible: page.section === "theme"
+                names: page.darkTones
+            }
 
-                TextInput {
-                    id: field
+            Note {
+                Layout.topMargin: 4
+                visible: page.section === "theme" && (page.lightTones.length > 0)
+                text: "Light"
+            }
 
-                    anchors.fill: parent
-                    anchors.leftMargin: 12
-                    anchors.rightMargin: 12
-                    verticalAlignment: TextInput.AlignVCenter
-                    text: page.colour
-                    maximumLength: 7
+            ToneCards {
+                Layout.bottomMargin: 12
+                visible: page.section === "theme" && (page.lightTones.length > 0)
+                names: page.lightTones
+            }
+
+            SectionLabel {
+                visible: page.section === "theme"
+                Layout.bottomMargin: 2
+                text: Theme.tones[Theme.savedTone].label
+            }
+
+            Note {
+                visible: page.section === "theme"
+                Layout.bottomMargin: 6
+                text: "Its cards and text. Changes stay with this tone."
+            }
+
+            SettingSlider {
+                visible: page.section === "theme"
+                Layout.fillWidth: true
+                Layout.topMargin: 2
+                label: "Card opacity"
+                from: 30
+                to: 100
+                unit: "%"
+                value: Math.round(Theme.cardOpacity * 100)
+                onMoved: value => Theme.setCardOpacity(Math.round(value) / 100)
+            }
+
+            RowLayout {
+                visible: page.section === "theme"
+                Layout.fillWidth: true
+                Layout.topMargin: 4
+                Layout.bottomMargin: 6
+
+                Text {
+                    Layout.fillWidth: true
+                    text: "Blur behind the cards"
                     color: Theme.foreground
-                    selectionColor: Qt.alpha(Theme.accent, 0.55)
                     font.family: Theme.font
                     font.pixelSize: Theme.rowFontSize
-                    clip: true
-
-                    onTextEdited: page.typed(text)
                 }
-            }
-
-            Text {
-                Layout.fillWidth: true
-                visible: /^#[0-9a-f]{6}$/i.test(field.text) && !Theme.readable(field.text)
-                text: "Too close to the background"
-                color: Theme.warning
-                font.family: Theme.font
-                font.pixelSize: Theme.bodyFontSize
-            }
-
-            Button {
-                enabled: Theme.toneAdjusted
-                text: "Back to the defaults"
-                onClicked: Theme.resetTone()
-            }
-        }
-
-        SectionLabel {
-            Layout.topMargin: 12
-            text: "Spectrum"
-        }
-
-        Flow {
-            Layout.fillWidth: true
-            spacing: 8
-
-            Repeater {
-                model: Object.keys(Cava.styles)
-
-                // Each style drawn from the same made-up levels, larger than on
-                // the bar; the bar shows it for real while the pointer is here.
-                PreviewCard {
-                    id: styleCard
-
-                    required property string modelData
-
-                    label: Cava.styles[modelData]
-                    chosen: modelData === Cava.savedStyle
-                    onHoveredChanged: {
-                        if (hovered) Cava.previewStyle = modelData;
-                        else if (Cava.previewStyle === modelData) Cava.previewStyle = "";
-                    }
-                    onClicked: {
-                        Cava.previewStyle = "";
-                        Cava.setStyle(modelData);
-                    }
-
-                    Spectrum {
-                        anchors.centerIn: parent
-                        scale: 1.5
-                        style: styleCard.modelData
-                        sample: [0.3, 0.65, 0.95, 0.7, 0.85, 0.5, 0.75, 0.4, 0.55, 0.25]
-                    }
-                }
-            }
-        }
-
-        SectionLabel {
-            Layout.topMargin: 12
-            text: "Wallpaper changes"
-        }
-
-        Flow {
-            Layout.fillWidth: true
-            spacing: 8
-
-            Repeater {
-                model: Wallpaper.transitions
-
-                // The new picture (the accent) coming in over the last, held half
-                // way; under the pointer it plays over and over. Random goes
-                // through the three in turn.
-                PreviewCard {
-                    id: change
-
-                    required property string modelData
-                    property real progress: 0.5
-                    property int round: 0
-                    readonly property string kind: modelData === "random" ? ["fade", "wipe", "circle"][round % 3] : modelData
-                    readonly property color picture: Qt.alpha(Theme.accent, 0.75)
-
-                    label: ({ fade: "Fade", wipe: "Wipe", circle: "Circle", random: "Random" })[modelData]
-                    chosen: modelData === Wallpaper.transition
-                    fill: Theme.fg(0.1)
-                    onClicked: Wallpaper.setTransition(modelData)
-                    onHoveredChanged: {
-                        if (hovered) return;
-                        progress = 0.5;
-                        round = 0;
-                    }
-
-                    SequentialAnimation {
-                        running: change.hovered
-                        loops: Animation.Infinite
-
-                        NumberAnimation {
-                            target: change
-                            property: "progress"
-                            from: 0
-                            to: 1
-                            duration: change.kind === "fade" ? 500 : 900
-                            easing.type: Easing.InOutCubic
-                        }
-                        PauseAnimation { duration: 500 }
-                        ScriptAction { script: change.round++ }
-                    }
-
-                    Rectangle {
-                        anchors.fill: parent
-                        visible: change.kind === "fade"
-                        color: change.picture
-                        opacity: change.progress
-                    }
-
-                    Rectangle {
-                        visible: change.kind === "wipe"
-                        width: change.progress * (parent.width + 16)
-                        height: parent.height
-                        gradient: Gradient {
-                            orientation: Gradient.Horizontal
-
-                            GradientStop { position: 0; color: change.picture }
-                            GradientStop { position: Math.max(0, 1 - 16 / Math.max(16, change.progress * 128)); color: change.picture }
-                            GradientStop { position: 1; color: "transparent" }
-                        }
-                    }
-
-                    // From where a tile might have been picked.
-                    Rectangle {
-                        readonly property real size: change.progress * 2 * 125
-
-                        visible: change.kind === "circle"
-                        x: 32 - size / 2
-                        y: 40 - size / 2
-                        width: size
-                        height: size
-                        radius: size / 2
-                        color: change.picture
-                    }
-                }
-            }
-        }
-
-        SectionLabel {
-            Layout.topMargin: 12
-            text: "Fastfetch"
-        }
-
-        Flow {
-            Layout.fillWidth: true
-            spacing: 6
-
-            Repeater {
-                model: Object.keys(Fastfetch.presets)
 
                 Chip {
-                    required property string modelData
-
-                    text: Fastfetch.presets[modelData]
-                    on: modelData === Fastfetch.saved
-                    onClicked: Fastfetch.set(modelData)
+                    text: Theme.cardBlur ? "on" : "off"
+                    on: Theme.cardBlur
+                    onClicked: Theme.setCardBlur(!Theme.cardBlur)
                 }
             }
-        }
 
-        SectionLabel {
-            Layout.topMargin: 12
-            visible: Login.ready
-            text: "Login screen"
-        }
+            RowLayout {
+                visible: page.section === "theme"
+                Layout.topMargin: 2
+                spacing: 8
 
-        Flow {
-            Layout.fillWidth: true
-            Layout.bottomMargin: 4
-            visible: Login.ready
-            spacing: 8
+                Repeater {
+                    model: page.swatches
 
-            Repeater {
-                model: Login.looks
+                    Rectangle {
+                        id: swatch
 
-                // The look's own background (a frame of a video one).
-                PreviewCard {
-                    id: look
+                        required property string modelData
 
-                    required property string modelData
+                        implicitWidth: 34
+                        implicitHeight: 34
+                        radius: Theme.moduleRadius
+                        color: page.tone.background
+                        border.width: modelData === page.colour ? 2 : 1
+                        border.color: modelData === page.colour ? Theme.accent : Theme.rim
 
-                    label: Login.label(modelData)
-                    chosen: modelData === Login.current
-                    onClicked: Login.pick(modelData)
+                        Text {
+                            anchors.centerIn: parent
+                            text: "A"
+                            color: swatch.modelData
+                            font.family: Theme.font
+                            font.pixelSize: Theme.fontSize
+                            font.bold: true
+                        }
 
-                    Image {
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: Theme.setTextColour(swatch.modelData)
+                        }
+                    }
+                }
+            }
+
+            RowLayout {
+                visible: page.section === "theme"
+                Layout.fillWidth: true
+                Layout.topMargin: 4
+                spacing: 12
+
+                Rectangle {
+                    implicitWidth: 110
+                    implicitHeight: 30
+                    radius: Theme.moduleRadius
+                    color: Theme.fg(0.06)
+                    border.width: 1
+                    border.color: field.activeFocus ? Qt.alpha(Theme.accent, 0.8) : Theme.rim
+
+                    TextInput {
+                        id: field
+
                         anchors.fill: parent
-                        source: Login.pictures[look.modelData] ? Theme.fileUrl(Login.pictures[look.modelData]) : ""
-                        sourceSize: Qt.size(224, 124)
-                        fillMode: Image.PreserveAspectCrop
-                        asynchronous: true
-                        cache: false  // the desktop look's changes with the wallpaper
-                        opacity: status === Image.Ready ? 1 : 0
+                        anchors.leftMargin: 12
+                        anchors.rightMargin: 12
+                        verticalAlignment: TextInput.AlignVCenter
+                        text: page.colour
+                        maximumLength: 7
+                        color: Theme.foreground
+                        selectionColor: Qt.alpha(Theme.accent, 0.55)
+                        font.family: Theme.font
+                        font.pixelSize: Theme.rowFontSize
+                        clip: true
 
-                        Behavior on opacity {
-                            NumberAnimation { duration: 160 }
+                        onTextEdited: page.typed(text)
+                    }
+                }
+
+                Text {
+                    Layout.fillWidth: true
+                    visible: /^#[0-9a-f]{6}$/i.test(field.text) && !Theme.readable(field.text)
+                    text: "Too close to the background"
+                    color: Theme.warning
+                    font.family: Theme.font
+                    font.pixelSize: Theme.bodyFontSize
+                }
+
+                Button {
+                    enabled: Theme.toneAdjusted
+                    text: "Back to the defaults"
+                    onClicked: Theme.resetTone()
+                }
+            }
+
+            SectionLabel {
+                visible: page.section === "motion"
+                text: "Spectrum"
+            }
+
+            Flow {
+                visible: page.section === "motion"
+                Layout.fillWidth: true
+                spacing: 8
+
+                Repeater {
+                    model: Object.keys(Cava.styles)
+
+                    // Each style drawn from the same made-up levels, larger than on
+                    // the bar; the bar shows it for real while the pointer is here.
+                    PreviewCard {
+                        id: styleCard
+
+                        required property string modelData
+
+                        label: Cava.styles[modelData]
+                        chosen: modelData === Cava.savedStyle
+                        onHoveredChanged: {
+                            if (hovered) Cava.previewStyle = modelData;
+                            else if (Cava.previewStyle === modelData) Cava.previewStyle = "";
+                        }
+                        onClicked: {
+                            Cava.previewStyle = "";
+                            Cava.setStyle(modelData);
+                        }
+
+                        Spectrum {
+                            anchors.centerIn: parent
+                            scale: 1.5
+                            style: styleCard.modelData
+                            sample: [0.3, 0.65, 0.95, 0.7, 0.85, 0.5, 0.75, 0.4, 0.55, 0.25]
+                        }
+                    }
+                }
+            }
+
+            SectionLabel {
+                visible: page.section === "motion"
+                Layout.topMargin: 12
+                text: "Wallpaper changes"
+            }
+
+            Flow {
+                visible: page.section === "motion"
+                Layout.fillWidth: true
+                spacing: 8
+
+                Repeater {
+                    model: Wallpaper.transitions
+
+                    // The new picture (the accent) coming in over the last, held half
+                    // way; under the pointer it plays over and over. Random goes
+                    // through the three in turn.
+                    PreviewCard {
+                        id: change
+
+                        required property string modelData
+                        property real progress: 0.5
+                        property int round: 0
+                        readonly property string kind: modelData === "random" ? ["fade", "wipe", "circle"][round % 3] : modelData
+                        readonly property color picture: Qt.alpha(Theme.accent, 0.75)
+
+                        label: ({ fade: "Fade", wipe: "Wipe", circle: "Circle", random: "Random" })[modelData]
+                        chosen: modelData === Wallpaper.transition
+                        fill: Theme.fg(0.1)
+                        onClicked: Wallpaper.setTransition(modelData)
+                        onHoveredChanged: {
+                            if (hovered) return;
+                            progress = 0.5;
+                            round = 0;
+                        }
+
+                        SequentialAnimation {
+                            running: change.hovered
+                            loops: Animation.Infinite
+
+                            NumberAnimation {
+                                target: change
+                                property: "progress"
+                                from: 0
+                                to: 1
+                                duration: change.kind === "fade" ? 500 : 900
+                                easing.type: Easing.InOutCubic
+                            }
+                            PauseAnimation { duration: 500 }
+                            ScriptAction { script: change.round++ }
+                        }
+
+                        Rectangle {
+                            anchors.fill: parent
+                            visible: change.kind === "fade"
+                            color: change.picture
+                            opacity: change.progress
+                        }
+
+                        Rectangle {
+                            visible: change.kind === "wipe"
+                            width: change.progress * (parent.width + 16)
+                            height: parent.height
+                            gradient: Gradient {
+                                orientation: Gradient.Horizontal
+
+                                GradientStop { position: 0; color: change.picture }
+                                GradientStop { position: Math.max(0, 1 - 16 / Math.max(16, change.progress * 128)); color: change.picture }
+                                GradientStop { position: 1; color: "transparent" }
+                            }
+                        }
+
+                        // From where a tile might have been picked.
+                        Rectangle {
+                            readonly property real size: change.progress * 2 * 125
+
+                            visible: change.kind === "circle"
+                            x: 32 - size / 2
+                            y: 40 - size / 2
+                            width: size
+                            height: size
+                            radius: size / 2
+                            color: change.picture
+                        }
+                    }
+                }
+            }
+
+            SectionLabel {
+                visible: page.section === "terminal"
+                text: "Fastfetch"
+            }
+
+            Flow {
+                visible: page.section === "terminal"
+                Layout.fillWidth: true
+                spacing: 6
+
+                Repeater {
+                    model: Object.keys(Fastfetch.presets)
+
+                    Chip {
+                        required property string modelData
+
+                        text: Fastfetch.presets[modelData]
+                        on: modelData === Fastfetch.saved
+                        onClicked: Fastfetch.set(modelData)
+                    }
+                }
+            }
+
+            SectionLabel {
+                visible: page.section === "login" && (Login.ready)
+                text: "Login screen"
+            }
+
+            Flow {
+                Layout.fillWidth: true
+                Layout.bottomMargin: 4
+                visible: page.section === "login" && (Login.ready)
+                spacing: 8
+
+                Repeater {
+                    model: Login.looks
+
+                    // The look's own background (a frame of a video one).
+                    PreviewCard {
+                        id: look
+
+                        required property string modelData
+
+                        label: Login.label(modelData)
+                        chosen: modelData === Login.current
+                        onClicked: Login.pick(modelData)
+
+                        Image {
+                            anchors.fill: parent
+                            source: Login.pictures[look.modelData] ? Theme.fileUrl(Login.pictures[look.modelData]) : ""
+                            sourceSize: Qt.size(224, 124)
+                            fillMode: Image.PreserveAspectCrop
+                            asynchronous: true
+                            cache: false  // the desktop look's changes with the wallpaper
+                            opacity: status === Image.Ready ? 1 : 0
+
+                            Behavior on opacity {
+                                NumberAnimation { duration: 160 }
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    MoreBelow {
+        flickable: flick
     }
 }

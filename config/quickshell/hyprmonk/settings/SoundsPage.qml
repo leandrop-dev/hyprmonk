@@ -1,10 +1,12 @@
-// Settings > Sounds (services/Sounds.qml): the interface's sounds on or off,
-// the set they come from, their volume and the notification tone, with a
-// chip to hear each one. Each change shows at once. Then the audio effects
-// (services/AudioEffects.qml): the equaliser with its presets and bands,
-// night mode and its strength,
-// the headphone correction, searched for in AutoEQ, and the microphone's
-// noise suppression, with a way to hear it.
+// Settings > Sounds, in three sub-pages:
+// - Interface (services/Sounds.qml): the interface's sounds on or off, the set
+//   they come from, their volume and the notification tone, with a chip to
+//   hear each one.
+// - Effects (services/AudioEffects.qml): the equaliser with its presets and
+//   bands, night mode and its strength, and the headphone correction,
+//   searched for in AutoEQ.
+// - Microphone: its noise suppression, with a way to hear it.
+// Each change shows at once.
 import QtQuick
 import QtQuick.Layouts
 import qs
@@ -12,8 +14,15 @@ import qs.services
 import qs.widgets
 
 ColumnLayout {
+    id: page
+
+    // The sub-page shown (SettingsCard.qml): interface, effects or
+    // microphone.
+    property string section: "interface"
+
     spacing: 8
 
+    onSectionChanged: flick.contentY = 0
     Component.onDestruction: AudioEffects.listening = false
 
     component Row: RowLayout {
@@ -42,6 +51,8 @@ ColumnLayout {
 
     // The options scroll; the button stays below them.
     Flickable {
+        id: flick
+
         Layout.fillWidth: true
         Layout.fillHeight: true
         contentHeight: column.implicitHeight
@@ -55,10 +66,12 @@ ColumnLayout {
             spacing: 8
 
             SectionLabel {
+                visible: page.section === "interface"
                 text: "Sounds"
             }
 
             Row {
+                visible: page.section === "interface"
                 text: "Play sounds"
 
                 Chip {
@@ -69,10 +82,12 @@ ColumnLayout {
             }
 
             Note {
+                visible: page.section === "interface"
                 text: "Quiet in game mode and do not disturb, except for urgent notifications."
             }
 
             Row {
+                visible: page.section === "interface"
                 text: "Set"
 
                 Repeater {
@@ -89,6 +104,7 @@ ColumnLayout {
             }
 
             SettingSlider {
+                visible: page.section === "interface"
                 Layout.fillWidth: true
                 Layout.bottomMargin: 4
                 label: "Volume"
@@ -100,11 +116,13 @@ ColumnLayout {
             }
 
             SectionLabel {
+                visible: page.section === "interface"
                 text: "Notification tone"
             }
 
             // Picking one plays it.
             Flow {
+                visible: page.section === "interface"
                 Layout.fillWidth: true
                 spacing: 6
 
@@ -126,10 +144,12 @@ ColumnLayout {
             }
 
             SectionLabel {
+                visible: page.section === "interface"
                 text: "Hear them"
             }
 
             Flow {
+                visible: page.section === "interface"
                 Layout.fillWidth: true
                 spacing: 6
 
@@ -157,11 +177,12 @@ ColumnLayout {
 
             // services/AudioEffects.qml
             SectionLabel {
-                Layout.topMargin: 12
+                visible: page.section === "effects"
                 text: "Equaliser"
             }
 
             Row {
+                visible: page.section === "effects"
                 text: "On every output, before the correction"
 
                 Chip {
@@ -172,6 +193,7 @@ ColumnLayout {
             }
 
             Flow {
+                visible: page.section === "effects"
                 Layout.fillWidth: true
                 spacing: 6
 
@@ -189,21 +211,25 @@ ColumnLayout {
             }
 
             Equaliser {
+                visible: page.section === "effects"
                 Layout.fillWidth: true
                 Layout.topMargin: 4
                 opacity: AudioEffects.eqOn ? 1 : Theme.dimOpacity
             }
 
             Note {
+                visible: page.section === "effects"
                 text: "Moving a band makes the preset Custom, kept for next time. The sound is lowered by the largest boost so that it never clips."
             }
 
             SectionLabel {
+                visible: page.section === "effects"
                 Layout.topMargin: 12
                 text: "Night mode"
             }
 
             Row {
+                visible: page.section === "effects"
                 text: "Quiet parts up, loud parts down"
 
                 Chip {
@@ -214,6 +240,7 @@ ColumnLayout {
             }
 
             Row {
+                visible: page.section === "effects"
                 text: "Strength"
 
                 Repeater {
@@ -230,15 +257,18 @@ ColumnLayout {
             }
 
             Note {
-                text: "For late listening: speech stays clear and bangs do not jump out, so the volume can stay low. On every output, after the equaliser."
+                visible: page.section === "effects"
+                text: "Like a TV's night mode: quiet parts such as speech come up and loud ones such as explosions come down, so you can keep the volume low and still hear everything."
             }
 
             SectionLabel {
+                visible: page.section === "effects"
                 Layout.topMargin: 12
                 text: "Headphone correction"
             }
 
             Row {
+                visible: page.section === "effects"
                 text: AudioEffects.profile ? `${AudioEffects.profile.name}, by ${AudioEffects.profile.source ?? "AutoEQ"}` : "None for this output"
 
                 Chip {
@@ -256,10 +286,12 @@ ColumnLayout {
             }
 
             Note {
+                visible: page.section === "effects"
                 text: `For ${Audio.nameOf(AudioEffects.sink) || "the output"}: AutoEQ's correction brings headphones to a neutral sound, so some sound quieter and with less bass. Search for yours to pick another.`
             }
 
             Rectangle {
+                visible: page.section === "effects"
                 Layout.fillWidth: true
                 implicitHeight: 30
                 radius: Theme.moduleRadius
@@ -299,16 +331,18 @@ ColumnLayout {
             }
 
             Searching {
+                visible: page.section === "effects" && running  // its own visible would be replaced
                 running: AudioEffects.cataloguing
             }
 
             Note {
-                visible: AudioEffects.catalogueFailed || AudioEffects.fetchFailed
+                visible: page.section === "effects" && (AudioEffects.catalogueFailed || AudioEffects.fetchFailed)
                 color: Theme.warning
                 text: AudioEffects.catalogueFailed ? "Could not reach AutoEQ." : "Could not download that one."
             }
 
             ColumnLayout {
+                visible: page.section === "effects"
                 Layout.fillWidth: true
                 spacing: 2
 
@@ -329,11 +363,12 @@ ColumnLayout {
             }
 
             SectionLabel {
-                Layout.topMargin: 12
+                visible: page.section === "microphone"
                 text: "Microphone"
             }
 
             Row {
+                visible: page.section === "microphone"
                 text: "Noise suppression"
 
                 Chip {
@@ -344,6 +379,7 @@ ColumnLayout {
             }
 
             SettingSlider {
+                visible: page.section === "microphone"
                 Layout.fillWidth: true
                 label: "Voice threshold"
                 unit: "%"
@@ -354,10 +390,12 @@ ColumnLayout {
             }
 
             Note {
+                visible: page.section === "microphone"
                 text: "How sure it must be that it hears a voice before letting the sound through. Higher cuts more noise, and may clip the start of words."
             }
 
             SettingSlider {
+                visible: page.section === "microphone"
                 Layout.fillWidth: true
                 label: "Hold after speaking"
                 unit: " ms"
@@ -368,10 +406,12 @@ ColumnLayout {
             }
 
             Note {
+                visible: page.section === "microphone"
                 text: "How long it stays open once you stop. Longer lets the room in as a faint static after each sentence; shorter may clip the ends of words."
             }
 
             Row {
+                visible: page.section === "microphone"
                 text: "Listen to yourself"
 
                 Chip {
@@ -382,14 +422,20 @@ ColumnLayout {
             }
 
             Note {
+                visible: page.section === "microphone"
                 Layout.bottomMargin: 4
                 text: "Plays the microphone in your headphones as others hear it, while this page is open. Through speakers it would feed back."
             }
         }
     }
 
+    MoreBelow {
+        flickable: flick
+    }
+
     Button {
         Layout.alignment: Qt.AlignRight
+        visible: page.section === "interface"
         enabled: Settings.soundsChanged
         text: "Back to the defaults"
         onClicked: Settings.resetSounds()

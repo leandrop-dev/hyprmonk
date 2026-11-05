@@ -1,8 +1,16 @@
 # Settings
 
-A centred card (Super+comma, or quick actions > Settings) with its pages down
-the side. Ideas from noctalia, Ryoku and Shibumi Shell,
-no code from them.
+A centred card (Super+comma, or quick actions > Settings), 880 by 680 (less
+on a short screen), with its pages down the side in three groups: Desktop
+(Display, Windows, Bar, Dock), Look and sound (Appearance, Sounds) and System
+(Input, Power, Recording, Notifications). Bar (Modules, Look), Appearance
+(Theme, Motion, Terminal, Login screen) and Sounds (Interface, Effects,
+Microphone) list their sub-pages under them while open; a sub-page is a part
+of its page (the page's `section`), so moving between them keeps what the
+page holds. The arrows and Tab go through what the side shows. A page that
+scrolls fades out at its foot under an arrow while there is more below
+(`widgets/MoreBelow.qml`). Ideas from noctalia, Ryoku and Shibumi Shell, no
+code from them.
 
 The Display, Windows, Bar, Dock, Sounds, Input and Power pages keep to `settings.json` in the
 state directory, holding only what was changed, so the rest follows the repo's
