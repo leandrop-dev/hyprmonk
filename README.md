@@ -43,7 +43,9 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   and the media in its centre card, with a live spectrum (cava, seven styles).
 - Panels from the bar: Wi-Fi (networks, passwords, the connection editor for
   the rest), Bluetooth (pairing, connecting, batteries), sound (outputs,
-  inputs, a mixer, the audio effects' switches), batteries, a calendar, and media with synced lyrics.
+  inputs, a mixer, the audio effects' switches), batteries, a calendar
+  (national holidays for a chosen country, events from Google or any iCal
+  link, and events of your own), and media with synced lyrics.
 - A dock at the bottom (or any other edge) with the open apps and a dot per
   window: a click focuses an app, goes through its windows or minimises it,
   and hovering lists its windows to pick or close. It can hide, list only the
@@ -64,7 +66,8 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   window floating, resized from its borders) and animations, the bar's
   modules by drag and drop, at the top or the bottom, with its clock,
   workspaces (pills, numbers, dots or a chomper) temperature unit and the cat's drawer or panel, the dock (where it sits, whose windows,
-  its size, hiding and growing icons), and the appearance, picked from small previews: the tone with each one's card opacity, blur and text
+  its size, hiding and growing icons), the calendar (the country whose
+  holidays it marks, and the calendars it shows, each in a colour), and the appearance, picked from small previews: the tone with each one's card opacity, blur and text
   colour, the spectrum's style, how a new wallpaper comes in (fade, wipe,
   a circle from where it was picked, or any), the fonts (one for the
   interface and apps, one for the terminal, from a set of freely licensed
@@ -359,7 +362,6 @@ cargo clippy --all-targets -- -D warnings
 
 An open list, in no fixed order.
 
-- Calendar events from all three sources: local, Google and CalDAV.
 - The shell in other languages, starting with Portuguese (Portugal): each
   account picks its own, from its locale to begin with, so one person can
   keep English while another has Portuguese. Every string the shell shows
@@ -416,6 +418,8 @@ An open list, in no fixed order.
 - The night light's guide to warmth after a table in KTC's
   [colour temperature for late-night gaming](https://us.ktcplay.com/blogs/support-tips/color-temperature-late-night-gaming);
   in our own words.
+- The public holidays from [Nager.Date](https://date.nager.at)'s free API, fetched
+  and kept a year at a time.
 - The night light's fade in even steps of mireds, after
   [serpantinum-gamma](https://github.com/ilyamiro/serpantinum-gamma); no code taken.
 - The running cat's font from [runcat-text](https://github.com/AlejandroMinor/runcat-text)

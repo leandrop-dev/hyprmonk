@@ -106,6 +106,11 @@ hyprsunset
 # its udev rule lets the logged-in user reach the screens
 ddcutil
 
+# The calendar's events: khal reads them, vdirsyncer fetches the subscribed
+# calendars (Settings > Calendar)
+khal
+vdirsyncer
+
 # Secrets: GNOME Keyring, unlocked at login by SDDM's PAM file; SSH keys
 # through gcr's agent (gcr-4 comes with it)
 gnome-keyring

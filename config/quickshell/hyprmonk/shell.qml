@@ -23,12 +23,14 @@ import qs.wallpaper
 
 ShellRoot {
     // Sounds listens for cards, panels and devices from the start, and
-    // AudioEffects starts the effects left on; both answer IPC. So they are
-    // loaded here rather than when first used.
+    // AudioEffects starts the effects left on; both answer IPC, as Calendar
+    // and Events do (Events also fetches the subscribed calendars). So they are loaded here rather than when first used.
     Component.onCompleted: {
         Idle.start();
         void Sounds.on;
         void AudioEffects.correctionOn;
+        void Calendar.country;
+        void Events.available;
     }
 
     ThemeOutputs {}

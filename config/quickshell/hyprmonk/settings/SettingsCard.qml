@@ -24,6 +24,8 @@ Overlay {
         { group: "Desktop", name: "Bar", icon: "\u{F0570}", file: "BarPage.qml",
           subs: [{ key: "modules", name: "Modules" }, { key: "look", name: "Look" }] },
         { group: "Desktop", name: "Dock", icon: "\u{F10A9}", file: "DockPage.qml" },
+        { group: "Desktop", name: "Calendar", icon: "\u{F00ED}", file: "CalendarPage.qml",
+          subs: [{ key: "holidays", name: "Holidays" }, { key: "calendars", name: "Calendars" }] },
         { group: "Look and sound", name: "Appearance", icon: "\u{F050E}", file: "AppearancePage.qml",
           subs: [{ key: "theme", name: "Theme" }, { key: "motion", name: "Motion" },
                  { key: "fonts", name: "Fonts" },

@@ -94,6 +94,31 @@ config. Hyprland options are also written to `settings.lua`, loaded after
   the pointer; and a dot per window. Kept in `dock`. Also over IPC: `qs -c
   hyprmonk ipc call dock set <key> <value>`, `dock toggle`, and for the bar
   `bar move <module> <left|right|hidden> <index>` and `bar set <key> <value>`.
+- [x] Calendar > Holidays (`services/Calendar.qml`): the country whose public
+  holidays the calendar under the clock marks, found by name or code in a
+  pop-up list, or none; from LC_TIME or LANG until one is picked. Regional
+  days (one part of the country only) and optional ones (days off for some)
+  can each be left out; both show fainter. From Nager.Date
+  (`date.nager.at/api/v3`, no key), a year at a time, kept in
+  `~/.cache/hyprmonk/holidays` and fetched again after 30 days. Kept in
+  `calendar.json`. IPC: `calendar country <code>`, `calendar holidays
+  <yyyy-mm-dd>`.
+- [x] Calendar > Calendars (`services/Events.qml`): the local calendar and
+  each subscribed one, with a colour from seven (the accent first); a
+  subscribed one is a name and its private iCal link (Google's "Secret
+  address in iCal format", Outlook's published ICS link; webcal:// read as
+  https://), removed with its folder. vdirsyncer fetches the links into
+  `~/.local/share/hyprmonk/calendar/<id>` at the shell's start, every 15
+  minutes and on "Fetch now", its last error shown; khal reads every folder,
+  the subscribed ones read-only. The panel lists the six weeks it shows with
+  one `khal list --json` (an array per day), a dot per event under each day
+  (three at most) and the selected day's events under the month. Local
+  events are added there (a title, from and to as 14:30 or neither for all
+  day, once, weekly, monthly or yearly), one `.ics` file each in `local/`,
+  and deleted by removing it. The links are kept in `calendars.json`; both
+  configs are written to the state directory's `calendar/` with mode 600.
+  Needs `khal` and `vdirsyncer`. IPC: `events sync`, `events list
+  <yyyy-mm-dd>`.
 - [x] Sounds (`services/Sounds.qml`): sounds on or off (on to begin with);
   the set, hyprmonk's own (`assets/sounds/hyprmonk`, sine waves made by its
   `make.sh` with ffmpeg) or serpantinum's (copied under its AGPL, see the
