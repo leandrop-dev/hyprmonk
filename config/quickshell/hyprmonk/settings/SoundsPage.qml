@@ -290,76 +290,30 @@ ColumnLayout {
                 text: `For ${Audio.nameOf(AudioEffects.sink) || "the output"}: AutoEQ's correction brings headphones to a neutral sound, so some sound quieter and with less bass. Search for yours to pick another.`
             }
 
-            Rectangle {
+            // Picking downloads it; the row's arrow shows while that runs.
+            SearchField {
+                id: search
+
                 visible: page.section === "effects"
                 Layout.fillWidth: true
-                implicitHeight: 30
-                radius: Theme.moduleRadius
-                color: Theme.fg(0.06)
-                border.width: 1
-                border.color: search.activeFocus ? Qt.alpha(Theme.accent, 0.8) : Theme.rim
-
-                TextInput {
-                    id: search
-
-                    anchors.fill: parent
-                    anchors.leftMargin: 12
-                    anchors.rightMargin: 12
-                    verticalAlignment: TextInput.AlignVCenter
-                    color: Theme.foreground
-                    selectionColor: Qt.alpha(Theme.accent, 0.55)
-                    font.family: Theme.font
-                    font.pixelSize: Theme.rowFontSize
-                    clip: true
-                    onActiveFocusChanged: if (activeFocus) AudioEffects.loadCatalogue()
-                    Keys.onEscapePressed: event => {
-                        if (text === "") {
-                            event.accepted = false;
-                            return;
-                        }
-                        text = "";
-                    }
-
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        visible: search.text === ""
-                        text: "Search AutoEQ for your headphones"
-                        color: Theme.fg(Theme.dimOpacity)
-                        font: search.font
-                    }
-                }
-            }
-
-            Searching {
-                visible: page.section === "effects" && running  // its own visible would be replaced
-                running: AudioEffects.cataloguing
+                placeholder: "Search AutoEQ for your headphones"
+                busy: AudioEffects.cataloguing
+                message: "No headphones by that name"
+                results: AudioEffects.search(search.text).map(entry => ({
+                    entry,
+                    icon: AudioEffects.fetching === entry.path ? "\u{F01DA}" : "\u{F02CB}",
+                    text: entry.name,
+                    detail: [entry.source, entry.form].filter(part => part !== "").join(", "),
+                    selected: AudioEffects.settingsProfiles[AudioEffects.sinkName]?.path === entry.path
+                }))
+                onFocused: AudioEffects.loadCatalogue()
+                onPicked: result => AudioEffects.pick(result.entry)
             }
 
             Note {
                 visible: page.section === "effects" && (AudioEffects.catalogueFailed || AudioEffects.fetchFailed)
                 color: Theme.warning
                 text: AudioEffects.catalogueFailed ? "Could not reach AutoEQ." : "Could not download that one."
-            }
-
-            ColumnLayout {
-                visible: page.section === "effects"
-                Layout.fillWidth: true
-                spacing: 2
-
-                Repeater {
-                    model: AudioEffects.search(search.text)
-
-                    OptionRow {
-                        required property var modelData
-
-                        Layout.fillWidth: true
-                        icon: AudioEffects.fetching === modelData.path ? "\u{F01DA}" : "\u{F02CB}"
-                        text: modelData.name
-                        detail: [modelData.source, modelData.form].filter(part => part !== "").join(", ")
-                        selected: AudioEffects.settingsProfiles[AudioEffects.sinkName]?.path === modelData.path
-                        onClicked: AudioEffects.pick(modelData)
-                    }
-                }
             }
 
             SectionLabel {

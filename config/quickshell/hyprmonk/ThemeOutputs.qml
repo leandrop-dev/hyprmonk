@@ -74,6 +74,7 @@ Scope {
         + `theme.surface = "rgba(${hex(saved.background).slice(1)}${alpha(Theme.savedCardOpacity)})"\n`
         + `theme.text = "rgb(${hex(saved.foreground).slice(1)})"\n`
         + (Theme.cardBlur ? "" : "theme.cardBlur = false\n")
+        + `theme.font = "${Theme.font.replace(/["\\]/g, "")}"\n`
 
     // kitty's text, background, cursor and selection (theme/kitty-tone.conf,
     // after matugen's in kitty.conf), and its 16 colours if the tone has them;
@@ -101,6 +102,9 @@ Scope {
         }
         // Translucent like the shell's cards (kitty.conf allows the change).
         lines.push("background_opacity".padEnd(24) + Theme.savedCardOpacity.toFixed(2));
+        // The monospace font (Settings > Appearance > Fonts); kitty brings the
+        // icons any font lacks.
+        lines.push("font_family".padEnd(24) + Theme.monoFont);
         return lines.join("\n") + "\n";
     }
 
@@ -229,8 +233,8 @@ Scope {
     }
 
     // qt6ct's settings: Breeze, the colours above, the tone's icons, the
-    // fonts GTK apps have. Running Qt apps read it again 3 s after it
-    // changes, so it is written after the colours.
+    // fonts (Settings > Appearance > Fonts). Running Qt apps read it again
+    // 3 s after it changes, so it is written after the colours.
     readonly property string qtConfig: {
         return [
             "# Written by the shell (ThemeOutputs.qml) for the saved tone. Do not edit.",
@@ -242,8 +246,8 @@ Scope {
             "style=Breeze",
             "",
             "[Fonts]",
-            "fixed=\"JetBrainsMono Nerd Font,10\"",
-            "general=\"Noto Sans,10\"",
+            `fixed="${Theme.monoFont},10"`,
+            `general="${Theme.appFont || "Noto Sans"},10"`,
             ""
         ].join("\n");
     }
@@ -840,13 +844,14 @@ Scope {
         command: ["pkill", "-USR1", "-x", "kitty"]
     }
 
-    // The theme GTK draws with, light or dark, the icons, and the cursor
-    // (named in uwsm/env; GTK 3 apps read it from here, not from there).
+    // The theme GTK draws with, light or dark, the icons, the cursor (named
+    // in uwsm/env; GTK 3 apps read it from here, not from there) and the
+    // two fonts, or GNOME's own until picked.
     Process {
         id: gsettings
-        command: ["sh", "-c", 'i=org.gnome.desktop.interface; gsettings set $i gtk-theme "$1" && gsettings set $i color-scheme "$2" && gsettings set $i icon-theme "$3" && gsettings set $i cursor-theme "$4" && gsettings set $i cursor-size "$5"',
+        command: ["sh", "-c", 'i=org.gnome.desktop.interface; gsettings set $i gtk-theme "$1" && gsettings set $i color-scheme "$2" && gsettings set $i icon-theme "$3" && gsettings set $i cursor-theme "$4" && gsettings set $i cursor-size "$5" && f() { if [ -n "$2" ]; then gsettings set $i "$1" "$2 11"; else gsettings reset $i "$1"; fi; } && f font-name "$6" && f monospace-font-name "$7"',
             "sh", root.saved.light ? "adw-gtk3" : "adw-gtk3-dark", root.saved.light ? "prefer-light" : "prefer-dark", root.iconTheme,
-            Quickshell.env("XCURSOR_THEME") || "Adwaita", Quickshell.env("XCURSOR_SIZE") || "24"]
+            Quickshell.env("XCURSOR_THEME") || "Adwaita", Quickshell.env("XCURSOR_SIZE") || "24", Theme.appFont, Theme.appMonoFont]
     }
 
     // KDE apps (KIconTheme::initTheme, KStyleManager) take their icons and

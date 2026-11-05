@@ -17,6 +17,8 @@ theme = {
     -- The tone's background and text: the Floating layout's title bars.
     surface  = "rgba(1e1e2ef2)",
     text     = "rgb(cdd6f4)",
+    -- The shell's interface font (Settings > Appearance > Fonts).
+    font     = "JetBrainsMono Nerd Font",
 }
 load_optional(state .. "/theme/colors.lua")
 -- The Appearance tone's own accent, if it has one (written by the shell).

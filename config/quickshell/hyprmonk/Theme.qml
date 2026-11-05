@@ -143,8 +143,28 @@ Singleton {
         return Qt.alpha(foreground, alpha >= 0.3 && tone.light ? Math.min(1, alpha + 0.25) : alpha);
     }
 
-    // Type
-    readonly property string font: "JetBrainsMono Nerd Font"
+    // Type. Two fonts, picked in Settings > Appearance > Fonts and kept in
+    // appearance.json: the interface's (the shell, GTK and Qt apps, the
+    // Floating layout's title bars and the login screen) and the monospace
+    // one (the terminal, and code in apps). ThemeOutputs.qml hands them on.
+    // A font without the shell's icons gets them from Symbols Nerd Font.
+    // Until one is picked ("" kept), the shell and the terminal have
+    // defaultFont and apps keep their own (appFont and appMonoFont empty).
+    readonly property string defaultFont: "JetBrainsMono Nerd Font"
+    readonly property string appFont: appearance.font
+    readonly property string appMonoFont: appearance.monoFont
+    readonly property string font: appFont || defaultFont
+    readonly property string monoFont: appMonoFont || defaultFont
+
+    // "" for the default.
+    function setFont(family: string): void {
+        appearance.font = family;
+    }
+
+    function setMonoFont(family: string): void {
+        appearance.monoFont = family;
+    }
+
     readonly property int fontSize: 14
     readonly property int rowFontSize: 13     // rows in panels
     readonly property int bodyFontSize: 12
@@ -205,6 +225,8 @@ Singleton {
             property var opacity: ({})
             property var text: ({})
             property var blur: ({})
+            property string font: ""  // "" for defaultFont
+            property string monoFont: ""
         }
     }
 

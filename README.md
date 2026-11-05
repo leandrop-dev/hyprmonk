@@ -66,8 +66,9 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   workspaces (pills, numbers, dots or a chomper) temperature unit and the cat's drawer or panel, the dock (where it sits, whose windows,
   its size, hiding and growing icons), and the appearance, picked from small previews: the tone with each one's card opacity, blur and text
   colour, the spectrum's style, how a new wallpaper comes in (fade, wipe,
-  a circle from where it was picked, or any), fastfetch's look and the login screen's
-  look; the sounds (on or off, hyprmonk's set or serpantinum's, their
+  a circle from where it was picked, or any), the fonts (one for the
+  interface and apps, one for the terminal, from a set of freely licensed
+  ones), fastfetch's look and the login screen's look; the sounds (on or off, hyprmonk's set or serpantinum's, their
   volume and the notification tone); the audio effects (the equaliser, with presets
   and ten bands, night mode and its strength, the headphone correction, searched for in AutoEQ, and the noise suppression's threshold and hold,
   with a way to hear yourself); keyboard layouts, the mouse and focus; when the screen locks and the
@@ -353,16 +354,6 @@ cargo clippy --all-targets -- -D warnings
 | `docs/` | Work planned in detail |
 
 ## Roadmap
-
-**Next**
-
-In this order.
-
-1. **A font for everything.** One font picked in Settings for the shell,
-   GTK and Qt apps and the terminal, starting from the set serpantinum has:
-   its freely licensed ones (Nerd Fonts, JetBrains Mono, Fira Code, Roboto
-   and the like), installed from the repos rather than copied. Its SF Pro
-   and TT Commons are not free to pass on.
 
 **Later**
 

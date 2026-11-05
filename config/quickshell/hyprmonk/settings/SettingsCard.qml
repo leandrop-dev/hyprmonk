@@ -26,6 +26,7 @@ Overlay {
         { group: "Desktop", name: "Dock", icon: "\u{F10A9}", file: "DockPage.qml" },
         { group: "Look and sound", name: "Appearance", icon: "\u{F050E}", file: "AppearancePage.qml",
           subs: [{ key: "theme", name: "Theme" }, { key: "motion", name: "Motion" },
+                 { key: "fonts", name: "Fonts" },
                  { key: "terminal", name: "Terminal" }, { key: "login", name: "Login screen" }] },
         { group: "Look and sound", name: "Sounds", icon: "\u{F057E}", file: "SoundsPage.qml",
           subs: [{ key: "interface", name: "Interface" }, { key: "effects", name: "Effects" },

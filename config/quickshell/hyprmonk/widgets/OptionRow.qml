@@ -11,6 +11,7 @@ Rectangle {
     property string icon: ""
     property string text: ""
     property string detail: ""
+    property string family: ""  // the name written in this font, if set
     property bool selected: false
 
     signal clicked()
@@ -40,7 +41,7 @@ Rectangle {
             text: option.text
             textFormat: Text.PlainText
             color: Theme.foreground
-            font.family: Theme.font
+            font.family: option.family || Theme.font
             font.pixelSize: Theme.rowFontSize
             font.bold: option.selected
             elide: Text.ElideRight

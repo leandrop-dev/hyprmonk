@@ -51,7 +51,7 @@ if bars then
         bar_color         = theme.surface,
         bar_blur          = theme.cardBlur ~= false,
         col               = { text = theme.text },
-        bar_text_font     = "JetBrainsMono Nerd Font",
+        bar_text_font     = theme.font,
         bar_text_size     = 12,
         bar_text_align    = "left",
         bar_padding       = 12,

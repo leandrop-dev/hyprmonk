@@ -23,6 +23,23 @@ qt6-imageformats   # WebP wallpapers
 ttf-jetbrains-mono-nerd
 noto-fonts   # text in apps and notifications beyond JetBrains Mono
 noto-fonts-emoji
+# The fonts Settings > Appearance > Fonts offers:
+# for the interface
+inter-font
+ttf-roboto
+ttf-ubuntu-font-family
+ttf-atkinson-hyperlegible   # made for easy reading
+otf-opendyslexic-nerd   # made for readers with dyslexia
+# monospace, for the terminal
+ttf-firacode-nerd
+ttf-0xproto-nerd
+ttf-agave-nerd
+otf-comicshanns-nerd
+ttf-cousine-nerd
+ttf-daddytime-mono-nerd
+otf-atkinsonhyperlegiblemono-nerd
+# the shell's icons, for an interface font without them
+ttf-nerd-fonts-symbols
 xdg-user-dirs   # ~/Pictures and the rest, where the wallpapers live
 adw-gtk-theme   # GTK3 apps looking like GTK4 ones, in the tone's colours
 breeze   # Qt apps' style (qt6ct)

@@ -1,9 +1,10 @@
 // Settings > Appearance: the tone, its cards and text (kept with that tone;
 // only colours that read on its background are offered or taken), the
 // spectrum's style, how a new wallpaper comes in, fastfetch's look and the
-// login screen's look, in four sub-pages: Theme, Motion (the spectrum and
-// wallpaper changes), Terminal and Login screen. A tone or a spectrum style
-// under the pointer is shown until it leaves. The page scrolls.
+// login screen's look, and the two fonts, in five sub-pages: Theme, Motion
+// (the spectrum and wallpaper changes), Fonts, Terminal and Login screen. A
+// tone or a spectrum style under the pointer is shown until it leaves. The
+// page scrolls.
 import QtQuick
 import QtQuick.Layouts
 import qs
@@ -14,7 +15,7 @@ import qs.widgets
 Item {
     id: page
 
-    // The sub-page shown (SettingsCard.qml): theme, motion, terminal or login.
+    // The sub-page shown (SettingsCard.qml): theme, motion, fonts, terminal or login.
     property string section: "theme"
 
     readonly property var tone: Theme.toneOf(Theme.savedTone)
@@ -437,6 +438,32 @@ Item {
                         }
                     }
                 }
+            }
+
+            // Theme.qml keeps the two; ThemeOutputs.qml hands them on.
+            FontPicker {
+                visible: page.section === "fonts"
+                Layout.fillWidth: true
+                title: "Interface"
+                families: ["JetBrainsMono Nerd Font", "Inter", "Roboto", "Ubuntu", "Adwaita Sans", "Noto Sans",
+                           "Atkinson Hyperlegible", "OpenDyslexic Nerd Font"]
+                current: Theme.appFont
+                note: "The shell, GTK and Qt apps, the title bars and the login screen."
+                onPicked: family => Theme.setFont(family)
+            }
+
+            FontPicker {
+                visible: page.section === "fonts"
+                Layout.fillWidth: true
+                Layout.topMargin: 12
+                title: "Monospace"
+                sample: "0O{}"
+                families: ["JetBrainsMono Nerd Font", "FiraCode Nerd Font", "0xProto Nerd Font", "Agave Nerd Font",
+                           "ComicShannsMono Nerd Font", "Cousine Nerd Font", "DaddyTimeMono Nerd Font",
+                           "AtkynsonMono Nerd Font", "Adwaita Mono"]
+                current: Theme.appMonoFont
+                note: "The terminal and code in apps."
+                onPicked: family => Theme.setMonoFont(family)
             }
 
             SectionLabel {

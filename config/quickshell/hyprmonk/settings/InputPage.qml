@@ -37,14 +37,24 @@ ColumnLayout {
         return codes.find(code => names[code].toLowerCase().startsWith(typed))
             ?? codes.find(code => names[code].toLowerCase().includes(typed)) ?? "";
     }
+    // Up to ten it names: the code typed, then names starting with it, then
+    // names holding it.
+    readonly property var found: {
+        const typed = field.text.trim().toLowerCase();
+        if (!typed) return [];
+        const codes = Object.keys(names);
+        const starts = codes.filter(code => names[code].toLowerCase().startsWith(typed));
+        const holds = codes.filter(code => !starts.includes(code) && names[code].toLowerCase().includes(typed));
+        return (typed in names ? [typed] : []).concat(starts.filter(code => code !== typed), holds.filter(code => code !== typed)).slice(0, 10);
+    }
 
     function setLayouts(list: var): void {
         Settings.setInput("layouts", list.join(","));
     }
 
-    function add(): void {
-        if (!match || layouts.includes(match) || layouts.length >= 4) return;
-        setLayouts(layouts.concat([match]));
+    function add(code: string): void {
+        if (!code || layouts.includes(code) || layouts.length >= 4) return;
+        setLayouts(layouts.concat([code]));
         field.text = "";
     }
 
@@ -115,56 +125,24 @@ ColumnLayout {
         }
     }
 
-    RowLayout {
-        Layout.fillWidth: true
+    // The layouts the typed text names, by code or name; Enter adds the best
+    // (page.match) unless one is marked.
+    SearchField {
+        id: field
+
+        Layout.preferredWidth: 260
         Layout.bottomMargin: 12
         visible: page.layouts.length < 4
-        spacing: 12
-
-        Rectangle {
-            implicitWidth: 180
-            implicitHeight: 30
-            radius: Theme.moduleRadius
-            color: Theme.fg(0.06)
-            border.width: 1
-            border.color: field.activeFocus ? Qt.alpha(Theme.accent, 0.8) : Theme.rim
-
-            TextInput {
-                id: field
-
-                anchors.fill: parent
-                anchors.leftMargin: 12
-                anchors.rightMargin: 12
-                verticalAlignment: TextInput.AlignVCenter
-                color: Theme.foreground
-                selectionColor: Qt.alpha(Theme.accent, 0.55)
-                font.family: Theme.font
-                font.pixelSize: Theme.rowFontSize
-                clip: true
-
-                onAccepted: page.add()
-
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: !field.text
-                    text: "Add a layout"
-                    color: Theme.fg(Theme.dimOpacity)
-                    font: field.font
-                }
-            }
-        }
-
-        Text {
-            Layout.fillWidth: true
-            elide: Text.ElideRight
-            visible: field.text.trim() !== ""
-            text: !page.match ? "No such layout"
-                : page.layouts.includes(page.match) ? "Already there"
-                : "Enter adds " + page.names[page.match]
-            color: page.match && !page.layouts.includes(page.match) ? Theme.fg(Theme.dimOpacity) : Theme.warning
-            font.family: Theme.font
-            font.pixelSize: Theme.bodyFontSize
-        }
+        placeholder: "Add a layout"
+        message: "No such layout"
+        results: page.found.map(code => ({
+            code,
+            text: page.names[code],
+            detail: page.layouts.includes(code) ? "added" : code,
+            selected: page.layouts.includes(code)
+        }))
+        onAccepted: page.add(page.match)
+        onPicked: result => page.add(result.code)
     }
 
     SectionLabel {
