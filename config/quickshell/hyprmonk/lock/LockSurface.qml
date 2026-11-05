@@ -110,7 +110,7 @@ Rectangle {
         // Above the digits' tops (0.73 of the size in JetBrains Mono).
         anchors.baseline: time.baseline
         anchors.baselineOffset: -(0.73 * time.font.pixelSize + 20 * surface.s)
-        text: Qt.locale("en_GB").toString(clock.date, "dddd dd · MMMM").toUpperCase()
+        text: I18n.locale.toString(clock.date, I18n.tr("dddd dd · MMMM")).toUpperCase()
         color: Theme.fg(0.73)
         font.family: Theme.font
         font.pixelSize: Math.round(26 * surface.s)
@@ -300,9 +300,9 @@ Rectangle {
             Text {
                 anchors.centerIn: parent
                 visible: input.text === ""
-                text: surface.lock.checking ? "Checking…"
+                text: surface.lock.checking ? I18n.tr("Checking…")
                     : field.failed ? surface.lock.error + " (" + surface.lock.failures + ")"
-                    : "Type to unlock"
+                    : I18n.tr("Type to unlock")
                 color: field.failed ? Theme.warning : Theme.fg(0.55)
                 font.family: Theme.font
                 font.pixelSize: Math.round(20 * surface.s)

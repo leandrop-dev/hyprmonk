@@ -159,7 +159,7 @@ Scope {
 
                         Text {
                             Layout.alignment: Qt.AlignHCenter
-                            text: tile.armed ? "Again" : tile.modelData.label
+                            text: tile.armed ? I18n.tr("Again") : tile.modelData.label
                             color: Theme.foreground
                             font.family: Theme.font
                             font.pixelSize: Theme.rowFontSize

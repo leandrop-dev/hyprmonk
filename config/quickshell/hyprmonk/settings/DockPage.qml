@@ -47,7 +47,7 @@ ColumnLayout {
     component Switch: Chip {
         property string key: ""
 
-        text: Settings.dockChoice(key) ? "on" : "off"
+        text: Settings.dockChoice(key) ? I18n.tr("on") : I18n.tr("off")
         on: Settings.dockChoice(key)
         onClicked: Settings.setDockChoice(key, !Settings.dockChoice(key))
     }
@@ -69,11 +69,11 @@ ColumnLayout {
             spacing: 8
 
             SectionLabel {
-                text: "Dock"
+                text: I18n.tr("Dock")
             }
 
             Row {
-                text: "Show the dock"
+                text: I18n.tr("Show the dock")
 
                 Switch {
                     key: "shown"
@@ -81,27 +81,27 @@ ColumnLayout {
             }
 
             Row {
-                text: "Position"
+                text: I18n.tr("Position")
 
                 Choice {
                     key: "position"
-                    labels: ({ bottom: "Bottom", top: "Top", left: "Left", right: "Right" })
+                    labels: ({ bottom: I18n.tr("Bottom"), top: I18n.tr("Top"), left: I18n.tr("Left"), right: I18n.tr("Right") })
                 }
             }
 
             Row {
-                text: "Windows from"
+                text: I18n.tr("Windows from")
 
                 Choice {
                     key: "scope"
-                    labels: ({ all: "Every workspace", workspace: "This workspace" })
+                    labels: ({ all: I18n.tr("Every workspace"), workspace: I18n.tr("This workspace") })
                 }
             }
 
             SettingSlider {
                 Layout.fillWidth: true
                 Layout.bottomMargin: 4
-                label: "Size"
+                label: I18n.tr("Size")
                 from: Settings.dockSizeRange.from
                 to: Settings.dockSizeRange.to
                 value: Settings.dockSize
@@ -109,20 +109,20 @@ ColumnLayout {
             }
 
             SectionLabel {
-                text: "Behaviour"
+                text: I18n.tr("Behaviour")
             }
 
             Row {
-                text: "Hide"
+                text: I18n.tr("Hide")
 
                 Choice {
                     key: "autohide"
-                    labels: ({ off: "Never", touch: "When a window touches it", always: "Always" })
+                    labels: ({ off: I18n.tr("Never"), touch: I18n.tr("When a window touches it"), always: I18n.tr("Always") })
                 }
             }
 
             Row {
-                text: "Grow under the pointer"
+                text: I18n.tr("Grow under the pointer")
 
                 Switch {
                     key: "magnify"
@@ -130,7 +130,7 @@ ColumnLayout {
             }
 
             Row {
-                text: "A dot per window"
+                text: I18n.tr("A dot per window")
 
                 Switch {
                     key: "dots"
@@ -146,7 +146,7 @@ ColumnLayout {
     Button {
         Layout.alignment: Qt.AlignRight
         enabled: Settings.dockChanged
-        text: "Back to the defaults"
+        text: I18n.tr("Back to the defaults")
         onClicked: Settings.resetDock()
     }
 }

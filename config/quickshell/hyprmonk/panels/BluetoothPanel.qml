@@ -43,7 +43,7 @@ ColumnLayout {
 
         SectionLabel {
             Layout.fillWidth: true
-            text: "Bluetooth"
+            text: I18n.tr("Bluetooth")
         }
 
         Searching {
@@ -53,13 +53,13 @@ ColumnLayout {
 
         Chip {
             visible: Bluez.on && !Bluez.searching
-            text: "search"
+            text: I18n.tr("search")
             onClicked: Bluez.search()
         }
 
         Chip {
             visible: Bluez.adapter?.state !== BluetoothAdapterState.Blocked
-            text: Bluez.on ? "on" : "off"
+            text: Bluez.on ? I18n.tr("on") : I18n.tr("off")
             on: Bluez.on
             onClicked: Bluez.adapter.enabled = !Bluez.on
         }
@@ -107,9 +107,9 @@ ColumnLayout {
                 Layout.fillWidth: true
                 readonly property string name: ask.request?.name ?? ""
 
-                text: ask.shows ? "Type this on " + name
-                    : ask.types ? "Code for " + name
-                    : "Pair with " + name + "?"
+                text: ask.shows ? I18n.tr("Type this on %1", name)
+                    : ask.types ? I18n.tr("Code for %1", name)
+                    : I18n.tr("Pair with %1?", name)
                 textFormat: Text.PlainText
                 color: Theme.foreground
                 font.family: Theme.font
@@ -131,9 +131,9 @@ ColumnLayout {
             Text {
                 Layout.fillWidth: true
                 visible: text !== ""
-                text: ask.kind === "confirmation" ? "Pair only if the device shows the same code"
-                    : ask.kind === "show-passkey" ? "Then press Enter on it"
-                    : ask.types ? "The one the device shows, or 0000 if it shows none"
+                text: ask.kind === "confirmation" ? I18n.tr("Pair only if the device shows the same code")
+                    : ask.kind === "show-passkey" ? I18n.tr("Then press Enter on it")
+                    : ask.types ? I18n.tr("The one the device shows, or 0000 if it shows none")
                     : ""
                 color: Theme.fg(Theme.dimOpacity)
                 font.family: Theme.font
@@ -177,13 +177,13 @@ ColumnLayout {
                 Button {
                     Layout.fillWidth: true
                     primary: true
-                    text: "Pair"
+                    text: I18n.tr("Pair")
                     onClicked: ask.accept()
                 }
 
                 Button {
                     Layout.fillWidth: true
-                    text: "Cancel"
+                    text: I18n.tr("Cancel")
                     onClicked: Bluez.answer(false, "")
                 }
             }
@@ -193,7 +193,7 @@ ColumnLayout {
     Text {
         Layout.fillWidth: true
         visible: !Bluez.on
-        text: Bluez.adapter?.state === BluetoothAdapterState.Blocked ? "Blocked by a switch or key on the machine" : "Bluetooth is off"
+        text: Bluez.adapter?.state === BluetoothAdapterState.Blocked ? I18n.tr("Blocked by a switch or key on the machine") : I18n.tr("Bluetooth is off")
         color: Theme.fg(Theme.dimOpacity)
         font.family: Theme.font
         font.pixelSize: Theme.bodyFontSize
@@ -216,13 +216,13 @@ ColumnLayout {
     SectionLabel {
         Layout.topMargin: Bluez.paired.length > 0 ? 6 : 0
         visible: Bluez.on
-        text: "In reach"
+        text: I18n.tr("In reach")
     }
 
     Text {
         Layout.fillWidth: true
         visible: Bluez.on
-        text: "Others see this machine as " + (Bluez.adapter?.name ?? "") + " while this is open"
+        text: I18n.tr("Others see this machine as %1 while this is open", Bluez.adapter?.name ?? "")
         textFormat: Text.PlainText
         wrapMode: Text.Wrap
         color: Theme.fg(Theme.dimOpacity)
@@ -233,7 +233,7 @@ ColumnLayout {
     Text {
         Layout.fillWidth: true
         visible: Bluez.on && Bluez.available.length === 0
-        text: Bluez.searching ? "Looking for devices" : "Nothing found"
+        text: Bluez.searching ? I18n.tr("Looking for devices") : I18n.tr("Nothing found")
         color: Theme.fg(Theme.dimOpacity)
         font.family: Theme.font
         font.pixelSize: Theme.bodyFontSize
@@ -291,12 +291,12 @@ ColumnLayout {
                 Layout.fillWidth: true
                 icon: Bluez.deviceIcon(row.modelData)
                 text: row.modelData?.name
-                detail: row.modelData?.pairing ? "Pairing"
-                      : row.modelData?.state === BluetoothDeviceState.Connecting ? "Connecting"
-                      : row.modelData?.state === BluetoothDeviceState.Disconnecting ? "Disconnecting"
+                detail: row.modelData?.pairing ? I18n.tr("Pairing")
+                      : row.modelData?.state === BluetoothDeviceState.Connecting ? I18n.tr("Connecting")
+                      : row.modelData?.state === BluetoothDeviceState.Disconnecting ? I18n.tr("Disconnecting")
                       : row.modelData?.connected && row.modelData?.batteryAvailable ? Math.round(row.modelData?.battery * 100) + "%"
-                      : row.modelData?.connected ? "Connected"
-                      : row.modelData?.paired ? "Paired" : ""
+                      : row.modelData?.connected ? I18n.tr("Connected")
+                      : row.modelData?.paired ? I18n.tr("Paired") : ""
                 selected: row.modelData?.connected
                 onClicked: panel.expand(row.modelData?.address)
             }
@@ -305,8 +305,8 @@ ColumnLayout {
                 Layout.fillWidth: true
                 Layout.leftMargin: 12
                 visible: row.open && text !== ""
-                text: Bluez.pairFailed === row.modelData?.address ? "Could not pair"
-                    : panel.failed === row.modelData?.address ? "Could not connect"
+                text: Bluez.pairFailed === row.modelData?.address ? I18n.tr("Could not pair")
+                    : panel.failed === row.modelData?.address ? I18n.tr("Could not connect")
                     : ""
                 color: Theme.warning
                 font.family: Theme.font
@@ -325,9 +325,9 @@ ColumnLayout {
                     Layout.fillWidth: true
                     enabled: !row.busy || row.modelData?.pairing
                     primary: !row.modelData?.connected
-                    text: row.modelData?.pairing ? "Cancel"
-                        : row.modelData?.connected ? "Disconnect"
-                        : row.modelData?.paired ? "Connect" : "Pair"
+                    text: row.modelData?.pairing ? I18n.tr("Cancel")
+                        : row.modelData?.connected ? I18n.tr("Disconnect")
+                        : row.modelData?.paired ? I18n.tr("Connect") : I18n.tr("Pair")
                     onClicked: {
                         const device = row.modelData;
                         if (!device) return;
@@ -343,7 +343,7 @@ ColumnLayout {
                     Layout.fillWidth: true
                     visible: row.modelData?.paired
                     enabled: !row.busy
-                    text: panel.arming === row.modelData?.address ? "Again" : "Forget"
+                    text: panel.arming === row.modelData?.address ? I18n.tr("Again") : I18n.tr("Forget")
                     onClicked: if (row.modelData) panel.forget(row.modelData)
                 }
             }

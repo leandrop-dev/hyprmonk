@@ -68,13 +68,13 @@ Scope {
     function announceVolume(): void {
         if (outputSettle.running) return;
         const percent = Math.round(Audio.volume * 100);
-        show(Audio.volumeIcon, "Volume", Audio.muted ? "Muted" : percent + "%", Audio.muted ? 0 : percent);
+        show(Audio.volumeIcon, I18n.tr("Volume"), Audio.muted ? I18n.tr("Muted") : percent + "%", Audio.muted ? 0 : percent);
     }
 
     function announceMic(): void {
         if (inputSettle.running) return;
         const percent = Math.round(Audio.micVolume * 100);
-        show(Audio.micIcon, "Microphone", Audio.micMuted ? "Muted" : percent + "%", Audio.micMuted ? 0 : percent);
+        show(Audio.micIcon, I18n.tr("Microphone"), Audio.micMuted ? I18n.tr("Muted") : percent + "%", Audio.micMuted ? 0 : percent);
     }
 
     Timer {
@@ -94,7 +94,7 @@ Scope {
             if (name === "" || name === root.shownOutput) return;
             const first = root.shownOutput === "";
             root.shownOutput = name;
-            if (!first) root.show("\u{F04C3}", "Audio output", name, -1);
+            if (!first) root.show("\u{F04C3}", I18n.tr("Audio output"), name, -1);
         }
     }
 
@@ -115,11 +115,11 @@ Scope {
                 root.keyboard = now;
                 if (!was) return;
                 if (now.capsLock !== was.capsLock)
-                    root.show("\u{F0632}", "Caps Lock", now.capsLock ? "On" : "Off", -1);
+                    root.show("\u{F0632}", I18n.tr("Caps Lock"), now.capsLock ? I18n.tr("On") : I18n.tr("Off"), -1);
                 if (now.numLock !== was.numLock)
-                    root.show("\u{F03A0}", "Num Lock", now.numLock ? "On" : "Off", -1);
+                    root.show("\u{F03A0}", I18n.tr("Num Lock"), now.numLock ? I18n.tr("On") : I18n.tr("Off"), -1);
                 if (now.active_keymap !== was.active_keymap)
-                    root.show("\u{F030C}", "Keyboard layout", now.active_keymap, -1);
+                    root.show("\u{F030C}", I18n.tr("Keyboard layout"), now.active_keymap, -1);
             }
         }
     }
@@ -146,7 +146,7 @@ Scope {
                 const player = modelData;
                 if (!player.lengthSupported || player.length <= 0) return;
                 const track = [player.trackTitle, player.trackArtist].filter(s => s).join(" · ");
-                root.show(player.isPlaying ? "\u{F040A}" : "\u{F03E4}", player.isPlaying ? "Playing" : "Paused", track, -1);
+                root.show(player.isPlaying ? "\u{F040A}" : "\u{F03E4}", player.isPlaying ? I18n.tr("Playing") : I18n.tr("Paused"), track, -1);
             }
         }
     }
@@ -155,8 +155,8 @@ Scope {
         target: Notifications
 
         function onDoNotDisturbChanged(): void {
-            root.show(Notifications.doNotDisturb ? "\u{F009B}" : "\u{F009A}", "Do not disturb",
-                      Notifications.doNotDisturb ? "On" : "Off", -1);
+            root.show(Notifications.doNotDisturb ? "\u{F009B}" : "\u{F009A}", I18n.tr("Do not disturb"),
+                      Notifications.doNotDisturb ? I18n.tr("On") : I18n.tr("Off"), -1);
         }
     }
 
@@ -164,7 +164,7 @@ Scope {
         target: Awake
 
         function onOnChanged(): void {
-            root.show(Awake.on ? "\u{F0176}" : "\u{F0FAA}", "Stay awake", Awake.on ? "On" : "Off", -1);
+            root.show(Awake.on ? "\u{F0176}" : "\u{F0FAA}", I18n.tr("Stay awake"), Awake.on ? I18n.tr("On") : I18n.tr("Off"), -1);
         }
     }
 
@@ -173,7 +173,7 @@ Scope {
         target: Brightness
 
         function onStepped(caption: string, value: int): void {
-            root.show("\u{F00DF}", "Brightness", caption, value);
+            root.show("\u{F00DF}", I18n.tr("Brightness"), caption, value);
         }
     }
 
@@ -182,7 +182,7 @@ Scope {
         target: GameMode
 
         function onOnChanged(): void {
-            root.show("\u{F0297}", "Game mode", GameMode.on ? "On" : "Off", -1);
+            root.show("\u{F0297}", I18n.tr("Game mode"), GameMode.on ? I18n.tr("On") : I18n.tr("Off"), -1);
             gameSettle.restart();
         }
     }
@@ -197,7 +197,7 @@ Scope {
 
         function onProfileNameChanged(): void {
             if (gameSettle.running) return;
-            root.show("\u{F04C5}", "Power profile", Power.profileName, -1);
+            root.show("\u{F04C5}", I18n.tr("Power profile"), I18n.tr(Power.profileName), -1);
         }
     }
 

@@ -3,6 +3,7 @@
 import QtQuick
 import QtQuick.Layouts
 import qs
+import qs.services
 
 RowLayout {
     id: searching
@@ -28,7 +29,7 @@ RowLayout {
     }
 
     Text {
-        text: "Searching"
+        text: I18n.tr("Searching")
         color: Theme.fg(Theme.dimOpacity)
         font.family: Theme.font
         font.pixelSize: Theme.smallFontSize

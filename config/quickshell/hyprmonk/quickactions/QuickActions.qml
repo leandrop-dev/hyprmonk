@@ -24,9 +24,9 @@ Scope {
 
     readonly property list<Action> actions: [
         Action {
-            section: "Audio"
+            section: I18n.mark("Audio")
             icon: "\u{F04C3}"
-            label: "Audio output"
+            label: I18n.tr("Audio output")
             value: Audio.sinkName
             available: Audio.sinks.length > 0
             onRun: {
@@ -35,54 +35,54 @@ Scope {
             }
         },
         Action {
-            section: "Audio"
+            section: I18n.mark("Audio")
             icon: "\u{F036C}"
-            label: "Microphone"
+            label: I18n.tr("Microphone")
             on: !Audio.micMuted
             available: Audio.source?.audio != null
             onRun: Audio.source.audio.muted = !Audio.source.audio.muted
         },
         Action {
-            section: "System"
+            section: I18n.mark("System")
             icon: "\u{F0297}"
-            label: "Game mode"
+            label: I18n.tr("Game mode")
             on: GameMode.on
             onRun: GameMode.toggle()
         },
         Action {
-            section: "System"
+            section: I18n.mark("System")
             icon: "\u{F009B}"
-            label: "Do not disturb"
+            label: I18n.tr("Do not disturb")
             on: Notifications.doNotDisturb
             onRun: Notifications.doNotDisturb = !Notifications.doNotDisturb
         },
         Action {
-            section: "System"
+            section: I18n.mark("System")
             icon: "\u{F0176}"
-            label: "Stay awake"
+            label: I18n.tr("Stay awake")
             on: Awake.on
             onRun: Awake.toggle()
         },
         Action {
-            section: "System"
+            section: I18n.mark("System")
             icon: "\u{F0594}"
-            label: "Night light"
+            label: I18n.tr("Night light")
             value: NightLight.modeLabels[NightLight.mode]
             options: NightLight.modes.map(mode => NightLight.modeLabels[mode])
             onPicked: option => NightLight.setMode(NightLight.modes.find(mode => NightLight.modeLabels[mode] === option))
         },
         Action {
-            section: "System"
+            section: I18n.mark("System")
             icon: "\u{F04C5}"
-            label: "Power profile"
+            label: I18n.tr("Power profile")
             value: Power.profileName
             options: Power.names
             onPicked: option => Power.setProfile(option)
         },
         Action {
-            section: "System"
+            section: I18n.mark("System")
             icon: "\u{F030C}"
-            label: "Keyboard layout"
+            label: I18n.tr("Keyboard layout")
             value: Keyboard.layouts[Keyboard.index] ?? ""
             available: Keyboard.layouts.length > 1
             onRun: Keyboard.next()
@@ -90,10 +90,10 @@ Scope {
         // The other screens beside the main one (Settings > Display), showing
         // what it shows, or off. Tried like a mode: Keep, or it goes back.
         Action {
-            section: "System"
+            section: I18n.mark("System")
             icon: "\u{F037A}"
-            label: "Screens"
-            readonly property var kinds: ({ "Extend": "extend", "Mirror": "mirror", "Main screen only": "main" })
+            label: I18n.tr("Screens")
+            readonly property var kinds: ({ [I18n.mark("Extend")]: "extend", [I18n.mark("Mirror")]: "mirror", [I18n.mark("Main screen only")]: "main" })
             value: Object.keys(kinds).find(name => kinds[name] === Display.layout) ?? ""
             options: Object.keys(kinds)
             available: Display.all.length > 1
@@ -103,65 +103,65 @@ Scope {
             }
         },
         Action {
-            section: "System"
+            section: I18n.mark("System")
             icon: "\u{F012C}"
-            label: "Keep this layout"
-            value: Display.left + " s"
+            label: I18n.tr("Keep this layout")
+            value: I18n.tr("%1 s", Display.left)
             available: Display.trying
             onRun: Display.keep()
         },
         Action {
-            section: "System"
+            section: I18n.mark("System")
             icon: "\u{F0493}"
-            label: "Settings"
+            label: I18n.tr("Settings")
             onRun: Overlays.toggle("settings")
         },
         Action {
-            section: "System"
+            section: I18n.mark("System")
             icon: "\u{F0425}"
-            label: "Power menu"
+            label: I18n.tr("Power menu")
             onRun: Overlays.toggle("power")
         },
         Action {
-            section: "Recording"
+            section: I18n.mark("Recording")
             icon: "\u{F044A}"
-            label: "Screen recording"
+            label: I18n.tr("Screen recording")
             on: Recorder.active
             onRun: Recorder.toggle()
         },
         Action {
-            section: "Recording"
+            section: I18n.mark("Recording")
             icon: "\u{F0489}"
-            label: "Record area"
+            label: I18n.tr("Record area")
             value: Recorder.area
             options: Recorder.areas
             stays: true
             onPicked: option => Recorder.setArea(option)
         },
         Action {
-            section: "Recording"
+            section: I18n.mark("Recording")
             icon: "\u{F0459}"
-            label: "Keep the last minute"
+            label: I18n.tr("Keep the last minute")
             on: Recorder.replaying
             onRun: Recorder.toggleReplay()
         },
         Action {
-            section: "Recording"
+            section: I18n.mark("Recording")
             icon: "\u{F0193}"
-            label: "Save the last minute"
+            label: I18n.tr("Save the last minute")
             available: Recorder.replaying
             onRun: Recorder.saveReplay()
         },
         Action {
-            section: "Appearance"
+            section: I18n.mark("Appearance")
             icon: "\u{F0E09}"
-            label: "Wallpaper"
+            label: I18n.tr("Wallpaper")
             onRun: Overlays.toggle("wallpapers")
         },
         Action {
-            section: "Appearance"
+            section: I18n.mark("Appearance")
             icon: "\u{F049D}"
-            label: "Random wallpaper"
+            label: I18n.tr("Random wallpaper")
             available: Wallpaper.files.length > 1
             onRun: Wallpaper.random()
         }
@@ -172,7 +172,8 @@ Scope {
         ? opened.options.map(option => ({
             section: opened.label,
             icon: option === opened.value ? "\u{F043E}" : "\u{F043D}",
-            label: option,
+            option: option,
+            label: I18n.tr(option),
             chosen: option === opened.value,
             value: "",
             options: []
@@ -232,7 +233,7 @@ Scope {
         if (!item) return;
         Sounds.play(!opened && item.on !== undefined ? (item.on ? "off" : "on") : "click", false);
         if (opened) {
-            opened.picked(item.label);
+            opened.picked(item.option);
             if (opened.stays) back();
             else Overlays.close();
         } else if (item.options.length > 0) {
@@ -305,7 +306,7 @@ Scope {
 
             Text {
                 visible: !search.text
-                text: root.opened?.label ?? "Quick actions"
+                text: root.opened?.label ?? I18n.tr("Quick actions")
                 color: Theme.fg(Theme.dimOpacity)
                 font: search.font
             }
@@ -330,7 +331,8 @@ Scope {
                 leftPadding: 12
                 bottomPadding: 6
                 verticalAlignment: Text.AlignBottom
-                text: modelData.section
+                // An opened action's options sit under its label, already translated.
+                text: modelData.option === undefined ? I18n.tr(modelData.section) : modelData.section
                 font.pixelSize: 10
                 font.capitalization: Font.MixedCase
             }
@@ -393,7 +395,7 @@ Scope {
                     anchors.verticalCenter: parent.verticalCenter
                     width: Math.min(implicitWidth, 160)
                     visible: isSwitch || row.modelData.value !== ""
-                    text: isSwitch ? (row.modelData.on ? "on" : "off") : row.modelData.value
+                    text: isSwitch ? (row.modelData.on ? I18n.tr("on") : I18n.tr("off")) : (row.modelData.options?.length > 0 ? I18n.tr(row.modelData.value) : row.modelData.value)
                     on: row.modelData.on
                     sounds: false
                     onClicked: root.run(row.modelData)

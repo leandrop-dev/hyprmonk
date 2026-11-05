@@ -7,6 +7,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Notifications
 import qs
+import qs.services
 import qs.widgets
 
 ColumnLayout {
@@ -46,7 +47,7 @@ ColumnLayout {
         }
 
         Chip {
-            text: group.expanded ? "Show less" : "Show all"
+            text: group.expanded ? I18n.tr("Show less") : I18n.tr("Show all")
             onClicked: group.toggled()
         }
 

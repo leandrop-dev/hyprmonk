@@ -8,6 +8,7 @@ import Quickshell.Hyprland
 import Quickshell.Services.Polkit
 import Quickshell.Wayland
 import qs
+import qs.services
 import qs.widgets
 
 Scope {
@@ -114,7 +115,7 @@ Scope {
                         spacing: 2
 
                         Text {
-                            text: "Authentication required"
+                            text: I18n.tr("Authentication required")
                             color: Theme.foreground
                             font.family: Theme.font
                             font.pixelSize: Theme.fontSize
@@ -174,8 +175,8 @@ Scope {
                             anchors.verticalCenter: parent.verticalCenter
                             visible: field.text === ""
                             // polkit's prompt reads "Password: ".
-                            readonly property string prompt: (window.flow?.inputPrompt ?? "").replace(/:\s*$/, "") || "Password"
-                            text: window.who ? prompt + " for " + window.who : prompt
+                            readonly property string prompt: (window.flow?.inputPrompt ?? "").replace(/:\s*$/, "") || I18n.tr("Password")
+                            text: window.who ? I18n.tr("%1 for %2", prompt, window.who) : prompt
                             textFormat: Text.PlainText
                             color: Theme.fg(Theme.dimOpacity)
                             font: field.font
@@ -205,14 +206,14 @@ Scope {
                     }
 
                     Button {
-                        text: "Cancel"
+                        text: I18n.tr("Cancel")
                         onClicked: window.cancel()
                     }
 
                     Button {
                         primary: true
                         enabled: !window.waiting
-                        text: window.waiting ? "Checking…" : "Authenticate"
+                        text: window.waiting ? I18n.tr("Checking…") : I18n.tr("Authenticate")
                         onClicked: window.authenticate()
                     }
                 }

@@ -17,26 +17,26 @@ Overlay {
     id: window
 
     readonly property var pages: [
-        { group: "Desktop", name: "Display", icon: "\u{F0379}", file: "DisplayPage.qml",
-          subs: [{ key: "screens", name: "Screens" }, { key: "brightness", name: "Brightness" },
-                 { key: "night", name: "Night light" }] },
-        { group: "Desktop", name: "Windows", icon: "\u{F05AF}", file: "WindowsPage.qml" },
-        { group: "Desktop", name: "Bar", icon: "\u{F0570}", file: "BarPage.qml",
-          subs: [{ key: "modules", name: "Modules" }, { key: "look", name: "Look" }] },
-        { group: "Desktop", name: "Dock", icon: "\u{F10A9}", file: "DockPage.qml" },
-        { group: "Desktop", name: "Calendar", icon: "\u{F00ED}", file: "CalendarPage.qml",
-          subs: [{ key: "holidays", name: "Holidays" }, { key: "calendars", name: "Calendars" }] },
-        { group: "Look and sound", name: "Appearance", icon: "\u{F050E}", file: "AppearancePage.qml",
-          subs: [{ key: "theme", name: "Theme" }, { key: "motion", name: "Motion" },
-                 { key: "fonts", name: "Fonts" },
-                 { key: "terminal", name: "Terminal" }, { key: "login", name: "Login screen" }] },
-        { group: "Look and sound", name: "Sounds", icon: "\u{F057E}", file: "SoundsPage.qml",
-          subs: [{ key: "interface", name: "Interface" }, { key: "effects", name: "Effects" },
-                 { key: "microphone", name: "Microphone" }] },
-        { group: "System", name: "Input", icon: "\u{F030C}", file: "InputPage.qml" },
-        { group: "System", name: "Power", icon: "\u{F0425}", file: "PowerPage.qml" },
-        { group: "System", name: "Recording", icon: "\u{F044A}", file: "RecordingPage.qml" },
-        { group: "System", name: "Notifications", icon: "\u{F009A}", file: "NotificationsPage.qml" }
+        { group: I18n.mark("Desktop"), name: I18n.mark("Display"), icon: "\u{F0379}", file: "DisplayPage.qml",
+          subs: [{ key: "screens", name: I18n.mark("Screens") }, { key: "brightness", name: I18n.mark("Brightness") },
+                 { key: "night", name: I18n.mark("Night light") }] },
+        { group: I18n.mark("Desktop"), name: I18n.mark("Windows"), icon: "\u{F05AF}", file: "WindowsPage.qml" },
+        { group: I18n.mark("Desktop"), name: I18n.mark("Bar"), icon: "\u{F0570}", file: "BarPage.qml",
+          subs: [{ key: "modules", name: I18n.mark("Modules") }, { key: "look", name: I18n.mark("Look") }] },
+        { group: I18n.mark("Desktop"), name: I18n.mark("Dock"), icon: "\u{F10A9}", file: "DockPage.qml" },
+        { group: I18n.mark("Desktop"), name: I18n.mark("Calendar"), icon: "\u{F00ED}", file: "CalendarPage.qml",
+          subs: [{ key: "holidays", name: I18n.mark("Holidays") }, { key: "calendars", name: I18n.mark("Calendars") }] },
+        { group: I18n.mark("Look and sound"), name: I18n.mark("Appearance"), icon: "\u{F050E}", file: "AppearancePage.qml",
+          subs: [{ key: "theme", name: I18n.mark("Theme") }, { key: "motion", name: I18n.mark("Motion") },
+                 { key: "fonts", name: I18n.mark("Fonts") },
+                 { key: "terminal", name: I18n.mark("Terminal") }, { key: "login", name: I18n.mark("Login screen") }] },
+        { group: I18n.mark("Look and sound"), name: I18n.mark("Sounds"), icon: "\u{F057E}", file: "SoundsPage.qml",
+          subs: [{ key: "interface", name: I18n.mark("Interface") }, { key: "effects", name: I18n.mark("Effects") },
+                 { key: "microphone", name: I18n.mark("Microphone") }] },
+        { group: I18n.mark("System"), name: I18n.mark("Language and input"), icon: "\u{F030C}", file: "InputPage.qml" },
+        { group: I18n.mark("System"), name: I18n.mark("Power"), icon: "\u{F0425}", file: "PowerPage.qml" },
+        { group: I18n.mark("System"), name: I18n.mark("Recording"), icon: "\u{F044A}", file: "RecordingPage.qml" },
+        { group: I18n.mark("System"), name: I18n.mark("Notifications"), icon: "\u{F009A}", file: "NotificationsPage.qml" }
     ]
     property int current: 0
     property string sub: ""  // the open page's sub-page; "" when it has none
@@ -119,7 +119,7 @@ Overlay {
                             SectionLabel {
                                 leftPadding: 12
                                 bottomPadding: 4
-                                text: row.modelData.text
+                                text: I18n.tr(row.modelData.text)
                             }
                         }
 
@@ -133,7 +133,7 @@ Overlay {
 
                                 // A sub-page sits in, under its page.
                                 icon: isSub ? "" : page.icon
-                                text: isSub ? row.modelData.text : page.name
+                                text: I18n.tr(isSub ? row.modelData.text : page.name)
                                 // A page with sub-pages shows whether they are listed.
                                 detail: isSub || !page.subs ? "" : isOpen ? "\u{F0140}" : "\u{F0142}"
                                 selected: isSub ? isOpen && row.modelData.key === window.sub : isOpen && !page.subs
@@ -168,8 +168,9 @@ Overlay {
 
             // Which part of the page shows.
             Binding {
-                // None on a page without sub-pages, which has no `section`.
-                target: window.sub !== "" ? content.item : null
+                // None on a page without sub-pages, which has no `section`; checked
+                // on the item too, which changes before `sub` when a page opens.
+                target: window.sub !== "" && content.item && "section" in content.item ? content.item : null
                 property: "section"
                 value: window.sub
             }

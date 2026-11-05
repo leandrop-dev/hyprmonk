@@ -24,7 +24,7 @@ Singleton {
     readonly property var groups: {
         const groups = [];
         for (const notification of all) {
-            const app = notification.appName || "Other";
+            const app = notification.appName || I18n.tr("Other");
             const group = groups.find(g => g.app === app);
             if (group) group.notifications.push(notification);
             else groups.push({ app, notifications: [notification] });
@@ -129,9 +129,9 @@ Singleton {
         const time = now;  // read whatever happens, so the binding follows the clock
         if (!at) return "";
         const minutes = Math.floor((time - at) / 60000);
-        if (minutes < 1) return "now";
-        if (minutes < 60) return minutes + "m";
-        if (minutes < 24 * 60) return Math.floor(minutes / 60) + "h";
+        if (minutes < 1) return I18n.tr("now");
+        if (minutes < 60) return I18n.tr("%1m", minutes);
+        if (minutes < 24 * 60) return I18n.tr("%1h", Math.floor(minutes / 60));
         return Qt.formatDateTime(at, "dd/MM");
     }
 

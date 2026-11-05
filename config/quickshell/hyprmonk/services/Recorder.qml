@@ -37,16 +37,16 @@ Singleton {
 
     readonly property bool active: recording.running && file !== ""
     readonly property bool replaying: replay.running
-    readonly property var areas: ["Screen", "Region", "Window"]
+    readonly property var areas: [I18n.mark("Screen"), I18n.mark("Region"), I18n.mark("Window")]
     readonly property string area: settings.area
     readonly property bool sound: settings.sound
     readonly property bool microphone: settings.microphone
     // GPU Screen Recorder's presets; very_high is its default.
     readonly property var qualities: [
-        { name: "medium", label: "Medium" },
-        { name: "high", label: "High" },
-        { name: "very_high", label: "Very high" },
-        { name: "ultra", label: "Ultra" }
+        { name: "medium", label: I18n.mark("Medium") },
+        { name: "high", label: I18n.mark("High") },
+        { name: "very_high", label: I18n.mark("Very high") },
+        { name: "ultra", label: I18n.mark("Ultra") }
     ]
     readonly property string quality: qualities.some(q => q.name === settings.quality) ? settings.quality : "very_high"
     // An absolute path, or "" for Recordings in the Videos folder.
@@ -106,7 +106,7 @@ Singleton {
         }
         window = area === "Window" ? Hyprland.activeToplevel?.address ?? "" : "";
         if (area === "Window" && window === "") {
-            notify("No window to record", "Focus one first");
+            notify(I18n.tr("No window to record"), I18n.tr("Focus one first"));
             return;
         }
         const target = window !== "" ? "window:" + window
@@ -145,7 +145,7 @@ Singleton {
 
     function saveReplay(): void {
         if (!replay.running) {
-            notify("Replay is off", "Turn it on in quick actions");
+            notify(I18n.tr("Replay is off"), I18n.tr("Turn it on in quick actions"));
         } else if (!replayStarting.running) {
             replay.signal(10);  // SIGUSR1
         }
@@ -157,7 +157,7 @@ Singleton {
     }
 
     function notify(summary: string, body: string): void {
-        Quickshell.execDetached(["notify-send", "--app-name", "Screen recording", "--icon", "dialog-error",
+        Quickshell.execDetached(["notify-send", "--app-name", I18n.tr("Screen recording"), "--icon", "dialog-error",
                                  summary, body]);
     }
 
@@ -177,7 +177,7 @@ Singleton {
             onRead: line => {
                 if (line.includes("error")) root.failure = line;
                 if (root.window !== "" && line.includes('previous state: "streaming"')) {
-                    root.notify("Recording stopped", "The window changed size, which ends a window's recording");
+                    root.notify(I18n.tr("Recording stopped"), I18n.tr("The window changed size, which ends a window's recording"));
                     root.stop();
                 }
             }
@@ -190,7 +190,7 @@ Singleton {
             if (code === 0 && saved !== "") {
                 Quickshell.execDetached([root.hyprmonk, "recording-saved", saved]);
             } else if (code !== 0) {
-                root.notify("Recording failed", root.failure || "It stopped with code " + code);
+                root.notify(I18n.tr("Recording failed"), root.failure || I18n.tr("It stopped with code %1", code));
             }
         }
     }
@@ -217,7 +217,7 @@ Singleton {
         stdout: SplitParser {
             onRead: line => {
                 if (line.startsWith("/")) Quickshell.execDetached([root.hyprmonk, "recording-saved", line]);
-                else root.notify("Replay not saved", line);
+                else root.notify(I18n.tr("Replay not saved"), line);
             }
         }
         stderr: SplitParser {
@@ -226,7 +226,7 @@ Singleton {
             }
         }
         onExited: (code, status) => {
-            if (code !== 0) root.notify("Replay stopped", root.replayFailure || "It stopped with code " + code);
+            if (code !== 0) root.notify(I18n.tr("Replay stopped"), root.replayFailure || I18n.tr("It stopped with code %1", code));
         }
     }
 

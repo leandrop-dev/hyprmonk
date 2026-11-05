@@ -19,13 +19,13 @@ Singleton {
 
     // Name -> label, in the picker's order.
     readonly property var styles: ({
-        wave: "Wave",
-        bars: "Bars",
-        equalizer: "Equalizer",
-        peaks: "Peaks",
+        wave: I18n.mark("Wave"),
+        bars: I18n.mark("Bars"),
+        equalizer: I18n.mark("Equalizer"),
+        peaks: I18n.mark("Peaks"),
         leds: "LEDs",
-        dots: "Dots",
-        mirror: "Mirror"
+        dots: I18n.mark("Dots"),
+        mirror: I18n.mark("Mirror")
     })
     // A previewed style (Settings > Appearance, under the pointer) shows
     // without being saved.

@@ -58,7 +58,7 @@ Singleton {
         const lowest = names.length === 0 || names.every(name => screens[name].brightness === 0);
         if (dim < 100 || (delta < 0 && lowest)) {
             setDim(dim + delta);
-            stepped(dim === 100 ? "Dimming off" : "Dimmed to " + dim + "%", 0);
+            stepped(dim === 100 ? I18n.tr("Dimming off") : I18n.tr("Dimmed to %1%", dim), 0);
             return;
         }
         for (const name of names) set(name, "brightness", screens[name].brightness + delta * screens[name].brightnessMax / 100);

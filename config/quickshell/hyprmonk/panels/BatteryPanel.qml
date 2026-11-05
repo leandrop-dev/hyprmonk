@@ -15,13 +15,13 @@ ColumnLayout {
     Component.onCompleted: Battery.refresh()
 
     SectionLabel {
-        text: "Batteries"
+        text: I18n.tr("Batteries")
     }
 
     Text {
         Layout.fillWidth: true
         visible: Battery.devices.length === 0
-        text: "No batteries"
+        text: I18n.tr("No batteries")
         color: Theme.fg(Theme.dimOpacity)
         font.family: Theme.font
         font.pixelSize: Theme.bodyFontSize
@@ -72,7 +72,7 @@ ColumnLayout {
 
                     Text {
                         visible: row.device.charging
-                        text: "\u{F140B} charging"
+                        text: "\u{F140B} " + I18n.tr("charging")
                         color: Theme.fg(Theme.dimOpacity)
                         font.family: Theme.font
                         font.pixelSize: Theme.smallFontSize

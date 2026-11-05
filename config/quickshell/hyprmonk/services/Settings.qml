@@ -18,17 +18,17 @@ Singleton {
 
     // `fallback` is look.lua's value, which the slider shows until it is moved.
     readonly property var windowOptions: [
-        { key: "gapsIn", group: "Gaps", label: "Between windows", from: 0, to: 30, fallback: 4,
+        { key: "gapsIn", group: "Gaps", label: I18n.mark("Between windows"), from: 0, to: 30, fallback: 4,
           lua: "general = { gaps_in = %1 }" },
-        { key: "gapsOut", group: "Gaps", label: "Around the screen", from: 0, to: 40, fallback: 10,
+        { key: "gapsOut", group: "Gaps", label: I18n.mark("Around the screen"), from: 0, to: 40, fallback: 10,
           lua: "general = { gaps_out = %1 }" },
-        { key: "borderSize", group: "Borders", label: "Border size", from: 0, to: 8, fallback: 2,
+        { key: "borderSize", group: "Borders", label: I18n.mark("Border size"), from: 0, to: 8, fallback: 2,
           lua: "general = { border_size = %1 }" },
-        { key: "rounding", group: "Borders", label: "Rounding", from: 0, to: 30, fallback: 10,
+        { key: "rounding", group: "Borders", label: I18n.mark("Rounding"), from: 0, to: 30, fallback: 10,
           lua: "decoration = { rounding = %1 }" },
-        { key: "blurSize", group: "Blur", label: "Size", from: 1, to: 20, fallback: 6,
+        { key: "blurSize", group: "Blur", label: I18n.mark("Size"), from: 1, to: 20, fallback: 6,
           lua: "decoration = { blur = { size = %1 } }" },
-        { key: "blurPasses", group: "Blur", label: "Passes", from: 1, to: 4, fallback: 2,
+        { key: "blurPasses", group: "Blur", label: I18n.mark("Passes"), from: 1, to: 4, fallback: 2,
           lua: "decoration = { blur = { passes = %1 } }" }
     ]
 
@@ -182,24 +182,24 @@ Singleton {
     // is. `panel` is what the module opens: it opens under the module's card.
     // Recording and Replay only show while they run, and cannot be hidden.
     readonly property var barModules: [
-        { key: "launcher", label: "Launcher", icon: "\u{F003B}" },
-        { key: "workspaces", label: "Workspaces", icon: "\u{F0570}" },
-        { key: "overview", label: "Overview", icon: "\u{F0F8D}" },
-        { key: "awake", label: "Stay awake", icon: "\u{F0176}" },
-        { key: "hardware", label: "Hardware", icon: "\u{F011B}", panel: "hardware" },
-        { key: "windows", label: "Window list", icon: "\u{F08C6}" },
-        { key: "recording", label: "Recording", icon: "\u{F044A}", fixed: true },
-        { key: "replay", label: "Replay", icon: "\u{F0459}", fixed: true },
-        { key: "tray", label: "Tray", icon: "\u{F0493}", panel: "tray" },
-        { key: "network", label: "Network", icon: "\u{F05A9}", panel: "network" },
-        { key: "bluetooth", label: "Bluetooth", icon: "\u{F00AF}", panel: "bluetooth" },
-        { key: "batteries", label: "Batteries", icon: "\u{F0079}", panel: "batteries" },
-        { key: "volume", label: "Volume", icon: "\u{F057E}", panel: "sound" },
-        { key: "microphone", label: "Microphone", icon: "\u{F036C}", panel: "microphone" },
-        { key: "notifications", label: "Notifications", icon: "\u{F009A}", panel: "notifications" },
-        { key: "clock", label: "Clock", icon: "\u{F00ED}", panel: "calendar" },
-        { key: "quickactions", label: "Quick actions", icon: "\u{F1542}" },
-        { key: "power", label: "Power", icon: "\u{F0425}" }
+        { key: "launcher", label: I18n.mark("Launcher"), icon: "\u{F003B}" },
+        { key: "workspaces", label: I18n.mark("Workspaces"), icon: "\u{F0570}" },
+        { key: "overview", label: I18n.mark("Overview"), icon: "\u{F0F8D}" },
+        { key: "awake", label: I18n.mark("Stay awake"), icon: "\u{F0176}" },
+        { key: "hardware", label: I18n.mark("Hardware"), icon: "\u{F011B}", panel: "hardware" },
+        { key: "windows", label: I18n.mark("Window list"), icon: "\u{F08C6}" },
+        { key: "recording", label: I18n.mark("Recording"), icon: "\u{F044A}", fixed: true },
+        { key: "replay", label: I18n.mark("Replay"), icon: "\u{F0459}", fixed: true },
+        { key: "tray", label: I18n.mark("Tray"), icon: "\u{F0493}", panel: "tray" },
+        { key: "network", label: I18n.mark("Network"), icon: "\u{F05A9}", panel: "network" },
+        { key: "bluetooth", label: I18n.mark("Bluetooth"), icon: "\u{F00AF}", panel: "bluetooth" },
+        { key: "batteries", label: I18n.mark("Batteries"), icon: "\u{F0079}", panel: "batteries" },
+        { key: "volume", label: I18n.mark("Volume"), icon: "\u{F057E}", panel: "sound" },
+        { key: "microphone", label: I18n.mark("Microphone"), icon: "\u{F036C}", panel: "microphone" },
+        { key: "notifications", label: I18n.mark("Notifications"), icon: "\u{F009A}", panel: "notifications" },
+        { key: "clock", label: I18n.mark("Clock"), icon: "\u{F00ED}", panel: "calendar" },
+        { key: "quickactions", label: I18n.mark("Quick actions"), icon: "\u{F1542}" },
+        { key: "power", label: I18n.mark("Power"), icon: "\u{F0425}" }
     ]
     readonly property var barDefaults: ({
         left: ["launcher", "workspaces", "overview", "awake", "hardware"],

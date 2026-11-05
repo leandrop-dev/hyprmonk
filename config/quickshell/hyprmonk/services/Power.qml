@@ -16,9 +16,9 @@ Singleton {
 
     function nameOf(profile: int): string {
         switch (profile) {
-        case PowerProfile.PowerSaver: return "saver";
-        case PowerProfile.Performance: return "performance";
-        default: return "balanced";
+        case PowerProfile.PowerSaver: return I18n.mark("saver");
+        case PowerProfile.Performance: return I18n.mark("performance");
+        default: return I18n.mark("balanced");
         }
     }
 

@@ -66,7 +66,7 @@ RowLayout {
                         rows.push(Hardware.cores.slice(i, i + 4)
                             .map((use, j) => String(i + j).padStart(2) + (Math.round(use) + "%").padStart(5))
                             .join("   "));
-                    return "CPU " + Math.round(Hardware.cpu) + "%\n" + rows.join("\n");
+                    return I18n.tr("CPU %1%", Math.round(Hardware.cpu)) + "\n" + rows.join("\n");
                 }
             }
 
@@ -77,7 +77,7 @@ RowLayout {
                 visible: !isNaN(Hardware.gpuTemp)
                 icon: "\u{F08AE}"
                 label: Settings.degrees(Hardware.gpuTemp) + " " + Hardware.used(Hardware.vramUsed, Hardware.vramTotal)
-                tooltip: Hardware.gpuName + "\nUse " + Math.round(Hardware.gpuUse) + "%"
+                tooltip: Hardware.gpuName + "\n" + I18n.tr("Use %1%", Math.round(Hardware.gpuUse))
                     + "\nVideo memory " + Hardware.human(Hardware.vramUsed) + " / " + Hardware.human(Hardware.vramTotal)
                 color: Hardware.gpuTemp >= hot ? Theme.warning : Theme.foreground
             }
@@ -86,7 +86,7 @@ RowLayout {
             Module {
                 icon: "\u{F035B}"
                 label: Hardware.used(Hardware.memUsed, Hardware.memTotal)
-                tooltip: "Memory " + Hardware.human(Hardware.memUsed) + " / " + Hardware.human(Hardware.memTotal)
+                tooltip: I18n.tr("Memory %1 / %2", Hardware.human(Hardware.memUsed), Hardware.human(Hardware.memTotal))
                     + Hardware.apps.map(app => "\n" + app.name.slice(0, 16).padEnd(17) + Hardware.human(app.bytes).padStart(6)).join("")
 
                 onTooltipShownChanged: tooltipShown ? Hardware.watchApps() : Hardware.unwatchApps()
@@ -97,7 +97,7 @@ RowLayout {
             Module {
                 icon: "\u{F02CA}"
                 label: Hardware.used(Hardware.diskUsed, Hardware.diskSize)
-                tooltip: "Disks" + Hardware.disks.map(disk => "\n" + disk.mount.padEnd(8)
+                tooltip: I18n.tr("Disks") + Hardware.disks.map(disk => "\n" + disk.mount.padEnd(8)
                     + Hardware.human(disk.used).padStart(6) + " / " + Hardware.human(disk.size).padStart(5)
                     + (Math.round(100 * disk.used / disk.size) + "%").padStart(5)).join("")
             }

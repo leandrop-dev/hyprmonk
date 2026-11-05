@@ -107,7 +107,7 @@ ClippingRectangle {
 
                 Chip {
                     visible: Lyrics.shown
-                    text: "In bar"
+                    text: I18n.tr("In bar")
                     on: Lyrics.inBar
                     onClicked: Lyrics.setInBar(!Lyrics.inBar)
                 }
@@ -131,7 +131,7 @@ ClippingRectangle {
                 Layout.fillWidth: true
                 Layout.topMargin: 4
                 visible: !Lyrics.shown
-                text: panel.player?.trackTitle || "Unknown track"
+                text: panel.player?.trackTitle || I18n.tr("Unknown track")
                 textFormat: Text.PlainText
                 color: Theme.foreground
                 font.family: Theme.font
@@ -171,7 +171,7 @@ ClippingRectangle {
                 visible: !Lyrics.shown
 
                 Text {
-                    text: panel.hasLength ? Player.time(panel.player.position) : "Live"
+                    text: panel.hasLength ? Player.time(panel.player.position) : I18n.tr("Live")
                     color: Theme.fg(Theme.dimOpacity)
                     font.family: Theme.font
                     font.pixelSize: Theme.smallFontSize

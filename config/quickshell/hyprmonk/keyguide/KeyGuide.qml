@@ -37,14 +37,14 @@ Scope {
     }
 
     readonly property var keyNames: ({
-        "Return": "Enter",
+        "Return": I18n.tr("Enter"),
         "left": "←", "right": "→", "up": "↑", "down": "↓",
-        "mouse:272": "Left drag", "mouse:273": "Right drag",
-        "mouse_down": "Scroll down", "mouse_up": "Scroll up",
-        "XF86AudioRaiseVolume": "Volume +", "XF86AudioLowerVolume": "Volume −",
-        "XF86AudioMute": "Mute", "XF86AudioMicMute": "Mic mute",
-        "XF86AudioPlay": "Play", "XF86AudioPause": "Pause",
-        "XF86AudioNext": "Next", "XF86AudioPrev": "Previous"
+        "mouse:272": I18n.tr("Left drag"), "mouse:273": I18n.tr("Right drag"),
+        "mouse_down": I18n.tr("Scroll down"), "mouse_up": I18n.tr("Scroll up"),
+        "XF86AudioRaiseVolume": I18n.tr("Volume +"), "XF86AudioLowerVolume": I18n.tr("Volume −"),
+        "XF86AudioMute": I18n.tr("Mute"), "XF86AudioMicMute": I18n.tr("Mic mute"),
+        "XF86AudioPlay": I18n.tr("Play"), "XF86AudioPause": I18n.tr("Pause"),
+        "XF86AudioNext": I18n.tr("Next"), "XF86AudioPrev": I18n.tr("Previous")
     })
 
     function keyName(key: string): string {
@@ -69,8 +69,8 @@ Scope {
             // A mode's own keys show on its card (the screenshot mode's).
             if (bind.non_consuming || bind.submap || !bind.description) continue;
             const at = bind.description.indexOf(": ");
-            const section = at > 0 ? bind.description.slice(0, at) : "Other";
-            const description = at > 0 ? bind.description.slice(at + 2) : bind.description;
+            const section = I18n.tr(at > 0 ? bind.description.slice(0, at) : "Other");
+            const description = I18n.tr(at > 0 ? bind.description.slice(at + 2) : bind.description);
             const group = groups.find(g => g.section === section && g.description === description);
             if (group) group.binds.push(bind);
             else groups.push({ section, description, binds: [bind] });
@@ -179,7 +179,7 @@ Scope {
 
             Text {
                 visible: !search.text
-                text: "Keybindings"
+                text: I18n.tr("Keybindings")
                 color: Theme.fg(Theme.dimOpacity)
                 font: search.font
             }

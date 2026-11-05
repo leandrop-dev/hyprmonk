@@ -29,11 +29,11 @@ ColumnLayout {
         expanded = network.name;
         if (reason === ConnectionFailReason.NoSecrets) {
             asking = network.name;
-            failure = "That password did not work";
+            failure = I18n.tr("That password did not work");
         } else {
-            failure = reason === ConnectionFailReason.WifiAuthTimeout ? "The network did not answer"
-                    : reason === ConnectionFailReason.WifiNetworkLost ? "The network went out of reach"
-                    : "Could not connect";
+            failure = reason === ConnectionFailReason.WifiAuthTimeout ? I18n.tr("The network did not answer")
+                    : reason === ConnectionFailReason.WifiNetworkLost ? I18n.tr("The network went out of reach")
+                    : I18n.tr("Could not connect");
         }
     }
 
@@ -53,7 +53,7 @@ ColumnLayout {
 
     SectionLabel {
         visible: ethernet.visible
-        text: "Ethernet"
+        text: I18n.tr("Ethernet")
     }
 
     OptionRow {
@@ -62,8 +62,8 @@ ColumnLayout {
         Layout.fillWidth: true
         visible: Net.wired?.hasLink ?? false
         icon: "\u{F0200}"
-        text: "Ethernet"
-        detail: Net.wiredUp ? Net.wired.linkSpeed + " Mb/s" : "Not connected"
+        text: I18n.tr("Ethernet")
+        detail: Net.wiredUp ? I18n.tr("%1 Mb/s", Net.wired.linkSpeed) : I18n.tr("Not connected")
         selected: Net.wiredUp
     }
 
@@ -74,7 +74,7 @@ ColumnLayout {
 
         SectionLabel {
             Layout.fillWidth: true
-            text: "Wi-Fi"
+            text: I18n.tr("Wi-Fi")
         }
 
         Searching {
@@ -84,7 +84,7 @@ ColumnLayout {
 
         Chip {
             visible: Networking.wifiHardwareEnabled
-            text: Networking.wifiEnabled ? "on" : "off"
+            text: Networking.wifiEnabled ? I18n.tr("on") : I18n.tr("off")
             on: Networking.wifiEnabled
             onClicked: Networking.wifiEnabled = !Networking.wifiEnabled
         }
@@ -94,9 +94,9 @@ ColumnLayout {
         Layout.fillWidth: true
         visible: text !== ""
         text: Net.wifi === null ? ""
-            : !Networking.wifiHardwareEnabled ? "Off by a switch or key on the machine"
-            : !Networking.wifiEnabled ? "Wi-Fi is off"
-            : Net.sorted.length === 0 ? "Looking for networks"
+            : !Networking.wifiHardwareEnabled ? I18n.tr("Off by a switch or key on the machine")
+            : !Networking.wifiEnabled ? I18n.tr("Wi-Fi is off")
+            : Net.sorted.length === 0 ? I18n.tr("Looking for networks")
             : ""
         color: Theme.fg(Theme.dimOpacity)
         font.family: Theme.font
@@ -163,10 +163,10 @@ ColumnLayout {
                 Layout.fillWidth: true
                 icon: Net.signalIcon(row.modelData)
                 text: row.modelData.name
-                detail: row.modelData.stateChanging ? "Connecting"
-                      : row.modelData.connected ? "Connected"
-                      : row.modelData.known ? "Saved"
-                      : Net.isOpen(row.modelData) ? "Open" : "\u{F033E}"
+                detail: row.modelData.stateChanging ? I18n.tr("Connecting")
+                      : row.modelData.connected ? I18n.tr("Connected")
+                      : row.modelData.known ? I18n.tr("Saved")
+                      : Net.isOpen(row.modelData) ? I18n.trc("network", "Open") : "\u{F033E}"
                 selected: row.modelData.connected
                 onClicked: panel.expand(row.modelData.name)
             }
@@ -203,7 +203,7 @@ ColumnLayout {
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         visible: field.text === ""
-                        text: "Password"
+                        text: I18n.tr("Password")
                         color: Theme.fg(Theme.dimOpacity)
                         font: field.font
                     }
@@ -214,7 +214,7 @@ ColumnLayout {
                 Layout.fillWidth: true
                 Layout.leftMargin: 12
                 visible: row.open && (panel.failure !== "" || row.needsEditor)
-                text: panel.failure || "Set this one up in Connections"
+                text: panel.failure || I18n.tr("Set this one up in Connections")
                 color: panel.failure ? Theme.warning : Theme.fg(Theme.dimOpacity)
                 font.family: Theme.font
                 font.pixelSize: Theme.bodyFontSize
@@ -232,14 +232,14 @@ ColumnLayout {
                     visible: !row.needsEditor
                     enabled: !row.modelData.stateChanging
                     primary: !row.modelData.connected
-                    text: row.modelData.connected ? "Disconnect" : "Connect"
+                    text: row.modelData.connected ? I18n.tr("Disconnect") : I18n.tr("Connect")
                     onClicked: row.modelData.connected ? row.modelData.disconnect() : row.connect()
                 }
 
                 Button {
                     Layout.fillWidth: true
                     visible: row.modelData.known
-                    text: panel.arming === row.modelData.name ? "Again" : "Forget"
+                    text: panel.arming === row.modelData.name ? I18n.tr("Again") : I18n.tr("Forget")
                     onClicked: panel.forget(row.modelData)
                 }
             }
@@ -249,7 +249,7 @@ ColumnLayout {
     Button {
         Layout.fillWidth: true
         Layout.topMargin: 4
-        text: "\u{F0493}  Connections"
+        text: "\u{F0493}  " + I18n.tr("Connections")
         onClicked: {
             Quickshell.execDetached(["nm-connection-editor"]);
             Panels.close();

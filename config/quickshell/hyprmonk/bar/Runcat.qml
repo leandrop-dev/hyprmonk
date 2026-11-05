@@ -25,7 +25,7 @@ Module {
     onLoadChanged: awake = load >= (awake ? restAt : wakeAt)
     onRunningChanged: frame = running ? 0 : asleep
 
-    tooltip: isNaN(Hardware.cpu) ? "" : "CPU " + Math.round(Hardware.cpu) + "%"
+    tooltip: isNaN(Hardware.cpu) ? "" : I18n.tr("CPU %1%", Math.round(Hardware.cpu))
 
     FontLoader {
         id: runcat

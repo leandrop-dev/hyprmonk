@@ -57,7 +57,7 @@ Scope {
         if (checking || password === "") return;
         error = "";
         checking = pam.start();
-        if (!checking) error = "Could not start the password check";
+        if (!checking) error = I18n.tr("Could not start the password check");
     }
 
     Process {
@@ -108,7 +108,7 @@ Scope {
                 return;
             }
             root.failures += 1;
-            root.error = result === PamResult.Failed ? "Wrong password" : PamResult.toString(result);
+            root.error = result === PamResult.Failed ? I18n.tr("Wrong password") : PamResult.toString(result);
         }
 
         onError: error => {

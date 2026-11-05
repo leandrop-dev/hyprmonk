@@ -27,10 +27,10 @@ Scope {
     property int current: 0
 
     readonly property var tabs: [
-        { label: "Apps", icon: "\u{F003B}", hint: "Search apps", find: Apps.findApps },
-        { label: "Commands", icon: "\u{F018D}", hint: "Run a command", find: Apps.findCommands },
-        { label: "SSH", icon: "\u{F048D}", hint: "Connect to a host", find: Apps.findHosts },
-        { label: "Clipboard", icon: "\u{F018F}", hint: "Search what you copied", find: Clipboard.find }
+        { label: I18n.tr("Apps"), icon: "\u{F003B}", hint: I18n.tr("Search apps"), find: Apps.findApps },
+        { label: I18n.tr("Commands"), icon: "\u{F018D}", hint: I18n.tr("Run a command"), find: Apps.findCommands },
+        { label: I18n.tr("SSH"), icon: "\u{F048D}", hint: I18n.tr("Connect to a host"), find: Apps.findHosts },
+        { label: I18n.tr("Clipboard"), icon: "\u{F018F}", hint: I18n.tr("Search what you copied"), find: Clipboard.find }
     ]
     readonly property var shown: tabs[tab].find(query)
     readonly property var picked: shown[current] ?? null
@@ -313,10 +313,10 @@ Scope {
                     x: 10
                     height: window.rowHeight
                     verticalAlignment: Text.AlignVCenter
-                    text: root.query !== "" ? "Nothing matches"
-                        : root.tab === 2 ? "No hosts in ~/.ssh/config: type one"
-                        : root.tab === 3 ? "Nothing copied yet"
-                        : "Nothing matches"
+                    text: root.query !== "" ? I18n.tr("Nothing matches")
+                        : root.tab === 2 ? I18n.tr("No hosts in ~/.ssh/config: type one")
+                        : root.tab === 3 ? I18n.tr("Nothing copied yet")
+                        : I18n.tr("Nothing matches")
                     color: Theme.fg(Theme.dimOpacity)
                     font.family: Theme.font
                     font.pixelSize: Theme.rowFontSize
@@ -442,9 +442,9 @@ Scope {
             width: window.cardWidth - window.listWidth - 1
             y: window.cardHeight - height - 16
             horizontalAlignment: Text.AlignHCenter
-            text: root.tab === 1 ? "Enter run  ·  Shift+Enter in terminal  ·  Tab switch"
-                : root.tab === 3 ? "Enter copy  ·  Shift+Delete forget  ·  Tab switch"
-                : "Enter open  ·  Tab switch  ·  Esc close"
+            text: root.tab === 1 ? I18n.tr("Enter run  ·  Shift+Enter in terminal  ·  Tab switch")
+                : root.tab === 3 ? I18n.tr("Enter copy  ·  Shift+Delete forget  ·  Tab switch")
+                : I18n.tr("Enter open  ·  Tab switch  ·  Esc close")
             color: Theme.fg(0.3)
             font.family: Theme.font
             font.pixelSize: Theme.smallFontSize

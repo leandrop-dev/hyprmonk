@@ -10,7 +10,8 @@ Module {
     icon: Recorder.paused ? "\u{F03E4}" : "\u{F044A}"
     label: Recorder.elapsed
     color: Theme.warning
-    tooltip: (Recorder.paused ? "Paused" : "Recording") + "\nClick to stop, right click to " + (Recorder.paused ? "resume" : "pause")
+    tooltip: Recorder.paused ? I18n.tr("Paused\nClick to stop, right click to resume")
+                             : I18n.tr("Recording\nClick to stop, right click to pause")
 
     onClicked: button => {
         if (button === Qt.LeftButton) Recorder.toggle();

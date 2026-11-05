@@ -1,7 +1,8 @@
-// Settings > Input: the keyboard layouts (the first is the default; up to
-// four, switched with the bar's layout or quick actions), the mouse's
-// sensitivity, acceleration and scrolling, and whether focus follows the
-// pointer. Applied at once (services/Settings.qml).
+// Settings > Language and input: the shell's language, and from the next
+// login this account's apps' (services/I18n.qml); the keyboard layouts (the
+// first is the default; up to four, switched with the bar's layout or
+// quick actions), the mouse's sensitivity, acceleration and scrolling, and
+// whether focus follows the pointer. Applied at once (services/Settings.qml).
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.Io
@@ -90,8 +91,41 @@ ColumnLayout {
         font.pixelSize: Theme.smallFontSize
     }
 
+    // The shell's language and this account's apps' (services/I18n.qml).
     SectionLabel {
-        text: "Keyboard layouts"
+        text: I18n.tr("Language")
+    }
+
+    Flow {
+        Layout.fillWidth: true
+        spacing: 6
+
+        Repeater {
+            model: I18n.languages
+
+            Chip {
+                required property var modelData
+                text: modelData.name
+                on: I18n.language === modelData.code
+                onClicked: I18n.setLanguage(modelData.code)
+            }
+        }
+    }
+
+    Note {
+        text: I18n.tr("The shell changes at once; apps follow from the next login.")
+    }
+
+    Note {
+        visible: !I18n.generatedFor(I18n.language)
+        color: Theme.warning
+        text: I18n.tr("This system cannot give apps this language yet. In a terminal: %1, then %2.",
+                      "sudo sed -i 's/^#" + I18n.current.lang + "/" + I18n.current.lang + "/' /etc/locale.gen", "sudo locale-gen")
+    }
+
+    SectionLabel {
+        Layout.topMargin: 8
+        text: I18n.tr("Keyboard layouts")
     }
 
     Repeater {
@@ -107,19 +141,19 @@ ColumnLayout {
 
             Chip {
                 visible: layout.index === 0
-                text: "default"
+                text: I18n.tr("default")
                 on: true
             }
 
             Chip {
                 visible: layout.index > 0
-                text: "Make default"
+                text: I18n.tr("Make default")
                 onClicked: page.setLayouts([layout.modelData].concat(page.layouts.filter(code => code !== layout.modelData)))
             }
 
             Chip {
                 visible: page.layouts.length > 1
-                text: "Remove"
+                text: I18n.tr("Remove")
                 onClicked: page.setLayouts(page.layouts.filter(code => code !== layout.modelData))
             }
         }
@@ -133,12 +167,12 @@ ColumnLayout {
         Layout.preferredWidth: 260
         Layout.bottomMargin: 12
         visible: page.layouts.length < 4
-        placeholder: "Add a layout"
-        message: "No such layout"
+        placeholder: I18n.tr("Add a layout")
+        message: I18n.tr("No such layout")
         results: page.found.map(code => ({
             code,
             text: page.names[code],
-            detail: page.layouts.includes(code) ? "added" : code,
+            detail: page.layouts.includes(code) ? I18n.tr("added") : code,
             selected: page.layouts.includes(code)
         }))
         onAccepted: page.add(page.match)
@@ -146,12 +180,12 @@ ColumnLayout {
     }
 
     SectionLabel {
-        text: "Mouse"
+        text: I18n.tr("Mouse")
     }
 
     SettingSlider {
         Layout.fillWidth: true
-        label: "Sensitivity"
+        label: I18n.tr("Sensitivity")
         from: -100
         to: 100
         value: Math.round(Settings.inputValue("sensitivity") * 100)
@@ -161,26 +195,26 @@ ColumnLayout {
 
     Row {
         Layout.topMargin: 4
-        text: "Acceleration"
+        text: I18n.tr("Acceleration")
 
         Chip {
-            text: "Adaptive"
+            text: I18n.tr("Adaptive")
             on: Settings.inputValue("accel") === "adaptive"
             onClicked: Settings.setInput("accel", "adaptive")
         }
 
         Chip {
-            text: "Flat"
+            text: I18n.tr("Flat")
             on: Settings.inputValue("accel") === "flat"
             onClicked: Settings.setInput("accel", "flat")
         }
     }
 
     Row {
-        text: "Natural scroll"
+        text: I18n.tr("Natural scroll")
 
         Chip {
-            text: Settings.inputValue("naturalScroll") ? "on" : "off"
+            text: Settings.inputValue("naturalScroll") ? I18n.tr("on") : I18n.tr("off")
             on: Settings.inputValue("naturalScroll")
             onClicked: Settings.setInput("naturalScroll", !Settings.inputValue("naturalScroll"))
         }
@@ -188,14 +222,14 @@ ColumnLayout {
 
     SectionLabel {
         Layout.topMargin: 12
-        text: "Focus"
+        text: I18n.tr("Focus")
     }
 
     Row {
-        text: "Focus follows the pointer"
+        text: I18n.tr("Focus follows the pointer")
 
         Chip {
-            text: Settings.inputValue("followMouse") ? "on" : "off"
+            text: Settings.inputValue("followMouse") ? I18n.tr("on") : I18n.tr("off")
             on: Settings.inputValue("followMouse")
             onClicked: Settings.setInput("followMouse", !Settings.inputValue("followMouse"))
         }
@@ -203,7 +237,7 @@ ColumnLayout {
 
     Note {
         visible: !Settings.inputValue("followMouse")
-        text: "A click moves the keyboard to a window; scrolling still follows the pointer."
+        text: I18n.tr("A click moves the keyboard to a window; scrolling still follows the pointer.")
     }
 
     Item {
@@ -213,7 +247,7 @@ ColumnLayout {
     Button {
         Layout.alignment: Qt.AlignRight
         enabled: Settings.inputChanged
-        text: "Back to the defaults"
+        text: I18n.tr("Back to the defaults")
         onClicked: Settings.resetInput()
     }
 }

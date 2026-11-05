@@ -32,9 +32,9 @@ Singleton {
                                  : Networking.wifiEnabled && wifi ? "\u{F092F}" : "\u{F05AA}"
 
     // What the bar's tooltip says: the first line is its title.
-    readonly property string summary: wiredUp ? "Ethernet\n" + wired.linkSpeed + " Mb/s"
-                                    : current ? current.name + "\nSignal " + Math.round(current.signalStrength * 100) + "%"
-                                    : "Not connected"
+    readonly property string summary: wiredUp ? I18n.tr("Ethernet\n%1 Mb/s", wired.linkSpeed)
+                                    : current ? current.name + "\n" + I18n.tr("Signal %1%", Math.round(current.signalStrength * 100))
+                                    : I18n.tr("Not connected")
 
     function bars(network: WifiNetwork): int {
         return Math.min(Math.floor(network.signalStrength * 4), 3);

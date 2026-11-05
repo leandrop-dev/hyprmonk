@@ -53,7 +53,7 @@ Singleton {
         const id = line.slice(0, tab);
         const text = line.slice(tab + 1);
         const image = /^\[\[ binary data (.+) (\w+) (\d+x\d+) \]\]$/.exec(text);
-        if (image) return { kind: "clip", id, text, name: "Image " + image[3], detail: image[2] + ", " + image[1], image: true };
+        if (image) return { kind: "clip", id, text, name: I18n.tr("Image %1", image[3]), detail: image[2] + ", " + image[1], image: true };
         return { kind: "clip", id, text, name: text, detail: "", image: false };
     }
 

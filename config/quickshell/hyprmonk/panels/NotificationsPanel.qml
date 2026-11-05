@@ -25,18 +25,18 @@ ColumnLayout {
 
         SectionLabel {
             Layout.fillWidth: true
-            text: "Notifications"
+            text: I18n.tr("Notifications")
         }
 
         Chip {
-            text: "Do not disturb"
+            text: I18n.tr("Do not disturb")
             on: Notifications.doNotDisturb
             onClicked: Notifications.doNotDisturb = !Notifications.doNotDisturb
         }
 
         Chip {
             visible: Notifications.count > 0
-            text: "Clear all"
+            text: I18n.tr("Clear all")
             onClicked: Notifications.clearAll()
         }
     }
@@ -47,7 +47,7 @@ ColumnLayout {
         Layout.bottomMargin: 16
         visible: Notifications.count === 0
         horizontalAlignment: Text.AlignHCenter
-        text: "\u{F009B}  No notifications"
+        text: "\u{F009B}  " + I18n.tr("No notifications")
         color: Theme.fg(Theme.dimOpacity)
         font.family: Theme.font
         font.pixelSize: Theme.bodyFontSize

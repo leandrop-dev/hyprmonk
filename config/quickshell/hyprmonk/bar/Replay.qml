@@ -9,7 +9,7 @@ Module {
     interactive: true
     icon: "\u{F0459}"
     color: Theme.warning
-    tooltip: "Keeping the last minute\nClick to save, right click to stop"
+    tooltip: I18n.tr("Keeping the last minute\nClick to save, right click to stop")
 
     onClicked: button => {
         if (button === Qt.LeftButton) Recorder.saveReplay();

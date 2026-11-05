@@ -33,3 +33,9 @@ export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gcr/ssh"
 # Icons in the shell: Yaru (packages/aur.txt). Read once at its start, so it
 # does not follow the tone as GTK apps do (Theme.qml); dark, Yaru's orange.
 export QS_ICON_THEME=Yaru-dark
+
+# This account's language, picked in Settings > Language and input
+# (services/I18n.qml): LANG for its apps, from the next login.
+if [ -r "$HOME/.local/state/hyprmonk/language.env" ]; then
+    . "$HOME/.local/state/hyprmonk/language.env"
+fi

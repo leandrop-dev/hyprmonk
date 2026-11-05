@@ -38,9 +38,9 @@ Singleton {
 
     // What the bar's tooltip says: the first line is its title.
     readonly property string summary: {
-        if (!on) return "Bluetooth off";
-        if (connected.length === 0) return "Bluetooth\nNothing connected";
-        return "Bluetooth\n" + connected.map(d => d.name + (d.batteryAvailable ? "  " + Math.round(d.battery * 100) + "%" : "")).join("\n");
+        if (!on) return I18n.tr("Bluetooth off");
+        if (connected.length === 0) return I18n.tr("Bluetooth\nNothing connected");
+        return I18n.tr("Bluetooth") + "\n" + connected.map(d => d.name + (d.batteryAvailable ? "  " + Math.round(d.battery * 100) + "%" : "")).join("\n");
     }
 
     property BluetoothDevice pairing: null  // the device being paired
@@ -84,7 +84,7 @@ Singleton {
             reply(message.id, device?.paired ?? false, "");
             return;
         }
-        request = Object.assign(message, { device, name: device?.name ?? "this device" });
+        request = Object.assign(message, { device, name: device?.name ?? I18n.tr("this device") });
         if (Panels.open !== "bluetooth") Panels.toggle("bluetooth");
     }
 

@@ -85,10 +85,10 @@ Item {
         anchors.centerIn: parent
         visible: !list.visible
         text: ({
-            loading: "Looking for lyrics…",
-            instrumental: "♪  Instrumental",
-            none: "No lyrics found",
-            error: "Lyrics unavailable right now"
+            loading: I18n.tr("Looking for lyrics…"),
+            instrumental: "♪  " + I18n.tr("Instrumental"),
+            none: I18n.tr("No lyrics found"),
+            error: I18n.tr("Lyrics unavailable right now")
         })[Lyrics.status] ?? ""
         color: Theme.fg(Theme.dimOpacity)
         font.family: Theme.font

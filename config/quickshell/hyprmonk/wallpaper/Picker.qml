@@ -140,7 +140,7 @@ Scope {
 
             Text {
                 visible: !search.text
-                text: "Wallpapers"
+                text: I18n.tr("Wallpapers")
                 color: Theme.fg(Theme.dimOpacity)
                 font: search.font
             }
@@ -247,7 +247,7 @@ Scope {
         Text {
             anchors.centerIn: grid
             visible: root.shown.length === 0
-            text: Wallpaper.files.length === 0 ? "No pictures in " + Wallpaper.folder : "No match"
+            text: Wallpaper.files.length === 0 ? I18n.tr("No pictures in %1", Wallpaper.folder) : I18n.tr("No match")
             color: Theme.fg(Theme.dimOpacity)
             font.family: Theme.font
             font.pixelSize: Theme.rowFontSize

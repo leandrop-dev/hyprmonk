@@ -10,6 +10,7 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Wayland
 import qs
+import qs.services
 import qs.widgets
 
 Scope {
@@ -130,7 +131,7 @@ Scope {
 
                     Text {
                         Layout.fillWidth: true
-                        text: "Screenshot"
+                        text: I18n.tr("Screenshot")
                         color: Theme.foreground
                         font.family: Theme.font
                         font.pixelSize: Theme.fontSize
@@ -142,8 +143,8 @@ Scope {
                     spacing: 8
 
                     Item { Layout.fillWidth: true }
-                    Dim { text: "Save"; Layout.preferredWidth: root.keyWidth; horizontalAlignment: Text.AlignHCenter }
-                    Dim { text: "Copy"; Layout.preferredWidth: root.keyWidth; horizontalAlignment: Text.AlignHCenter }
+                    Dim { text: I18n.tr("Save"); Layout.preferredWidth: root.keyWidth; horizontalAlignment: Text.AlignHCenter }
+                    Dim { text: I18n.tr("Copy"); Layout.preferredWidth: root.keyWidth; horizontalAlignment: Text.AlignHCenter }
                 }
 
                 Repeater {
@@ -174,7 +175,7 @@ Scope {
                     Layout.fillWidth: true
                     Layout.topMargin: 4
                     visible: root.cancel !== ""
-                    text: root.cancel + " cancels"
+                    text: I18n.tr("%1 cancels", root.cancel)
                 }
             }
         }

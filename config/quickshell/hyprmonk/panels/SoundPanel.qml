@@ -27,7 +27,7 @@ ColumnLayout {
     }
 
     SectionLabel {
-        text: panel.output ? "Output" : "Microphone"
+        text: panel.output ? I18n.tr("Output") : I18n.tr("Microphone")
     }
 
     LevelRow {
@@ -72,7 +72,7 @@ ColumnLayout {
 
         Text {
             Layout.fillWidth: true
-            text: panel.output ? "Headphone correction" : "Noise suppression"
+            text: panel.output ? I18n.tr("Headphone correction") : I18n.tr("Noise suppression")
             color: Theme.foreground
             font.family: Theme.font
             font.pixelSize: Theme.rowFontSize
@@ -82,7 +82,7 @@ ColumnLayout {
         Chip {
             readonly property bool active: panel.output ? AudioEffects.correctionOn : AudioEffects.noiseOn
 
-            text: active ? "on" : "off"
+            text: active ? I18n.tr("on") : I18n.tr("off")
             on: active
             onClicked: panel.output ? AudioEffects.setCorrection(!active) : AudioEffects.setNoise(!active)
         }
@@ -98,7 +98,7 @@ ColumnLayout {
 
         Text {
             Layout.fillWidth: true
-            text: "Equaliser"
+            text: I18n.tr("Equaliser")
             color: Theme.foreground
             font.family: Theme.font
             font.pixelSize: Theme.rowFontSize
@@ -106,7 +106,7 @@ ColumnLayout {
         }
 
         Chip {
-            text: AudioEffects.eqOn ? "on" : "off"
+            text: AudioEffects.eqOn ? I18n.tr("on") : I18n.tr("off")
             on: AudioEffects.eqOn
             onClicked: AudioEffects.setEq(!AudioEffects.eqOn)
         }
@@ -125,7 +125,7 @@ ColumnLayout {
             Chip {
                 required property string modelData
 
-                text: AudioEffects.presetLabels[modelData]
+                text: I18n.tr(AudioEffects.presetLabels[modelData])
                 on: modelData === AudioEffects.preset
                 onClicked: AudioEffects.setPreset(modelData)
             }
@@ -141,7 +141,7 @@ ColumnLayout {
 
         Text {
             Layout.fillWidth: true
-            text: "Night mode"
+            text: I18n.tr("Night mode")
             color: Theme.foreground
             font.family: Theme.font
             font.pixelSize: Theme.rowFontSize
@@ -149,7 +149,7 @@ ColumnLayout {
         }
 
         Chip {
-            text: AudioEffects.nightOn ? "on" : "off"
+            text: AudioEffects.nightOn ? I18n.tr("on") : I18n.tr("off")
             on: AudioEffects.nightOn
             onClicked: AudioEffects.setNight(!AudioEffects.nightOn)
         }
@@ -158,7 +158,7 @@ ColumnLayout {
     SectionLabel {
         Layout.topMargin: 6
         visible: panel.apps.length > 0
-        text: panel.output ? "Apps" : "Recording"
+        text: panel.output ? I18n.tr("Apps") : I18n.tr("Recording")
     }
 
     Repeater {
@@ -184,7 +184,7 @@ ColumnLayout {
     SectionLabel {
         Layout.topMargin: 6
         visible: panel.output && Audio.source !== null
-        text: "Microphone"
+        text: I18n.tr("Microphone")
     }
 
     LevelRow {
@@ -201,7 +201,7 @@ ColumnLayout {
     Button {
         Layout.fillWidth: true
         Layout.topMargin: 4
-        text: "\u{F05B2}  Mixer"
+        text: "\u{F05B2}  " + I18n.tr("Mixer")
         onClicked: {
             // pavucontrol's tabs: 3 output devices, 4 input devices.
             Quickshell.execDetached(["pavucontrol", "-t", panel.output ? "3" : "4"]);

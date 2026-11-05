@@ -12,10 +12,10 @@ ColumnLayout {
     id: page
 
     readonly property var corners: ({
-        "top-right": "Top right",
-        "top-left": "Top left",
-        "bottom-right": "Bottom right",
-        "bottom-left": "Bottom left"
+        "top-right": I18n.tr("Top right"),
+        "top-left": I18n.tr("Top left"),
+        "bottom-right": I18n.tr("Bottom right"),
+        "bottom-left": I18n.tr("Bottom left")
     })
 
     spacing: 8
@@ -52,11 +52,11 @@ ColumnLayout {
     }
 
     SectionLabel {
-        text: "Pop-ups stay for"
+        text: I18n.tr("Pop-ups stay for")
     }
 
     Note {
-        text: "Unless the sender says otherwise; low ones half as long, urgent ones until dismissed. The pointer over one holds it."
+        text: I18n.tr("Unless the sender says otherwise; low ones half as long, urgent ones until dismissed. The pointer over one holds it.")
     }
 
     Choices {
@@ -65,7 +65,7 @@ ColumnLayout {
     }
 
     SectionLabel {
-        text: "Corner"
+        text: I18n.tr("Corner")
     }
 
     Choices {
@@ -74,7 +74,7 @@ ColumnLayout {
     }
 
     SectionLabel {
-        text: "Shown at once, at most"
+        text: I18n.tr("Shown at once, at most")
     }
 
     Choices {
@@ -82,11 +82,11 @@ ColumnLayout {
     }
 
     SectionLabel {
-        text: "The centre keeps"
+        text: I18n.tr("The centre keeps")
     }
 
     Note {
-        text: "Older ones go first; urgent ones stay until dismissed."
+        text: I18n.tr("Older ones go first; urgent ones stay until dismissed.")
     }
 
     Choices {
@@ -101,9 +101,9 @@ ColumnLayout {
         Layout.fillWidth: true
 
         Button {
-            text: "Send a test"
-            onClicked: Quickshell.execDetached(["notify-send", "--app-name", "Settings",
-                                                "Test notification", "This is where they show, and for how long."])
+            text: I18n.tr("Send a test")
+            onClicked: Quickshell.execDetached(["notify-send", "--app-name", I18n.tr("Settings"),
+                                                I18n.tr("Test notification"), I18n.tr("This is where they show, and for how long.")])
         }
 
         Item {
@@ -112,7 +112,7 @@ ColumnLayout {
 
         Button {
             enabled: Notifications.changed
-            text: "Back to the defaults"
+            text: I18n.tr("Back to the defaults")
             onClicked: Notifications.reset()
         }
     }

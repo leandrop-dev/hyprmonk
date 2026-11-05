@@ -9,8 +9,8 @@ Module {
     icon: Awake.on ? "\u{F0176}" : "\u{F06CA}"
     color: Awake.on ? Theme.accent : Theme.foreground
     dim: !Awake.on
-    tooltip: Awake.on ? "Staying awake: the screen will not lock or go off\nClick to stop"
-                      : "Stay awake\nClick to keep the screen from locking or going off"
+    tooltip: Awake.on ? I18n.tr("Staying awake: the screen will not lock or go off\nClick to stop")
+                      : I18n.tr("Stay awake\nClick to keep the screen from locking or going off")
 
     onClicked: Awake.toggle()
 }

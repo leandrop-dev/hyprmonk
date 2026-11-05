@@ -7,6 +7,7 @@
 // hovering itself.
 import QtQuick
 import qs
+import qs.services
 
 Flickable {
     id: list
@@ -18,7 +19,7 @@ Flickable {
     property int highlightRadius: 10
     property Component delegate: null
     property Component heading: null
-    property string emptyText: "Nothing matches"
+    property string emptyText: I18n.tr("Nothing matches")
     property int emptyFontSize: Theme.fontSize
 
     // Where each row and heading goes, which rows start a section, and the

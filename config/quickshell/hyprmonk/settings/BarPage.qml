@@ -234,7 +234,7 @@ Item {
                             Text {
                                 anchors.centerIn: parent
                                 visible: Settings.bar[section.side].length === 0
-                                text: "Drag modules here"
+                                text: I18n.tr("Drag modules here")
                                 color: Theme.fg(Theme.dimOpacity)
                                 font.family: Theme.font
                                 font.pixelSize: Theme.smallFontSize
@@ -245,52 +245,52 @@ Item {
 
                 SectionLabel {
                     visible: page.section === "look"
-                    text: "How it looks"
+                    text: I18n.tr("How it looks")
                 }
 
                 Row {
                     visible: page.section === "look"
-                    text: "Position"
+                    text: I18n.tr("Position")
 
                     Choice {
                         key: "position"
-                        labels: ({ top: "Top", bottom: "Bottom" })
+                        labels: ({ top: I18n.tr("Top"), bottom: I18n.tr("Bottom") })
                     }
                 }
 
                 Row {
                     visible: page.section === "look"
-                    text: "Clock"
+                    text: I18n.tr("Clock")
 
                     Choice {
                         key: "hours"
-                        labels: ({ "24": "24-hour", "12": "12-hour" })
+                        labels: ({ "24": I18n.tr("24-hour"), "12": I18n.tr("12-hour") })
                     }
 
                     Switch {
                         key: "seconds"
-                        text: "Seconds"
+                        text: I18n.tr("Seconds")
                     }
 
                     Switch {
                         key: "date"
-                        text: "Date"
+                        text: I18n.tr("Date")
                     }
                 }
 
                 Row {
                     visible: page.section === "look"
-                    text: "Workspaces"
+                    text: I18n.tr("Workspaces")
 
                     Choice {
                         key: "workspaces"
-                        labels: ({ 0: "In use", 5: "1 to 5", 10: "1 to 10" })
+                        labels: ({ 0: I18n.tr("In use"), 5: I18n.tr("1 to 5"), 10: I18n.tr("1 to 10") })
                     }
                 }
 
                 Row {
                     visible: page.section === "look"
-                    text: "Workspaces look"
+                    text: I18n.tr("Workspaces look")
                 }
 
                 // Each look on four made-up workspaces, the fourth empty; under the
@@ -311,7 +311,7 @@ Item {
                             property int step: 0
                             readonly property var path: [1, 3, 2]
 
-                            label: ({ pills: "Pills", numbers: "Numbers", dots: "Dots", chomper: "Chomper" })[modelData]
+                            label: ({ pills: I18n.tr("Pills"), numbers: I18n.tr("Numbers"), dots: I18n.tr("Dots"), chomper: I18n.tr("Chomper") })[modelData]
                             chosen: modelData === Settings.barChoice("workspaceStyle")
                             onClicked: Settings.setBarChoice("workspaceStyle", modelData)
                             onHoveredChanged: if (!hovered) step = 0
@@ -336,21 +336,21 @@ Item {
 
                 Row {
                     visible: page.section === "look"
-                    text: "Temperature"
+                    text: I18n.tr("Temperature")
 
                     Choice {
                         key: "temperature"
-                        labels: ({ C: "°C", F: "°F" })
+                        labels: ({ C: I18n.tr("°C"), F: I18n.tr("°F") })
                     }
                 }
 
                 Row {
                     visible: page.section === "look"
-                    text: "Hardware, from the cat"
+                    text: I18n.tr("Hardware, from the cat")
 
                     Choice {
                         key: "hardware"
-                        labels: ({ drawer: "Drawer", panel: "Panel" })
+                        labels: ({ drawer: I18n.tr("Drawer"), panel: I18n.tr("Panel") })
                     }
                 }
             }
@@ -363,7 +363,7 @@ Item {
         Button {
             Layout.alignment: Qt.AlignRight
             enabled: Settings.barChanged || Settings.barLookChanged
-            text: "Back to the defaults"
+            text: I18n.tr("Back to the defaults")
             onClicked: Settings.resetBar()
         }
     }

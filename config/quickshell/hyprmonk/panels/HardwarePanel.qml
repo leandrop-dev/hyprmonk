@@ -39,13 +39,13 @@ ColumnLayout {
     }
 
     SectionLabel {
-        text: "Processor"
+        text: I18n.tr("Processor")
     }
 
     ReadingBar {
         Layout.fillWidth: true
         icon: "\u{F0EE0}"
-        label: "Use"
+        label: I18n.tr("Use")
         value: panel.percent(Hardware.cpu)
         level: Hardware.cpu / 100
         warnAt: 0.9
@@ -91,7 +91,7 @@ ColumnLayout {
         Layout.fillWidth: true
         visible: !isNaN(Hardware.cpuTemp)
         icon: "\u{F050F}"
-        label: "Temperature"
+        label: I18n.tr("Temperature")
         value: Settings.degrees(Hardware.cpuTemp)
         level: Hardware.cpuTemp / 100
         warnAt: panel.hot / 100
@@ -100,14 +100,14 @@ ColumnLayout {
     SectionLabel {
         Layout.topMargin: 6
         visible: !isNaN(Hardware.gpuTemp)
-        text: Hardware.gpuName || "Graphics"
+        text: Hardware.gpuName || I18n.tr("Graphics")
     }
 
     ReadingBar {
         Layout.fillWidth: true
         visible: !isNaN(Hardware.gpuUse)
         icon: "\u{F08AE}"
-        label: "Use"
+        label: I18n.tr("Use")
         value: panel.percent(Hardware.gpuUse)
         level: Hardware.gpuUse / 100
         warnAt: 0.9
@@ -117,7 +117,7 @@ ColumnLayout {
         Layout.fillWidth: true
         visible: !isNaN(Hardware.gpuTemp)
         icon: "\u{F050F}"
-        label: "Temperature"
+        label: I18n.tr("Temperature")
         value: Settings.degrees(Hardware.gpuTemp)
         level: Hardware.gpuTemp / 100
         warnAt: panel.hot / 100
@@ -127,7 +127,7 @@ ColumnLayout {
         Layout.fillWidth: true
         visible: !isNaN(Hardware.vramTotal)
         icon: "\u{F035B}"
-        label: "Video memory"
+        label: I18n.tr("Video memory")
         value: Hardware.human(Hardware.vramUsed) + " / " + Hardware.human(Hardware.vramTotal)
         level: Hardware.vramUsed / Hardware.vramTotal
         warnAt: 0.9
@@ -135,13 +135,13 @@ ColumnLayout {
 
     SectionLabel {
         Layout.topMargin: 6
-        text: "Memory and disks"
+        text: I18n.tr("Memory and disks")
     }
 
     ReadingBar {
         Layout.fillWidth: true
         icon: "\u{F035B}"
-        label: "Memory"
+        label: I18n.tr("Memory")
         value: Hardware.human(Hardware.memUsed) + " / " + Hardware.human(Hardware.memTotal)
         level: Hardware.memUsed / Hardware.memTotal
         warnAt: 0.9
@@ -165,13 +165,13 @@ ColumnLayout {
 
     SectionLabel {
         Layout.topMargin: 6
-        text: "Network"
+        text: I18n.tr("Network")
     }
 
     ReadingBar {
         Layout.fillWidth: true
         icon: "\u{F01DA}"
-        label: "Down"
+        label: I18n.tr("Down")
         value: panel.speed(Hardware.down)
         level: Hardware.down / panel.fastest
     }
@@ -179,7 +179,7 @@ ColumnLayout {
     ReadingBar {
         Layout.fillWidth: true
         icon: "\u{F0552}"
-        label: "Up"
+        label: I18n.tr("Up")
         value: panel.speed(Hardware.up)
         level: Hardware.up / panel.fastest
     }

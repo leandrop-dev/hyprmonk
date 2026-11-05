@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Widgets
 import qs
+import qs.services
 
 RowLayout {
     id: row
@@ -66,7 +67,7 @@ RowLayout {
             }
 
             Text {
-                text: row.muted ? "Muted" : Math.round(row.value * 100) + "%"
+                text: row.muted ? I18n.tr("Muted") : Math.round(row.value * 100) + "%"
                 color: Theme.fg(Theme.dimOpacity)
                 font.family: Theme.font
                 font.pixelSize: Theme.smallFontSize

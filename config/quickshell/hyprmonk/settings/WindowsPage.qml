@@ -47,7 +47,7 @@ ColumnLayout {
     component Switch: Chip {
         property string key: ""
 
-        text: Settings.windowChoice(key) ? "on" : "off"
+        text: Settings.windowChoice(key) ? I18n.tr("on") : I18n.tr("off")
         on: Settings.windowChoice(key)
         onClicked: Settings.setWindowChoice(key, !Settings.windowChoice(key))
     }
@@ -69,7 +69,7 @@ ColumnLayout {
             spacing: 8
 
             Repeater {
-                model: ["Gaps", "Borders", "Blur"]
+                model: [I18n.mark("Gaps"), I18n.mark("Borders"), I18n.mark("Blur")]
 
                 ColumnLayout {
                     id: group
@@ -81,7 +81,7 @@ ColumnLayout {
                     spacing: 6
 
                     SectionLabel {
-                        text: group.modelData
+                        text: I18n.tr(group.modelData)
                     }
 
                     Repeater {
@@ -102,20 +102,20 @@ ColumnLayout {
             }
 
             SectionLabel {
-                text: "Tiling and motion"
+                text: I18n.tr("Tiling and motion")
             }
 
             Row {
-                text: "Layout"
+                text: I18n.tr("Layout")
 
                 Choice {
                     key: "layout"
-                    labels: ({ dwindle: "Dwindle", master: "Master", scrolling: "Scrolling", floating: "Floating" })
+                    labels: ({ dwindle: I18n.tr("Dwindle"), master: I18n.tr("Master"), scrolling: I18n.tr("Scrolling"), floating: I18n.tr("Floating") })
                 }
             }
 
             Row {
-                text: "Shadows"
+                text: I18n.tr("Shadows")
 
                 Switch {
                     key: "shadows"
@@ -123,11 +123,11 @@ ColumnLayout {
             }
 
             Row {
-                text: "Animations"
+                text: I18n.tr("Animations")
 
                 Choice {
                     key: "animationSpeed"
-                    labels: ({ normal: "Normal", fast: "Fast", slow: "Slow" })
+                    labels: ({ normal: I18n.tr("Normal"), fast: I18n.tr("Fast"), slow: I18n.tr("Slow") })
                 }
 
                 Switch {
@@ -144,7 +144,7 @@ ColumnLayout {
     Button {
         Layout.alignment: Qt.AlignRight
         enabled: Settings.windowChanged
-        text: "Back to the defaults"
+        text: I18n.tr("Back to the defaults")
         onClicked: Settings.resetWindow()
     }
 }

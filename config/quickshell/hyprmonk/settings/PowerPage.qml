@@ -10,7 +10,7 @@ ColumnLayout {
     id: page
 
     function minutes(value: int): string {
-        if (value === 0) return "Never";
+        if (value === 0) return I18n.tr("Never");
         if (value % 60 === 0) return value / 60 + (value === 60 ? " hour" : " hours");
         return value + " min";
     }
@@ -49,7 +49,7 @@ ColumnLayout {
     }
 
     SectionLabel {
-        text: "Lock the screen after"
+        text: I18n.tr("Lock the screen after")
     }
 
     Choices {
@@ -58,11 +58,11 @@ ColumnLayout {
     }
 
     SectionLabel {
-        text: "Turn the screens off"
+        text: I18n.tr("Turn the screens off")
     }
 
     Note {
-        text: Idle.lockAfter ? "This long after the lock." : "This long idle, since it never locks."
+        text: Idle.lockAfter ? I18n.tr("This long after the lock.") : I18n.tr("This long idle, since it never locks.")
     }
 
     Choices {
@@ -71,7 +71,7 @@ ColumnLayout {
     }
 
     Note {
-        text: "It always locks before a suspend."
+        text: I18n.tr("It always locks before a suspend.")
     }
 
     Item {
@@ -81,7 +81,7 @@ ColumnLayout {
     Button {
         Layout.alignment: Qt.AlignRight
         enabled: Idle.changed
-        text: "Back to the defaults"
+        text: I18n.tr("Back to the defaults")
         onClicked: Idle.reset()
     }
 }

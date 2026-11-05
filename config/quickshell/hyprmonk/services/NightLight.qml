@@ -18,7 +18,7 @@ Singleton {
     id: root
 
     readonly property var modes: ["off", "scheduled", "always"]
-    readonly property var modeLabels: ({ off: "Off", scheduled: "Between set times", always: "Always" })
+    readonly property var modeLabels: ({ off: I18n.mark("Off"), scheduled: I18n.mark("Between set times"), always: I18n.mark("Always") })
     readonly property var warmthRange: ({ from: 2500, to: 6000, value: 5500 })  // kelvin
     readonly property int neutral: 6500  // what the screens show without it
     readonly property int fade: 30  // minutes
@@ -27,12 +27,12 @@ Singleton {
     // table in KTC's guide to colour temperature for late-night gaming, in
     // our own words and stopping at the slider's ends.
     readonly property var guide: [
-        { kelvin: 6000, name: "Barely warm", use: "Evenings with a lamp on; colours stay true" },
-        { kelvin: 5500, name: "Warm white", use: "A good start for late games and films" },
-        { kelvin: 5000, name: "Warm", use: "Long sessions in a dark room; whites turn cream" },
-        { kelvin: 4000, name: "Amber", use: "Reading and browsing near bedtime; sepia colours" },
-        { kelvin: 3000, name: "Deep amber", use: "The last hour before sleep; colours fade" },
-        { kelvin: 2500, name: "Candlelight", use: "Winding down only; colours hard to tell apart" }
+        { kelvin: 6000, name: I18n.mark("Barely warm"), use: I18n.mark("Evenings with a lamp on; colours stay true") },
+        { kelvin: 5500, name: I18n.mark("Warm white"), use: I18n.mark("A good start for late games and films") },
+        { kelvin: 5000, name: I18n.mark("Warm"), use: I18n.mark("Long sessions in a dark room; whites turn cream") },
+        { kelvin: 4000, name: I18n.mark("Amber"), use: I18n.mark("Reading and browsing near bedtime; sepia colours") },
+        { kelvin: 3000, name: I18n.mark("Deep amber"), use: I18n.mark("The last hour before sleep; colours fade") },
+        { kelvin: 2500, name: I18n.mark("Candlelight"), use: I18n.mark("Winding down only; colours hard to tell apart") }
     ]
 
     readonly property string mode: modes.includes(saved.mode) ? saved.mode : "off"
@@ -50,9 +50,9 @@ Singleton {
 
     // A word on what it does next, for Settings.
     readonly property string status: {
-        if (mode === "off") return "Off";
-        if (mode === "always") return "On, at " + warmth + " K";
-        return warm ? "On until " + clock(to) : "Comes on at " + clock(from);
+        if (mode === "off") return I18n.tr("Off");
+        if (mode === "always") return I18n.tr("On, at %1 K", warmth);
+        return warm ? I18n.tr("On until %1", clock(to)) : I18n.tr("Comes on at %1", clock(from));
     }
 
     function wrap(minutes: int): int {

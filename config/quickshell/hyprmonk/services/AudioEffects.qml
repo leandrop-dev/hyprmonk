@@ -222,8 +222,8 @@ Singleton {
         classical: [3, 2, 1, 0, 0, 0, -1, -1, 1, 2]
     })
     readonly property var presetNames: Object.keys(presets).concat("custom")
-    readonly property var presetLabels: ({ flat: "Flat", bass: "Bass", treble: "Treble", vocal: "Vocal", rock: "Rock",
-        pop: "Pop", jazz: "Jazz", classical: "Classical", custom: "Custom" })
+    readonly property var presetLabels: ({ flat: I18n.mark("Flat"), bass: I18n.mark("Bass"), treble: I18n.mark("Treble"), vocal: I18n.mark("Vocal"), rock: I18n.mark("Rock"),
+        pop: I18n.mark("Pop"), jazz: I18n.mark("Jazz"), classical: I18n.mark("Classical"), custom: I18n.mark("Custom") })
 
     readonly property bool eqOn: settings.eq
     readonly property string preset: settings.preset in presets || settings.preset === "custom" ? settings.preset : "flat"
@@ -285,7 +285,7 @@ Singleton {
         strong: { threshold: -36, ratio: 8, makeup: 15 }
     })
     readonly property var strengthNames: Object.keys(strengths)
-    readonly property var strengthLabels: ({ light: "Light", medium: "Medium", strong: "Strong" })
+    readonly property var strengthLabels: ({ light: I18n.mark("Light"), medium: I18n.mark("Medium"), strong: I18n.mark("Strong") })
 
     readonly property bool nightOn: settings.night
     readonly property string strength: settings.strength in strengths ? settings.strength : "medium"

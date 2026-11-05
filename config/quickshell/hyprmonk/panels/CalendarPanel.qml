@@ -14,12 +14,22 @@ import qs.widgets
 ColumnLayout {
     id: panel
 
-    // Names in English like the rest of the shell. Weeks start on Monday
-    // (0 Sunday to 6 Saturday): not from the locale, whose data has Portugal
-    // (LC_TIME pt_PT) starting on Sunday.
-    readonly property var english: Qt.locale("en_GB")
+    // Names in the shell's language (services/I18n.qml). Weeks start on
+    // Monday (0 Sunday to 6 Saturday): not from the locale, whose data has
+    // Portugal starting on Sunday. Days by two letters in English (Mo, Tu),
+    // three where two would repeat (Seg, Ter, Qua, Qui, Sex in Portuguese).
+    readonly property var names: I18n.locale
     readonly property int firstDay: 1
-    readonly property var dayNames: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
+    readonly property var dayNames: Array.from({ length: 7 }, (_, day) => {
+        const name = names.dayName(day, Locale.ShortFormat).replace(".", "");
+        return panel.capital(name.slice(0, I18n.language === "en" ? 2 : 3));
+    })
+    // The country's own names for its holidays first, in its language.
+    readonly property bool localFirst: I18n.language.endsWith("_" + Calendar.country)
+
+    function capital(text: string): string {
+        return text.charAt(0).toUpperCase() + text.slice(1);
+    }
 
     readonly property date today: clock.date
     property date month: new Date(today.getFullYear(), today.getMonth(), 1)
@@ -73,7 +83,7 @@ ColumnLayout {
         Text {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
-            text: panel.english.toString(panel.month, "MMMM yyyy")
+            text: panel.capital(panel.names.toString(panel.month, I18n.tr("MMMM yyyy")))
             color: Theme.foreground
             font.family: Theme.font
             font.pixelSize: Theme.fontSize
@@ -207,7 +217,7 @@ ColumnLayout {
     Text {
         Layout.preferredWidth: grid.implicitWidth
         Layout.alignment: Qt.AlignHCenter
-        text: panel.sameDay(panel.selected, panel.today) ? "Today" : panel.english.toString(panel.selected, "dddd d MMMM")
+        text: panel.sameDay(panel.selected, panel.today) ? I18n.tr("Today") : panel.capital(panel.names.toString(panel.selected, I18n.tr("dddd d MMMM")))
         color: Theme.fg(Theme.dimOpacity)
         font.family: Theme.font
         font.pixelSize: Theme.smallFontSize
@@ -237,7 +247,7 @@ ColumnLayout {
 
                 Text {
                     Layout.fillWidth: true
-                    text: modelData.name
+                    text: panel.localFirst ? modelData.local : modelData.name
                     wrapMode: Text.Wrap
                     color: Theme.foreground
                     font.family: Theme.font
@@ -247,8 +257,8 @@ ColumnLayout {
                 Text {
                     Layout.fillWidth: true
                     visible: text !== ""
-                    text: [modelData.local !== modelData.name ? modelData.local : "",
-                           modelData.regional ? "regional" : "", modelData.optional ? "optional" : ""]
+                    text: [modelData.local !== modelData.name ? (panel.localFirst ? modelData.name : modelData.local) : "",
+                           modelData.regional ? I18n.tr("regional") : "", modelData.optional ? I18n.tr("optional") : ""]
                         .filter(part => part !== "").join(" · ")
                     wrapMode: Text.Wrap
                     color: Theme.fg(Theme.dimOpacity)
@@ -302,7 +312,7 @@ ColumnLayout {
 
                 Text {
                     Layout.fillWidth: true
-                    text: [eventRow.modelData.allDay ? "All day" : eventRow.modelData.start + " – " + eventRow.modelData.end,
+                    text: [eventRow.modelData.allDay ? I18n.tr("All day") : eventRow.modelData.start + " – " + eventRow.modelData.end,
                            eventRow.modelData.location,
                            eventRow.modelData.calendar === "local" ? "" : Events.nameOf(eventRow.modelData.calendar)]
                         .filter(part => part).join(" · ")
@@ -346,7 +356,7 @@ ColumnLayout {
         Layout.preferredWidth: grid.implicitWidth
         Layout.alignment: Qt.AlignHCenter
         visible: panel.holidays.length === 0 && panel.events.length === 0 && !panel.adding
-        text: "Nothing on this day"
+        text: I18n.tr("Nothing on this day")
         color: Theme.fg(0.45)
         font.family: Theme.font
         font.pixelSize: Theme.smallFontSize
@@ -358,7 +368,7 @@ ColumnLayout {
         Layout.preferredWidth: grid.implicitWidth
         Layout.alignment: Qt.AlignHCenter
         visible: Events.available && !panel.adding
-        text: "\u{F0415}  Add an event"  // a plus
+        text: "\u{F0415}  " + I18n.tr("Add an event")  // a plus
         color: addMouse.containsMouse ? Theme.foreground : Theme.fg(Theme.dimOpacity)
         font.family: Theme.font
         font.pixelSize: Theme.smallFontSize
@@ -402,7 +412,7 @@ ColumnLayout {
         TextField {
             id: title
             Layout.fillWidth: true
-            placeholder: "Title"
+            placeholder: I18n.tr("Title")
             onAccepted: form.save()
         }
 
@@ -413,7 +423,7 @@ ColumnLayout {
             TextField {
                 id: startTime
                 Layout.preferredWidth: 64
-                placeholder: "from"
+                placeholder: I18n.tr("from")
                 horizontalAlignment: TextInput.AlignHCenter
                 onAccepted: form.save()
             }
@@ -421,14 +431,14 @@ ColumnLayout {
             TextField {
                 id: endTime
                 Layout.preferredWidth: 64
-                placeholder: "to"
+                placeholder: I18n.tr("to")
                 horizontalAlignment: TextInput.AlignHCenter
                 onAccepted: form.save()
             }
 
             Text {
                 Layout.fillWidth: true
-                text: form.timesOk ? (startTime.text === "" ? "all day" : "") : "as 14:30"
+                text: form.timesOk ? (startTime.text === "" ? I18n.tr("all day") : "") : I18n.tr("as 14:30")
                 color: form.timesOk ? Theme.fg(Theme.dimOpacity) : Theme.warning
                 font.family: Theme.font
                 font.pixelSize: Theme.smallFontSize
@@ -462,12 +472,12 @@ ColumnLayout {
             }
 
             Button {
-                text: "Cancel"
+                text: I18n.tr("Cancel")
                 onClicked: panel.adding = false
             }
 
             Button {
-                text: "Add"
+                text: I18n.tr("Add")
                 primary: true
                 enabled: form.ready
                 onClicked: form.save()

@@ -41,12 +41,12 @@ ColumnLayout {
 
         SectionLabel {
             Layout.fillWidth: true
-            text: "Screens"
+            text: I18n.tr("Screens")
         }
 
         // The one quick actions' Mirror and Main screen only keep.
         Chip {
-            text: "Main screen"
+            text: I18n.tr("Main screen")
             on: Display.monitor?.name === Display.mainScreen
             onClicked: if (Display.monitor) Settings.setMainScreen(Display.monitor.name)
         }
@@ -60,7 +60,7 @@ ColumnLayout {
 
     SectionLabel {
         visible: page.section === "screens"
-        text: "Resolution"
+        text: I18n.tr("Resolution")
     }
 
     Flow {
@@ -87,7 +87,7 @@ ColumnLayout {
 
     SectionLabel {
         visible: page.section === "screens"
-        text: "Refresh rate"
+        text: I18n.tr("Refresh rate")
     }
 
     Flow {
@@ -102,7 +102,7 @@ ColumnLayout {
             Chip {
                 required property real modelData
 
-                text: modelData + " Hz"
+                text: I18n.tr("%1 Hz", modelData)
                 on: modelData === Display.shownRate
                 onClicked: Display.chosenRate = modelData
             }
@@ -111,7 +111,7 @@ ColumnLayout {
 
     SectionLabel {
         visible: page.section === "screens"
-        text: "Scale"
+        text: I18n.tr("Scale")
     }
 
     Flow {
@@ -154,7 +154,7 @@ ColumnLayout {
             SettingSlider {
                 Layout.fillWidth: true
                 visible: screen.ddc?.brightness !== undefined
-                label: "Brightness"
+                label: I18n.tr("Brightness")
                 to: screen.ddc?.brightnessMax ?? 100
                 value: screen.ddc?.brightness ?? 0
                 onMoved: value => Brightness.set(screen.modelData.name, "brightness", value)
@@ -163,7 +163,7 @@ ColumnLayout {
             SettingSlider {
                 Layout.fillWidth: true
                 visible: screen.ddc?.contrast !== undefined
-                label: "Contrast"
+                label: I18n.tr("Contrast")
                 to: screen.ddc?.contrastMax ?? 100
                 value: screen.ddc?.contrast ?? 0
                 onMoved: value => Brightness.set(screen.modelData.name, "contrast", value)
@@ -171,8 +171,8 @@ ColumnLayout {
 
             Note {
                 visible: !screen.ddc
-                text: Brightness.reading || !Brightness.read ? "Asking the screen…"
-                    : "This screen does not answer over DDC/CI, so its own brightness cannot be set from here. Many monitors have DDC/CI as a switch in their menu."
+                text: Brightness.reading || !Brightness.read ? I18n.tr("Asking the screen…")
+                    : I18n.tr("This screen does not answer over DDC/CI, so its own brightness cannot be set from here. Many monitors have DDC/CI as a switch in their menu.")
             }
         }
     }
@@ -180,17 +180,17 @@ ColumnLayout {
     SettingSlider {
         Layout.fillWidth: true
         visible: page.section === "brightness"
-        label: "Dim further"
+        label: I18n.tr("Dim further")
         from: Brightness.dimRange.from
         to: Brightness.dimRange.to
         value: Brightness.dim
-        shown: Brightness.dim === 100 ? "Off" : Brightness.dim + "%"
+        shown: Brightness.dim === 100 ? I18n.tr("Off") : Brightness.dim + "%"
         onMoved: value => Brightness.setDim(value)
     }
 
     Note {
         visible: page.section === "brightness"
-        text: "Brightness and contrast are the monitor's own, as its buttons set them, and it keeps them. Dimming further darkens the picture itself, on every screen at once and below the monitor's lowest setting, for late nights; dark scenes lose some detail, so turn the brightness down first."
+        text: I18n.tr("Brightness and contrast are the monitor's own, as its buttons set them, and it keeps them. Dimming further darkens the picture itself, on every screen at once and below the monitor's lowest setting, for late nights; dark scenes lose some detail, so turn the brightness down first.")
     }
 
     // services/NightLight.qml
@@ -200,7 +200,7 @@ ColumnLayout {
 
         SectionLabel {
             Layout.fillWidth: true
-            text: "Night light"
+            text: I18n.tr("Night light")
         }
 
         Text {
@@ -223,7 +223,7 @@ ColumnLayout {
             Chip {
                 required property string modelData
 
-                text: NightLight.modeLabels[modelData]
+                text: I18n.tr(NightLight.modeLabels[modelData])
                 on: modelData === NightLight.mode
                 onClicked: NightLight.setMode(modelData)
             }
@@ -234,7 +234,7 @@ ColumnLayout {
     SettingSlider {
         Layout.fillWidth: true
         visible: page.section === "night"
-        label: "Warmth"
+        label: I18n.tr("Warmth")
         from: 0
         to: (NightLight.warmthRange.to - NightLight.warmthRange.from) / 100
         value: (NightLight.warmthRange.to - NightLight.warmth) / 100
@@ -249,7 +249,7 @@ ColumnLayout {
         visible: page.section === "night"
         enabled: NightLight.mode === "scheduled"
         opacity: enabled ? 1 : Theme.dimOpacity
-        label: "Starts at"
+        label: I18n.tr("Starts at")
         from: 0
         to: 95
         value: Math.round(NightLight.from / 15)
@@ -262,7 +262,7 @@ ColumnLayout {
         visible: page.section === "night"
         enabled: NightLight.mode === "scheduled"
         opacity: enabled ? 1 : Theme.dimOpacity
-        label: "Ends at"
+        label: I18n.tr("Ends at")
         from: 0
         to: 95
         value: Math.round(NightLight.to / 15)
@@ -272,7 +272,7 @@ ColumnLayout {
 
     Note {
         visible: page.section === "night"
-        text: "Less blue light in the evening, which is easier on the eyes and on sleep. Between set times it fades in over half an hour from the start, and out over the half hour before the end. The warmth shows at once while it is on."
+        text: I18n.tr("Less blue light in the evening, which is easier on the eyes and on sleep. Between set times it fades in over half an hour from the start, and out over the half hour before the end. The warmth shows at once while it is on.")
     }
 
     // How warm for what (NightLight.guide); a row picks its warmth, the
@@ -280,7 +280,7 @@ ColumnLayout {
     SectionLabel {
         Layout.topMargin: 12
         visible: page.section === "night"
-        text: "How warm"
+        text: I18n.tr("How warm")
     }
 
     Repeater {
@@ -316,7 +316,7 @@ ColumnLayout {
 
                 Text {
                     Layout.preferredWidth: 130
-                    text: row.modelData.name
+                    text: I18n.tr(row.modelData.name)
                     color: Theme.foreground
                     font.family: Theme.font
                     font.pixelSize: Theme.rowFontSize
@@ -324,7 +324,7 @@ ColumnLayout {
 
                 Text {
                     Layout.fillWidth: true
-                    text: row.modelData.use
+                    text: I18n.tr(row.modelData.use)
                     elide: Text.ElideRight
                     color: Theme.fg(0.6)
                     font.family: Theme.font
@@ -348,7 +348,7 @@ ColumnLayout {
 
     Note {
         visible: page.section === "night"
-        text: "Warmer is not dimmer: in a dark room, turning the brightness down does more for the eyes than warmth alone."
+        text: I18n.tr("Warmer is not dimmer: in a dark room, turning the brightness down does more for the eyes than warmth alone.")
     }
 
     Item {
@@ -362,8 +362,8 @@ ColumnLayout {
 
         Text {
             Layout.fillWidth: true
-            text: Display.trying ? "Keep this? Going back in " + Display.left + " s"
-                : Display.changed ? "Nothing changes until applied" : ""
+            text: Display.trying ? I18n.tr("Keep this? Going back in %1 s", Display.left)
+                : Display.changed ? I18n.tr("Nothing changes until applied") : ""
             color: Theme.foreground
             font.family: Theme.font
             font.pixelSize: Theme.rowFontSize
@@ -371,28 +371,28 @@ ColumnLayout {
 
         Button {
             visible: Display.trying
-            text: "Go back"
+            text: I18n.tr("Go back")
             onClicked: Display.goBack()
         }
 
         Button {
             visible: Display.changed
             primary: true
-            text: "Apply"
+            text: I18n.tr("Apply")
             onClicked: Display.tryChoice()
         }
 
         Button {
             visible: Display.trying && !Display.changed
             primary: true
-            text: "Keep"
+            text: I18n.tr("Keep")
             onClicked: Display.keep()
         }
 
         Button {
             visible: !Display.trying && !Display.changed
             enabled: Settings.displayKept(Display.monitor?.name ?? "")
-            text: "Back to the defaults"
+            text: I18n.tr("Back to the defaults")
             onClicked: Display.resetScreen()
         }
     }

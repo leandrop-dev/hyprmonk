@@ -67,15 +67,15 @@ ColumnLayout {
 
             SectionLabel {
                 visible: page.section === "interface"
-                text: "Sounds"
+                text: I18n.tr("Sounds")
             }
 
             Row {
                 visible: page.section === "interface"
-                text: "Play sounds"
+                text: I18n.tr("Play sounds")
 
                 Chip {
-                    text: Sounds.on ? "on" : "off"
+                    text: Sounds.on ? I18n.tr("on") : I18n.tr("off")
                     on: Sounds.on
                     onClicked: Settings.setSoundChoice("on", !Sounds.on)
                 }
@@ -83,12 +83,12 @@ ColumnLayout {
 
             Note {
                 visible: page.section === "interface"
-                text: "Quiet in game mode and do not disturb, except for urgent notifications."
+                text: I18n.tr("Quiet in game mode and do not disturb, except for urgent notifications.")
             }
 
             Row {
                 visible: page.section === "interface"
-                text: "Set"
+                text: I18n.tr("Set")
 
                 Repeater {
                     model: Settings.soundChoices.set
@@ -96,7 +96,7 @@ ColumnLayout {
                     Chip {
                         required property string modelData
 
-                        text: ({ hyprmonk: "hyprmonk", serpantinum: "Serpantinum" })[modelData]
+                        text: ({ hyprmonk: I18n.tr("hyprmonk"), serpantinum: I18n.tr("Serpantinum") })[modelData]
                         on: modelData === Sounds.set
                         onClicked: Settings.setSoundChoice("set", modelData)
                     }
@@ -107,7 +107,7 @@ ColumnLayout {
                 visible: page.section === "interface"
                 Layout.fillWidth: true
                 Layout.bottomMargin: 4
-                label: "Volume"
+                label: I18n.tr("Volume")
                 unit: "%"
                 from: Settings.soundVolumeRange.from
                 to: Settings.soundVolumeRange.to
@@ -117,7 +117,7 @@ ColumnLayout {
 
             SectionLabel {
                 visible: page.section === "interface"
-                text: "Notification tone"
+                text: I18n.tr("Notification tone")
             }
 
             // Picking one plays it.
@@ -132,7 +132,7 @@ ColumnLayout {
                     Chip {
                         required property string modelData
 
-                        text: ({ set: "The set's own", chime: "hyprmonk chime" })[modelData] ?? modelData
+                        text: ({ set: I18n.tr("The set's own"), chime: I18n.tr("hyprmonk chime") })[modelData] ?? modelData
                         on: modelData === Sounds.tone
                         sounds: false
                         onClicked: {
@@ -145,7 +145,7 @@ ColumnLayout {
 
             SectionLabel {
                 visible: page.section === "interface"
-                text: "Hear them"
+                text: I18n.tr("Hear them")
             }
 
             Flow {
@@ -155,14 +155,14 @@ ColumnLayout {
 
                 Repeater {
                     model: [
-                        { kind: "click", label: "Click" },
-                        { kind: "on", label: "Switch on" },
-                        { kind: "off", label: "Switch off" },
-                        { kind: "open", label: "Card opens" },
-                        { kind: "close", label: "Card closes" },
-                        { kind: "notify", label: "Notification" },
-                        { kind: "connect", label: "Connected" },
-                        { kind: "disconnect", label: "Disconnected" }
+                        { kind: "click", label: I18n.tr("Click") },
+                        { kind: "on", label: I18n.tr("Switch on") },
+                        { kind: "off", label: I18n.tr("Switch off") },
+                        { kind: "open", label: I18n.tr("Card opens") },
+                        { kind: "close", label: I18n.tr("Card closes") },
+                        { kind: "notify", label: I18n.tr("Notification") },
+                        { kind: "connect", label: I18n.tr("Connected") },
+                        { kind: "disconnect", label: I18n.tr("Disconnected") }
                     ]
 
                     Chip {
@@ -178,15 +178,15 @@ ColumnLayout {
             // services/AudioEffects.qml
             SectionLabel {
                 visible: page.section === "effects"
-                text: "Equaliser"
+                text: I18n.tr("Equaliser")
             }
 
             Row {
                 visible: page.section === "effects"
-                text: "On every output, before the correction"
+                text: I18n.tr("On every output, before the correction")
 
                 Chip {
-                    text: AudioEffects.eqOn ? "on" : "off"
+                    text: AudioEffects.eqOn ? I18n.tr("on") : I18n.tr("off")
                     on: AudioEffects.eqOn
                     onClicked: AudioEffects.setEq(!AudioEffects.eqOn)
                 }
@@ -203,7 +203,7 @@ ColumnLayout {
                     Chip {
                         required property string modelData
 
-                        text: AudioEffects.presetLabels[modelData]
+                        text: I18n.tr(AudioEffects.presetLabels[modelData])
                         on: modelData === AudioEffects.preset
                         onClicked: AudioEffects.setPreset(modelData)
                     }
@@ -219,21 +219,21 @@ ColumnLayout {
 
             Note {
                 visible: page.section === "effects"
-                text: "Moving a band makes the preset Custom, kept for next time. The sound is lowered by the largest boost so that it never clips."
+                text: I18n.tr("Moving a band makes the preset Custom, kept for next time. The sound is lowered by the largest boost so that it never clips.")
             }
 
             SectionLabel {
                 visible: page.section === "effects"
                 Layout.topMargin: 12
-                text: "Night mode"
+                text: I18n.tr("Night mode")
             }
 
             Row {
                 visible: page.section === "effects"
-                text: "Quiet parts up, loud parts down"
+                text: I18n.tr("Quiet parts up, loud parts down")
 
                 Chip {
-                    text: AudioEffects.nightOn ? "on" : "off"
+                    text: AudioEffects.nightOn ? I18n.tr("on") : I18n.tr("off")
                     on: AudioEffects.nightOn
                     onClicked: AudioEffects.setNight(!AudioEffects.nightOn)
                 }
@@ -241,7 +241,7 @@ ColumnLayout {
 
             Row {
                 visible: page.section === "effects"
-                text: "Strength"
+                text: I18n.tr("Strength")
 
                 Repeater {
                     model: AudioEffects.strengthNames
@@ -249,7 +249,7 @@ ColumnLayout {
                     Chip {
                         required property string modelData
 
-                        text: AudioEffects.strengthLabels[modelData]
+                        text: I18n.tr(AudioEffects.strengthLabels[modelData])
                         on: modelData === AudioEffects.strength
                         onClicked: AudioEffects.setStrength(modelData)
                     }
@@ -258,28 +258,28 @@ ColumnLayout {
 
             Note {
                 visible: page.section === "effects"
-                text: "Like a TV's night mode: quiet parts such as speech come up and loud ones such as explosions come down, so you can keep the volume low and still hear everything."
+                text: I18n.tr("Like a TV's night mode: quiet parts such as speech come up and loud ones such as explosions come down, so you can keep the volume low and still hear everything.")
             }
 
             SectionLabel {
                 visible: page.section === "effects"
                 Layout.topMargin: 12
-                text: "Headphone correction"
+                text: I18n.tr("Headphone correction")
             }
 
             Row {
                 visible: page.section === "effects"
-                text: AudioEffects.profile ? `${AudioEffects.profile.name}, by ${AudioEffects.profile.source ?? "AutoEQ"}` : "None for this output"
+                text: AudioEffects.profile ? I18n.tr("%1, by %2", AudioEffects.profile.name, AudioEffects.profile.source ?? "AutoEQ") : I18n.tr("None for this output")
 
                 Chip {
                     visible: AudioEffects.sinkName in AudioEffects.settingsProfiles
-                    text: AudioEffects.ready.some(profile => AudioEffects.sinkName.includes(profile.match)) ? "The ready one" : "Remove"
+                    text: AudioEffects.ready.some(profile => AudioEffects.sinkName.includes(profile.match)) ? I18n.tr("The ready one") : I18n.tr("Remove")
                     onClicked: AudioEffects.forget(AudioEffects.sinkName)
                 }
 
                 Chip {
                     visible: AudioEffects.profile !== null
-                    text: AudioEffects.correctionOn ? "on" : "off"
+                    text: AudioEffects.correctionOn ? I18n.tr("on") : I18n.tr("off")
                     on: AudioEffects.correctionOn
                     onClicked: AudioEffects.setCorrection(!AudioEffects.correctionOn)
                 }
@@ -287,7 +287,7 @@ ColumnLayout {
 
             Note {
                 visible: page.section === "effects"
-                text: `For ${Audio.nameOf(AudioEffects.sink) || "the output"}: AutoEQ's correction brings headphones to a neutral sound, so some sound quieter and with less bass. Search for yours to pick another.`
+                text: I18n.tr("For %1: AutoEQ's correction brings headphones to a neutral sound, so some sound quieter and with less bass. Search for yours to pick another.", Audio.nameOf(AudioEffects.sink) || I18n.tr("the output"))
             }
 
             // Picking downloads it; the row's arrow shows while that runs.
@@ -296,9 +296,9 @@ ColumnLayout {
 
                 visible: page.section === "effects"
                 Layout.fillWidth: true
-                placeholder: "Search AutoEQ for your headphones"
+                placeholder: I18n.tr("Search AutoEQ for your headphones")
                 busy: AudioEffects.cataloguing
-                message: "No headphones by that name"
+                message: I18n.tr("No headphones by that name")
                 results: AudioEffects.search(search.text).map(entry => ({
                     entry,
                     icon: AudioEffects.fetching === entry.path ? "\u{F01DA}" : "\u{F02CB}",
@@ -313,20 +313,20 @@ ColumnLayout {
             Note {
                 visible: page.section === "effects" && (AudioEffects.catalogueFailed || AudioEffects.fetchFailed)
                 color: Theme.warning
-                text: AudioEffects.catalogueFailed ? "Could not reach AutoEQ." : "Could not download that one."
+                text: AudioEffects.catalogueFailed ? I18n.tr("Could not reach AutoEQ.") : I18n.tr("Could not download that one.")
             }
 
             SectionLabel {
                 visible: page.section === "microphone"
-                text: "Microphone"
+                text: I18n.tr("Microphone")
             }
 
             Row {
                 visible: page.section === "microphone"
-                text: "Noise suppression"
+                text: I18n.tr("Noise suppression")
 
                 Chip {
-                    text: AudioEffects.noiseOn ? "on" : "off"
+                    text: AudioEffects.noiseOn ? I18n.tr("on") : I18n.tr("off")
                     on: AudioEffects.noiseOn
                     onClicked: AudioEffects.setNoise(!AudioEffects.noiseOn)
                 }
@@ -335,7 +335,7 @@ ColumnLayout {
             SettingSlider {
                 visible: page.section === "microphone"
                 Layout.fillWidth: true
-                label: "Voice threshold"
+                label: I18n.tr("Voice threshold")
                 unit: "%"
                 from: 0
                 to: 95
@@ -345,13 +345,13 @@ ColumnLayout {
 
             Note {
                 visible: page.section === "microphone"
-                text: "How sure it must be that it hears a voice before letting the sound through. Higher cuts more noise, and may clip the start of words."
+                text: I18n.tr("How sure it must be that it hears a voice before letting the sound through. Higher cuts more noise, and may clip the start of words.")
             }
 
             SettingSlider {
                 visible: page.section === "microphone"
                 Layout.fillWidth: true
-                label: "Hold after speaking"
+                label: I18n.tr("Hold after speaking")
                 unit: " ms"
                 from: 0
                 to: 1000
@@ -361,15 +361,15 @@ ColumnLayout {
 
             Note {
                 visible: page.section === "microphone"
-                text: "How long it stays open once you stop. Longer lets the room in as a faint static after each sentence; shorter may clip the ends of words."
+                text: I18n.tr("How long it stays open once you stop. Longer lets the room in as a faint static after each sentence; shorter may clip the ends of words.")
             }
 
             Row {
                 visible: page.section === "microphone"
-                text: "Listen to yourself"
+                text: I18n.tr("Listen to yourself")
 
                 Chip {
-                    text: AudioEffects.listening ? "on" : "off"
+                    text: AudioEffects.listening ? I18n.tr("on") : I18n.tr("off")
                     on: AudioEffects.listening
                     onClicked: AudioEffects.listening = !AudioEffects.listening
                 }
@@ -378,7 +378,7 @@ ColumnLayout {
             Note {
                 visible: page.section === "microphone"
                 Layout.bottomMargin: 4
-                text: "Plays the microphone in your headphones as others hear it, while this page is open. Through speakers it would feed back."
+                text: I18n.tr("Plays the microphone in your headphones as others hear it, while this page is open. Through speakers it would feed back.")
             }
         }
     }
@@ -391,7 +391,7 @@ ColumnLayout {
         Layout.alignment: Qt.AlignRight
         visible: page.section === "interface"
         enabled: Settings.soundsChanged
-        text: "Back to the defaults"
+        text: I18n.tr("Back to the defaults")
         onClicked: Settings.resetSounds()
     }
 }

@@ -137,10 +137,10 @@ ${pairs}`;
     // A link as given: webcal:// is https://.
     function addFeed(name: string, url: string, colour: string): string {
         const link = url.trim().replace(/^webcal:\/\//i, "https://");
-        if (!/^https?:\/\/\S+$/i.test(link)) return "That is not a web link";
-        if (feeds.some(feed => feed.url === link)) return "That calendar is already here";
+        if (!/^https?:\/\/\S+$/i.test(link)) return I18n.tr("That is not a web link");
+        if (feeds.some(feed => feed.url === link)) return I18n.tr("That calendar is already here");
         const id = "feed" + Date.now();
-        saved.feeds = feeds.concat([{ id, name: name.trim() || "Calendar", url: link, colour }]);
+        saved.feeds = feeds.concat([{ id, name: name.trim() || I18n.tr("Calendar"), url: link, colour }]);
         configure();
         return "";
     }
@@ -274,7 +274,7 @@ ${pairs}`;
             // The last error line, with the calendar's name for its id.
             const last = syncErrors.text.trim().split("\n").filter(line => /error/i.test(line)).pop() ?? "";
             root.syncError = code === 0 ? "" : root.feeds.reduce((text, feed) => text.split(feed.id).join(feed.name),
-                                                                last.replace(/^error:\s*/i, "") || "The calendars could not be fetched");
+                                                                last.replace(/^error:\s*/i, "") || I18n.tr("The calendars could not be fetched"));
             root.list();
         }
     }

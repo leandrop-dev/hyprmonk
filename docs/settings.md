@@ -3,7 +3,7 @@
 A centred card (Super+comma, or quick actions > Settings), 880 by 680 (less
 on a short screen), with its pages down the side in three groups: Desktop
 (Display, Windows, Bar, Dock), Look and sound (Appearance, Sounds) and System
-(Input, Power, Recording, Notifications). Display (Screens, Brightness, Night light),
+(Language and input, Power, Recording, Notifications). Display (Screens, Brightness, Night light),
 Bar (Modules, Look), Appearance
 (Theme, Motion, Fonts, Terminal, Login screen) and Sounds (Interface, Effects,
 Microphone) list their sub-pages under them while open; a sub-page is a part
@@ -15,7 +15,7 @@ list over the page rather than pushing it down (`widgets/SearchField.qml`):
 Up and Down mark one, Enter picks it, Escape empties the box. Ideas from noctalia, Ryoku and Shibumi Shell, no
 code from them.
 
-The Display, Windows, Bar, Dock, Sounds, Input and Power pages keep to `settings.json` in the
+The Display, Windows, Bar, Dock, Sounds, Language and input, and Power pages keep to `settings.json` in the
 state directory, holding only what was changed, so the rest follows the repo's
 config. Hyprland options are also written to `settings.lua`, loaded after
 `look.lua` and `input.lua`, and applied at once with `hyprctl eval`.
@@ -228,8 +228,12 @@ config. Hyprland options are also written to `settings.lua`, loaded after
   directory. Also a row in quick actions. Over IPC,
   `qs -c hyprmonk ipc call nightlight mode <off|scheduled|always>` and
   `nightlight status`.
-- [x] Input: up to four keyboard layouts, found by code or name (XKB's
-  `base.lst`), the first the default; the mouse's sensitivity, acceleration
+- [x] Language and input: the language (English or Portuguese (Portugal)),
+  for the shell at once and the account's apps from the next login, kept in
+  `language.json` in the state directory rather than `settings.json`; when
+  the system has not generated the locale, a note gives the two commands to
+  run (see [translations.md](translations.md)). Up to four keyboard
+  layouts, found by code or name (XKB's `base.lst`), the first the default; the mouse's sensitivity, acceleration
   (adaptive or flat) and natural scroll; focus following the pointer, or a
   click moving the keyboard while scrolling still follows the pointer.
 - [x] Power: lock after 5 minutes to an hour or never, and the screens off

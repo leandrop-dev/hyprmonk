@@ -43,24 +43,24 @@ ColumnLayout {
     }
 
     SectionLabel {
-        text: "Sound"
+        text: I18n.tr("Sound")
     }
 
     Row {
-        text: "What the system plays"
+        text: I18n.tr("What the system plays")
 
         Chip {
-            text: Recorder.sound ? "on" : "off"
+            text: Recorder.sound ? I18n.tr("on") : I18n.tr("off")
             on: Recorder.sound
             onClicked: Recorder.setSound(!Recorder.sound)
         }
     }
 
     Row {
-        text: "The microphone"
+        text: I18n.tr("The microphone")
 
         Chip {
-            text: Recorder.microphone ? "on" : "off"
+            text: Recorder.microphone ? I18n.tr("on") : I18n.tr("off")
             on: Recorder.microphone
             onClicked: Recorder.setMicrophone(!Recorder.microphone)
         }
@@ -68,12 +68,12 @@ ColumnLayout {
 
     Note {
         visible: Recorder.sound && Recorder.microphone
-        text: "Both go into one track, so any player plays them together."
+        text: I18n.tr("Both go into one track, so any player plays them together.")
     }
 
     SectionLabel {
         Layout.topMargin: 12
-        text: "Quality"
+        text: I18n.tr("Quality")
     }
 
     Flow {
@@ -86,7 +86,7 @@ ColumnLayout {
             Chip {
                 required property var modelData
 
-                text: modelData.label
+                text: I18n.tr(modelData.label)
                 on: modelData.name === Recorder.quality
                 onClicked: Recorder.setQuality(modelData.name)
             }
@@ -94,12 +94,12 @@ ColumnLayout {
     }
 
     Note {
-        text: "Higher looks better and makes bigger files. Very high is the recorder's own default."
+        text: I18n.tr("Higher looks better and makes bigger files. Very high is the recorder's own default.")
     }
 
     SectionLabel {
         Layout.topMargin: 12
-        text: "Save to"
+        text: I18n.tr("Save to")
     }
 
     RowLayout {
@@ -158,22 +158,22 @@ ColumnLayout {
         }
 
         Chip {
-            text: "Open"
+            text: I18n.tr("Open")
             onClicked: Recorder.openFolder()
         }
     }
 
     Note {
         color: page.refused ? Theme.warning : Theme.fg(Theme.dimOpacity)
-        text: page.refused ? "A folder from the top, starting with / or ~/."
-            : field.activeFocus && field.text !== Recorder.folder ? "Enter keeps it, Escape puts back the last one."
-            : Recorder.folder ? "Emptied, it goes back to " + Recorder.defaultFolder + "."
-            : "Type another folder and press Enter to save there instead."
+        text: page.refused ? I18n.tr("A folder from the top, starting with / or ~/.")
+            : field.activeFocus && field.text !== Recorder.folder ? I18n.tr("Enter keeps it, Escape puts back the last one.")
+            : Recorder.folder ? I18n.tr("Emptied, it goes back to %1.", Recorder.defaultFolder)
+            : I18n.tr("Type another folder and press Enter to save there instead.")
     }
 
     Note {
         Layout.topMargin: 12
-        text: "A change counts from the next recording; a replay that is on keeps what it started with until switched off and on."
+        text: I18n.tr("A change counts from the next recording; a replay that is on keeps what it started with until switched off and on.")
     }
 
     Item {
@@ -183,7 +183,7 @@ ColumnLayout {
     Button {
         Layout.alignment: Qt.AlignRight
         enabled: Recorder.changed
-        text: "Back to the defaults"
+        text: I18n.tr("Back to the defaults")
         onClicked: Recorder.reset()
     }
 }

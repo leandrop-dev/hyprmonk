@@ -14,12 +14,12 @@ Singleton {
     id: root
 
     readonly property var presets: ({
-        default: "Default",
-        compact: "Compact",
-        minimal: "Minimal",
-        tree: "Tree",
-        sections: "Sections",
-        full: "Full"
+        default: I18n.mark("Default"),
+        compact: I18n.mark("Compact"),
+        minimal: I18n.mark("Minimal"),
+        tree: I18n.mark("Tree"),
+        sections: I18n.mark("Sections"),
+        full: I18n.mark("Full")
     })
     readonly property string saved: settings.preset in presets ? settings.preset : "default"
 

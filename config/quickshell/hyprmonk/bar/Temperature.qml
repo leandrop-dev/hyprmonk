@@ -13,6 +13,6 @@ Module {
     visible: !isNaN(celsius)
     icon: "\u{F050F}"
     label: Settings.degrees(celsius)
-    tooltip: "CPU temperature\n" + Hardware.cpuSensor + " sensor, hot from " + Settings.degrees(hot)
+    tooltip: I18n.tr("CPU temperature\n%1 sensor, hot from %2", Hardware.cpuSensor, Settings.degrees(hot))
     color: celsius >= hot ? Theme.warning : Theme.foreground
 }

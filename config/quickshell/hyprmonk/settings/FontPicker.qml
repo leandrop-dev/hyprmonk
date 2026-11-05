@@ -85,8 +85,8 @@ ColumnLayout {
         id: search
 
         Layout.preferredWidth: 260
-        placeholder: "Search every font"
-        message: "No font by that name"
+        placeholder: I18n.tr("Search every font")
+        message: I18n.tr("No font by that name")
         results: picker.found.map(family => ({ text: family, family, selected: family === picker.inUse }))
         onPicked: result => {
             picker.picked(result.text);

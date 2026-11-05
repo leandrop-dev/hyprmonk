@@ -29,6 +29,7 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
 - [Keeping it up to date](#keeping-it-up-to-date)
 - [Making it yours](#making-it-yours)
 - [Colours](#colours)
+- [Languages](#languages)
 - [The hyprmonk command](#the-hyprmonk-command)
 - [Layout](#layout)
 - [Roadmap](#roadmap)
@@ -74,7 +75,7 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   ones), fastfetch's look and the login screen's look; the sounds (on or off, hyprmonk's set or serpantinum's, their
   volume and the notification tone); the audio effects (the equaliser, with presets
   and ten bands, night mode and its strength, the headphone correction, searched for in AutoEQ, and the noise suppression's threshold and hold,
-  with a way to hear yourself); keyboard layouts, the mouse and focus; when the screen locks and the
+  with a way to hear yourself); the language, keyboard layouts, the mouse and focus; when the screen locks and the
   screens go off; what recordings hear, their quality and where they go; how
   long notifications stay, their corner, how many show and how many are kept.
 - Quick actions: wallpaper, game mode, screen recording, power profile, audio
@@ -100,6 +101,9 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   when idle), a power menu, a key guide built from the bindings themselves,
   and the polkit agent for password prompts.
 - An overview of every workspace (the hymission plugin).
+- English or Portuguese (Portugal), for each account: the shell changes at
+  once, and the account's apps follow from the next login (see
+  [Languages](#languages)).
 
 **The desktop around it**
 
@@ -281,6 +285,24 @@ into the skin, and Steam shows it at its next start.
 A Steam update can undo the skin; run `./install.py` the same way again.
 `./install.py --uninstall` removes it.
 
+## Languages
+
+The shell is in English or Portuguese (Portugal), picked for each account in
+Settings > Language and input. Until a language is picked, it follows the
+account's `LANG`. The shell changes at once. The account's apps follow from
+the next login, through `~/.local/state/hyprmonk/language.env`, which
+`config/uwsm/env` reads.
+
+The translations are in `config/quickshell/hyprmonk/i18n/`, one JSON file per
+language (`pt_PT.json`). Each entry maps the English text to its translation.
+A text missing from the file shows in English. A change to the file shows as
+soon as it is saved. `i18n/check.sh` lists what is missing or no longer used.
+
+[docs/translations.md](docs/translations.md) covers the rest:
+- correcting a translation;
+- adding a text to the shell;
+- adding a language.
+
 ## The hyprmonk command
 
 A small Rust binary (`crates/hyprmonk`) for what the shell and the binds
@@ -346,12 +368,12 @@ cargo clippy --all-targets -- -D warnings
 |------|------|
 | `install.sh` | The installer: the menu and every step |
 | `config/hypr/` | Hyprland in Lua: `hyprland.lua` loads `look`, `input`, `floating`, `minimise`, `binds`, `rules`, `plugins`, `gamemode`; `hypridle.conf` |
-| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `bar/`, `dock/`, `panels/`, `launcher/`, `quickactions/`, `notifications/`, `osd/`, `lock/`, `power/`, `keyguide/`, `screenshot/`, `wallpaper/`, `polkit/`, `services/`, `widgets/`, `assets/` (the sounds, the cat's font, AutoEQ's ready corrections, Vesktop's theme template) |
+| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `bar/`, `dock/`, `panels/`, `launcher/`, `quickactions/`, `notifications/`, `osd/`, `lock/`, `power/`, `keyguide/`, `screenshot/`, `wallpaper/`, `polkit/`, `services/`, `widgets/`, `i18n/` (the translations), `assets/` (the sounds, the cat's font, AutoEQ's ready corrections, Vesktop's theme template) |
 | `config/matugen/` | Templates for Hyprland, the shell and kitty |
 | `config/kitty/` | kitty, with the Noir palette |
 | `config/zsh/`, `config/starship/` | zsh and its prompt |
 | `config/fastfetch/` | fastfetch's presets, picked in Settings > Appearance |
-| `config/uwsm/env` | The session's environment (NVIDIA, cursor, toolkits, SSH agent) |
+| `config/uwsm/env` | The session's environment (NVIDIA, cursor, toolkits, SSH agent, the account's language) |
 | `config/systemd/user/` | Units for the shell, hypridle, udiskie, clipboard history and the four audio effects; they start only under Hyprland |
 | `crates/hyprmonk/` | The `hyprmonk` command |
 | `udev/` | Access rules for the devices `hyprmonk` reads |
@@ -364,10 +386,8 @@ cargo clippy --all-targets -- -D warnings
 
 An open list, in no fixed order.
 
-- The shell in other languages, starting with Portuguese (Portugal): each
-  account picks its own, from its locale to begin with, so one person can
-  keep English while another has Portuguese. Every string the shell shows
-  goes through one lookup, with a file of translations for each language.
+- The `hyprmonk` command's and the installer's output in Portuguese, like the
+  shell.
 - A phone module on the bar, beyond its battery: notifications, the clipboard,
   files, ringing it to find it. KDE Connect or an app of our own, still to
   decide.

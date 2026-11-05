@@ -100,15 +100,15 @@ Item {
 
             SectionLabel {
                 visible: page.section === "holidays"
-                text: "Holidays"
+                text: I18n.tr("Holidays")
             }
 
             Row {
                 visible: page.section === "holidays"
-                text: Calendar.country === "" ? "No country" : Calendar.countryName + " (" + Calendar.country + ")"
+                text: Calendar.country === "" ? I18n.tr("No country") : Calendar.countryName + " (" + Calendar.country + ")"
 
                 Chip {
-                    text: "None"
+                    text: I18n.tr("None")
                     on: Calendar.country === ""
                     onClicked: Calendar.setCountry("")
                 }
@@ -119,9 +119,9 @@ Item {
 
                 visible: page.section === "holidays"
                 Layout.preferredWidth: 260
-                placeholder: "Find a country"
+                placeholder: I18n.tr("Find a country")
                 busy: Calendar.countries.length === 0
-                message: "No country by that name"
+                message: I18n.tr("No country by that name")
                 results: {
                     const typed = countrySearch.text.trim().toLowerCase();
                     if (typed === "") return [];
@@ -140,10 +140,10 @@ Item {
             Row {
                 visible: page.section === "holidays"
                 Layout.topMargin: 8
-                text: "Regional days"
+                text: I18n.tr("Regional days")
 
                 Chip {
-                    text: Calendar.regional ? "on" : "off"
+                    text: Calendar.regional ? I18n.tr("on") : I18n.tr("off")
                     on: Calendar.regional
                     onClicked: Calendar.setRegional(!Calendar.regional)
                 }
@@ -151,10 +151,10 @@ Item {
 
             Row {
                 visible: page.section === "holidays"
-                text: "Optional days"
+                text: I18n.tr("Optional days")
 
                 Chip {
-                    text: Calendar.optional ? "on" : "off"
+                    text: Calendar.optional ? I18n.tr("on") : I18n.tr("off")
                     on: Calendar.optional
                     onClicked: Calendar.setOptional(!Calendar.optional)
                 }
@@ -162,25 +162,25 @@ Item {
 
             Note {
                 visible: page.section === "holidays"
-                text: "Regional days are kept in one part of the country only, such as Azores Day in Portugal; optional ones are days off for some, such as Carnival. Both show fainter on the calendar. The holidays come from Nager.Date and are kept, so the calendar has them offline."
+                text: I18n.tr("Regional days are kept in one part of the country only, such as Azores Day in Portugal; optional ones are days off for some, such as Carnival. Both show fainter on the calendar. The holidays come from Nager.Date and are kept, so the calendar has them offline.")
             }
 
             // Calendars: the local one and each subscribed link, with its
             // colour; then a new link.
             SectionLabel {
                 visible: page.section === "calendars"
-                text: "Calendars"
+                text: I18n.tr("Calendars")
             }
 
             Note {
                 visible: page.section === "calendars" && !Events.available
                 color: Theme.warning
-                text: "Events need khal and vdirsyncer, which are not installed."
+                text: I18n.tr("Events need khal and vdirsyncer, which are not installed.")
             }
 
             Row {
                 visible: page.section === "calendars"
-                text: "Local"
+                text: I18n.tr("Local")
 
                 Swatches {
                     calendar: "local"
@@ -200,7 +200,7 @@ Item {
                     }
 
                     Chip {
-                        text: "Remove"
+                        text: I18n.tr("Remove")
                         onClicked: Events.removeFeed(modelData.id)
                     }
                 }
@@ -208,18 +208,18 @@ Item {
 
             Note {
                 visible: page.section === "calendars"
-                text: "Events added on the calendar under the bar's clock go to Local. The others are shown as they are, without changes."
+                text: I18n.tr("Events added on the calendar under the bar's clock go to Local. The others are shown as they are, without changes.")
             }
 
             Row {
                 visible: page.section === "calendars" && Events.feeds.length > 0
                 Layout.topMargin: 8
-                text: Events.syncing ? "Fetching…"
-                    : Events.synced.getTime() === 0 ? "Not fetched yet"
-                    : "Fetched at " + Qt.formatTime(Events.synced, "HH:mm") + ", and every 15 minutes"
+                text: Events.syncing ? I18n.tr("Fetching…")
+                    : Events.synced.getTime() === 0 ? I18n.tr("Not fetched yet")
+                    : I18n.tr("Fetched at %1, and every 15 minutes", Qt.formatTime(Events.synced, "HH:mm"))
 
                 Chip {
-                    text: "Fetch now"
+                    text: I18n.tr("Fetch now")
                     onClicked: Events.sync()
                 }
             }
@@ -233,7 +233,7 @@ Item {
             SectionLabel {
                 visible: page.section === "calendars"
                 Layout.topMargin: 8
-                text: "Add a calendar"
+                text: I18n.tr("Add a calendar")
             }
 
             RowLayout {
@@ -244,19 +244,19 @@ Item {
                 TextField {
                     id: feedName
                     Layout.preferredWidth: 140
-                    placeholder: "Name"
+                    placeholder: I18n.tr("Name")
                     onAccepted: feedLink.takeFocus()
                 }
 
                 TextField {
                     id: feedLink
                     Layout.fillWidth: true
-                    placeholder: "Its iCal link (https:// or webcal://)"
+                    placeholder: I18n.tr("Its iCal link (https:// or webcal://)")
                     onAccepted: page.addFeed()
                 }
 
                 Button {
-                    text: "Add"
+                    text: I18n.tr("Add")
                     primary: true
                     enabled: Events.available && feedLink.text.trim() !== ""
                     onClicked: page.addFeed()
@@ -271,7 +271,7 @@ Item {
 
             Note {
                 visible: page.section === "calendars"
-                text: "Google Calendar, on the web: Settings, then the calendar under \"Settings for my calendars\", then \"Integrate calendar\": copy the \"Secret address in iCal format\". Outlook: Settings, Calendar, Shared calendars, Publish a calendar: the ICS link. Anyone with the link can see the calendar, so it is kept on this computer only, readable by you alone."
+                text: I18n.tr("Google Calendar, on the web: Settings, then the calendar under \"Settings for my calendars\", then \"Integrate calendar\": copy the \"Secret address in iCal format\". Outlook: Settings, Calendar, Shared calendars, Publish a calendar: the ICS link. Anyone with the link can see the calendar, so it is kept on this computer only, readable by you alone.")
             }
         }
     }

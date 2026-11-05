@@ -90,7 +90,7 @@ Item {
                     Text {
                         x: 7
                         y: 3
-                        text: "Aa"
+                        text: I18n.tr("Aa")
                         color: card.look.foreground
                         font.family: Theme.font
                         font.pixelSize: 14
@@ -154,12 +154,12 @@ Item {
 
             SectionLabel {
                 visible: page.section === "theme"
-                text: "Tone"
+                text: I18n.tr("Tone")
             }
 
             Note {
                 visible: page.section === "theme"
-                text: "Dark"
+                text: I18n.trc("tones", "Dark")
             }
 
             ToneCards {
@@ -170,7 +170,7 @@ Item {
             Note {
                 Layout.topMargin: 4
                 visible: page.section === "theme" && (page.lightTones.length > 0)
-                text: "Light"
+                text: I18n.trc("tones", "Light")
             }
 
             ToneCards {
@@ -188,14 +188,14 @@ Item {
             Note {
                 visible: page.section === "theme"
                 Layout.bottomMargin: 6
-                text: "Its cards and text. Changes stay with this tone."
+                text: I18n.tr("Its cards and text. Changes stay with this tone.")
             }
 
             SettingSlider {
                 visible: page.section === "theme"
                 Layout.fillWidth: true
                 Layout.topMargin: 2
-                label: "Card opacity"
+                label: I18n.tr("Card opacity")
                 from: 30
                 to: 100
                 unit: "%"
@@ -211,14 +211,14 @@ Item {
 
                 Text {
                     Layout.fillWidth: true
-                    text: "Blur behind the cards"
+                    text: I18n.tr("Blur behind the cards")
                     color: Theme.foreground
                     font.family: Theme.font
                     font.pixelSize: Theme.rowFontSize
                 }
 
                 Chip {
-                    text: Theme.cardBlur ? "on" : "off"
+                    text: Theme.cardBlur ? I18n.tr("on") : I18n.tr("off")
                     on: Theme.cardBlur
                     onClicked: Theme.setCardBlur(!Theme.cardBlur)
                 }
@@ -298,7 +298,7 @@ Item {
                 Text {
                     Layout.fillWidth: true
                     visible: /^#[0-9a-f]{6}$/i.test(field.text) && !Theme.readable(field.text)
-                    text: "Too close to the background"
+                    text: I18n.tr("Too close to the background")
                     color: Theme.warning
                     font.family: Theme.font
                     font.pixelSize: Theme.bodyFontSize
@@ -306,14 +306,14 @@ Item {
 
                 Button {
                     enabled: Theme.toneAdjusted
-                    text: "Back to the defaults"
+                    text: I18n.tr("Back to the defaults")
                     onClicked: Theme.resetTone()
                 }
             }
 
             SectionLabel {
                 visible: page.section === "motion"
-                text: "Spectrum"
+                text: I18n.tr("Spectrum")
             }
 
             Flow {
@@ -331,7 +331,7 @@ Item {
 
                         required property string modelData
 
-                        label: Cava.styles[modelData]
+                        label: I18n.tr(Cava.styles[modelData])
                         chosen: modelData === Cava.savedStyle
                         onHoveredChanged: {
                             if (hovered) Cava.previewStyle = modelData;
@@ -355,7 +355,7 @@ Item {
             SectionLabel {
                 visible: page.section === "motion"
                 Layout.topMargin: 12
-                text: "Wallpaper changes"
+                text: I18n.tr("Wallpaper changes")
             }
 
             Flow {
@@ -378,7 +378,7 @@ Item {
                         readonly property string kind: modelData === "random" ? ["fade", "wipe", "circle"][round % 3] : modelData
                         readonly property color picture: Qt.alpha(Theme.accent, 0.75)
 
-                        label: ({ fade: "Fade", wipe: "Wipe", circle: "Circle", random: "Random" })[modelData]
+                        label: ({ fade: I18n.tr("Fade"), wipe: I18n.tr("Wipe"), circle: I18n.tr("Circle"), random: I18n.tr("Random") })[modelData]
                         chosen: modelData === Wallpaper.transition
                         fill: Theme.fg(0.1)
                         onClicked: Wallpaper.setTransition(modelData)
@@ -444,11 +444,11 @@ Item {
             FontPicker {
                 visible: page.section === "fonts"
                 Layout.fillWidth: true
-                title: "Interface"
+                title: I18n.tr("Interface")
                 families: ["JetBrainsMono Nerd Font", "Inter", "Roboto", "Ubuntu", "Adwaita Sans", "Noto Sans",
                            "Atkinson Hyperlegible", "OpenDyslexic Nerd Font"]
                 current: Theme.appFont
-                note: "The shell, GTK and Qt apps, the title bars and the login screen."
+                note: I18n.tr("The shell, GTK and Qt apps, the title bars and the login screen.")
                 onPicked: family => Theme.setFont(family)
             }
 
@@ -456,19 +456,19 @@ Item {
                 visible: page.section === "fonts"
                 Layout.fillWidth: true
                 Layout.topMargin: 12
-                title: "Monospace"
+                title: I18n.tr("Monospace")
                 sample: "0O{}"
                 families: ["JetBrainsMono Nerd Font", "FiraCode Nerd Font", "0xProto Nerd Font", "Agave Nerd Font",
                            "ComicShannsMono Nerd Font", "Cousine Nerd Font", "DaddyTimeMono Nerd Font",
                            "AtkynsonMono Nerd Font", "Adwaita Mono"]
                 current: Theme.appMonoFont
-                note: "The terminal and code in apps."
+                note: I18n.tr("The terminal and code in apps.")
                 onPicked: family => Theme.setMonoFont(family)
             }
 
             SectionLabel {
                 visible: page.section === "terminal"
-                text: "Fastfetch"
+                text: I18n.tr("Fastfetch")
             }
 
             Flow {
@@ -482,7 +482,7 @@ Item {
                     Chip {
                         required property string modelData
 
-                        text: Fastfetch.presets[modelData]
+                        text: I18n.tr(Fastfetch.presets[modelData])
                         on: modelData === Fastfetch.saved
                         onClicked: Fastfetch.set(modelData)
                     }
@@ -491,7 +491,7 @@ Item {
 
             SectionLabel {
                 visible: page.section === "login" && (Login.ready)
-                text: "Login screen"
+                text: I18n.tr("Login screen")
             }
 
             Flow {
