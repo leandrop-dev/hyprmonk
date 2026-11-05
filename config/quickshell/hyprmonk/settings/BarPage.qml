@@ -343,6 +343,16 @@ Item {
                         labels: ({ C: "°C", F: "°F" })
                     }
                 }
+
+                Row {
+                    visible: page.section === "look"
+                    text: "Hardware, from the cat"
+
+                    Choice {
+                        key: "hardware"
+                        labels: ({ drawer: "Drawer", panel: "Panel" })
+                    }
+                }
             }
         }
 

@@ -40,6 +40,7 @@ PanelWindow {
         bluetooth: bluetoothPanel,
         batteries: batteryPanel,
         calendar: calendarPanel,
+        hardware: hardwarePanel,
         tray: trayMenu
     })
     readonly property Component openPanel: panelOpen ? panels[Panels.open] ?? null : null
@@ -216,6 +217,11 @@ PanelWindow {
     Component {
         id: calendarPanel
         CalendarPanel {}
+    }
+
+    Component {
+        id: hardwarePanel
+        HardwarePanel {}
     }
 
     Component {

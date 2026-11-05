@@ -61,7 +61,11 @@ config. Hyprland options are also written to `settings.lua`, loaded after
   5 or 1 to 10 (empty ones dim, a click opens one); how they look:
   pills, numbers, dots, or a chomper that goes from the active one to the
   next, chomping, each shown on four made-up workspaces whose active one
-  moves under the pointer; temperatures in °C or °F.
+  moves under the pointer; temperatures in °C or °F; and whether the cat
+  slides out its drawer on the bar or opens a panel (`panels/HardwarePanel.qml`)
+  of bars that fill as the readings change: the processor and each core, its
+  temperature, the GPU, memory, each disk, and the network against the
+  fastest seen while open.
   These are kept in `barLook`, apart from the modules. The window list (the
   dock's apps, at the bar's size) starts hidden, since the dock shows the same.
 - [x] Dock (`dock/`, `services/Windows.qml`): shown or not; the edge it sits

@@ -2,6 +2,8 @@
 // slides out the CPU temperature and use, the GPU, memory and disk space on
 // / as used/total, and network speed (services/Hardware.qml, read only while open); another
 // click folds them. Hovering one shows its details, in fixed-width columns.
+// With Settings > Bar > Look > Hardware on Panel, the cat opens
+// panels/HardwarePanel.qml instead.
 import QtQuick
 import QtQuick.Layouts
 import qs
@@ -11,12 +13,15 @@ RowLayout {
     id: drawer
 
     property bool open: false
+    // Settings > Bar: the cat opens a panel of bars instead.
+    readonly property bool asPanel: Settings.barChoice("hardware") === "panel"
     property real room: Infinity
     property real reveal: open ? 1 : 0
 
     spacing: 2
 
     onOpenChanged: open ? Hardware.watch() : Hardware.unwatch()
+    onAsPanelChanged: if (asPanel) open = false
     Component.onCompleted: if (open) Hardware.watch()
     Component.onDestruction: if (open) Hardware.unwatch()
 
@@ -27,8 +32,12 @@ RowLayout {
     Runcat {
         id: cat
         interactive: true
-        active: drawer.open
-        onClicked: button => { if (button === Qt.LeftButton) drawer.open = !drawer.open; }
+        active: drawer.asPanel ? Panels.open === "hardware" : drawer.open
+        onClicked: button => {
+            if (button !== Qt.LeftButton) return;
+            if (drawer.asPanel) Panels.toggle("hardware");
+            else drawer.open = !drawer.open;
+        }
     }
 
     Item {
@@ -43,9 +52,7 @@ RowLayout {
             spacing: 2
             opacity: Math.max(0, (drawer.reveal - 0.4) / 0.6)
 
-            Temperature {
-                watched: drawer.open
-            }
+            Temperature {}
 
             // Every core's use, four to a row.
             Module {

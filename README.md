@@ -50,8 +50,9 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   current workspace's windows, or give way to the same list on the bar.
   Minimised windows wait in it, faded (Super+M, or a title bar's button).
 - A running cat, faster the busier the CPU and resting when the machine is
-  quiet, that opens a hardware drawer:
-  temperatures, CPU, GPU and video memory, memory, disk and network.
+  quiet, that opens a hardware drawer on the bar, or a panel of bars filling
+  as they change: temperatures, CPU and each core, GPU and video memory,
+  memory, disks and network.
 - A launcher for apps, commands, SSH hosts and the clipboard history.
 - Settings, in three groups, the longer pages split into sub-pages: each
   screen's resolution, refresh rate and scale, and where screens
@@ -59,7 +60,7 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   gaps, borders, blur, shadows, the layout (three tiling ones, or every
   window floating, resized from its borders) and animations, the bar's
   modules by drag and drop, at the top or the bottom, with its clock,
-  workspaces (pills, numbers, dots or a chomper) and temperature unit, the dock (where it sits, whose windows,
+  workspaces (pills, numbers, dots or a chomper) temperature unit and the cat's drawer or panel, the dock (where it sits, whose windows,
   its size, hiding and growing icons), and the appearance, picked from small previews: the tone with each one's card opacity, blur and text
   colour, the spectrum's style, how a new wallpaper comes in (fade, wipe,
   a circle from where it was picked, or any), fastfetch's look and the login screen's
@@ -353,14 +354,10 @@ cargo clippy --all-targets -- -D warnings
 
 In this order.
 
-1. **The hardware drawer as a panel.** A second way to show it, picked in
-   Settings: a panel under the cat with a horizontal bar for each reading,
-   its name and value inside, filling as it changes (serpantinum has
-   vertical ones).
-2. **Night light.** Warmer colours between set times, or off.
-3. **Brightness and gamma.** For each screen, in Settings > Display, with
+1. **Night light.** Warmer colours between set times, or off.
+2. **Brightness and gamma.** For each screen, in Settings > Display, with
    ideas from [serpantinum-gamma](https://github.com/ilyamiro/serpantinum-gamma).
-4. **A font for everything.** One font picked in Settings for the shell,
+3. **A font for everything.** One font picked in Settings for the shell,
    GTK and Qt apps and the terminal, starting from the set serpantinum has:
    its freely licensed ones (Nerd Fonts, JetBrains Mono, Fira Code, Roboto
    and the like), installed from the repos rather than copied. Its SF Pro
@@ -421,6 +418,7 @@ An open list, in no fixed order.
   [serpantinum-audio](https://github.com/ilyamiro/serpantinum-audio); no code
   or preset values taken.
 - The Rival 3 Wireless battery protocol from [rivalcfg](https://github.com/flozz/rivalcfg).
+- The hardware panel's bars after serpantinum's upright ones; no code taken.
 - The running cat's font from [runcat-text](https://github.com/AlejandroMinor/runcat-text)
   (BSD-2-Clause, its licence in `config/quickshell/hyprmonk/assets/runcat/`),
   with the sleeping cat added from [RunCat](https://kyome.io/runcat/index.html)'s

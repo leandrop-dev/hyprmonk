@@ -26,6 +26,8 @@ Singleton {
     property real vramUsed: NaN     // bytes
     property real vramTotal: NaN
     property string gpuName: ""
+    property real cpuTemp: NaN      // °C, the package
+    property string cpuSensor: ""   // coretemp, k10temp or zenpower
     property var disks: []          // [{mount, used, size}], one per device
     property real down: NaN         // bytes a second, every interface but lo
     property real up: NaN
@@ -232,7 +234,30 @@ Singleton {
         onTriggered: {
             reader.running = true;
             gpuReader.running = true;
+            cpuTempReader.reload();
         }
+    }
+
+    // The CPU package temperature, from whichever hwmon sensor is here
+    // (coretemp on Intel; k10temp or zenpower on AMD). hwmon numbers change
+    // between boots, so the sensor is looked up by name once.
+    Process {
+        running: true
+        command: ["sh", "-c", 'grep -HxE "coretemp|k10temp|zenpower" /sys/class/hwmon/hwmon*/name']
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const [file, name] = text.split("\n")[0].split(":");
+                if (!name) return;
+                root.cpuSensor = name;
+                cpuTempReader.path = file.replace(/name$/, "temp1_input");
+            }
+        }
+    }
+
+    FileView {
+        id: cpuTempReader
+        printErrors: false
+        onLoaded: root.cpuTemp = Number(text()) / 1000
     }
 
     Timer {

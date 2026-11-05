@@ -186,7 +186,7 @@ Singleton {
         { key: "workspaces", label: "Workspaces", icon: "\u{F0570}" },
         { key: "overview", label: "Overview", icon: "\u{F0F8D}" },
         { key: "awake", label: "Stay awake", icon: "\u{F0176}" },
-        { key: "hardware", label: "Hardware", icon: "\u{F011B}" },
+        { key: "hardware", label: "Hardware", icon: "\u{F011B}", panel: "hardware" },
         { key: "windows", label: "Window list", icon: "\u{F08C6}" },
         { key: "recording", label: "Recording", icon: "\u{F044A}", fixed: true },
         { key: "replay", label: "Replay", icon: "\u{F0459}", fixed: true },
@@ -288,7 +288,8 @@ Singleton {
     // Where the bar sits, and how its clock, workspaces and temperatures show,
     // the first of each to begin with. `workspaces` 0 shows those in use; more
     // always shows 1 to that many, empty ones dim; `workspaceStyle` is how
-    // they look (bar/Workspaces.qml).
+    // they look (bar/Workspaces.qml); `hardware` whether the cat slides out a
+    // drawer on the bar or opens a panel of bars (panels/HardwarePanel.qml).
     readonly property var barChoices: ({
         position: ["top", "bottom"],
         hours: ["24", "12"],
@@ -296,7 +297,8 @@ Singleton {
         date: [true, false],
         workspaces: [0, 5, 10],
         workspaceStyle: ["pills", "numbers", "dots", "chomper"],
-        temperature: ["C", "F"]
+        temperature: ["C", "F"],
+        hardware: ["drawer", "panel"]
     })
     readonly property var barChoiceValues: {
         const values = {};

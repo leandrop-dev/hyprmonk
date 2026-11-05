@@ -163,10 +163,10 @@ Overlay {
 
             // Which part of the page shows.
             Binding {
-                target: content.item
+                // None on a page without sub-pages, which has no `section`.
+                target: window.sub !== "" ? content.item : null
                 property: "section"
                 value: window.sub
-                when: content.item !== null && window.sub !== ""
             }
         }
     }
