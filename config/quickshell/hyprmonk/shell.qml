@@ -22,11 +22,13 @@ import qs.settings
 import qs.wallpaper
 
 ShellRoot {
-    // Sounds listens for cards, panels and devices from the start (and
-    // answers IPC), so it is loaded here rather than at the first click.
+    // Sounds listens for cards, panels and devices from the start, and
+    // AudioEffects starts the effects left on; both answer IPC. So they are
+    // loaded here rather than when first used.
     Component.onCompleted: {
         Idle.start();
         void Sounds.on;
+        void AudioEffects.correctionOn;
     }
 
     ThemeOutputs {}

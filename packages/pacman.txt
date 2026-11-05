@@ -107,6 +107,7 @@ pipewire-pulse   # apps speaking PulseAudio (pavucontrol, browsers)
 pipewire-alsa   # apps speaking ALSA
 wireplumber
 pavucontrol   # the sound panel's Mixer
+noise-suppression-for-voice   # the microphone's noise suppression (rnnoise)
 playerctl
 upower
 cava   # the centre card's spectrum

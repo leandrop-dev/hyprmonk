@@ -5,6 +5,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Pipewire
+import qs
 import qs.services
 import qs.widgets
 
@@ -58,6 +59,32 @@ ColumnLayout {
                 selected: modelData === panel.device
                 onClicked: Audio.setDefault(modelData)
             }
+        }
+    }
+
+    // This side's effect (services/AudioEffects.qml): the correction while the
+    // output has one, the noise suppression while there is a microphone.
+    RowLayout {
+        Layout.fillWidth: true
+        Layout.leftMargin: 12
+        visible: panel.output ? AudioEffects.profile !== null : panel.device !== null
+        spacing: 8
+
+        Text {
+            Layout.fillWidth: true
+            text: panel.output ? "Headphone correction" : "Noise suppression"
+            color: Theme.foreground
+            font.family: Theme.font
+            font.pixelSize: Theme.rowFontSize
+            elide: Text.ElideRight
+        }
+
+        Chip {
+            readonly property bool active: panel.output ? AudioEffects.correctionOn : AudioEffects.noiseOn
+
+            text: active ? "on" : "off"
+            on: active
+            onClicked: panel.output ? AudioEffects.setCorrection(!active) : AudioEffects.setNoise(!active)
         }
     }
 

@@ -11,6 +11,11 @@ ConditionEnvironment=XDG_CURRENT_DESKTOP=Hyprland
 # time a window shows or hides. The shell does that all day, and it froze after
 # about a day, out of file descriptors.
 Environment=__NV_DISABLE_EXPLICIT_SYNC=1
+# Qt's own PipeWire backend pins the sounds' stream to the output by id and
+# will not let it be moved: when the headphone correction's filter comes or
+# goes (services/AudioEffects.qml) the stream dies and the sounds stop.
+# Through PulseAudio (pipewire-pulse) it is moved like any app's.
+Environment=QT_AUDIO_BACKEND=pulseaudio
 ExecStart=/usr/bin/qs -c hyprmonk
 Restart=on-failure
 RestartSec=2

@@ -1,6 +1,8 @@
 // Settings > Sounds (services/Sounds.qml): the interface's sounds on or off,
 // the set they come from, their volume and the notification tone, with a
-// chip to hear each one. Each change shows at once.
+// chip to hear each one. Each change shows at once. Then the audio effects
+// (services/AudioEffects.qml): the headphone correction, searched for in
+// AutoEQ, and the microphone's noise suppression, with a way to hear it.
 import QtQuick
 import QtQuick.Layouts
 import qs
@@ -9,6 +11,8 @@ import qs.widgets
 
 ColumnLayout {
     spacing: 8
+
+    Component.onDestruction: AudioEffects.listening = false
 
     component Row: RowLayout {
         property alias text: label.text
@@ -147,6 +151,160 @@ ColumnLayout {
                         onClicked: Sounds.preview(modelData.kind)
                     }
                 }
+            }
+
+            // services/AudioEffects.qml
+            SectionLabel {
+                Layout.topMargin: 12
+                text: "Headphone correction"
+            }
+
+            Row {
+                text: AudioEffects.profile ? `${AudioEffects.profile.name}, by ${AudioEffects.profile.source ?? "AutoEQ"}` : "None for this output"
+
+                Chip {
+                    visible: AudioEffects.sinkName in AudioEffects.settingsProfiles
+                    text: AudioEffects.ready.some(profile => AudioEffects.sinkName.includes(profile.match)) ? "The ready one" : "Remove"
+                    onClicked: AudioEffects.forget(AudioEffects.sinkName)
+                }
+
+                Chip {
+                    visible: AudioEffects.profile !== null
+                    text: AudioEffects.correctionOn ? "on" : "off"
+                    on: AudioEffects.correctionOn
+                    onClicked: AudioEffects.setCorrection(!AudioEffects.correctionOn)
+                }
+            }
+
+            Note {
+                text: `For ${Audio.nameOf(AudioEffects.sink) || "the output"}: AutoEQ's correction brings headphones to a neutral sound, so some sound quieter and with less bass. Search for yours to pick another.`
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: 30
+                radius: Theme.moduleRadius
+                color: Theme.fg(0.06)
+                border.width: 1
+                border.color: search.activeFocus ? Qt.alpha(Theme.accent, 0.8) : Theme.rim
+
+                TextInput {
+                    id: search
+
+                    anchors.fill: parent
+                    anchors.leftMargin: 12
+                    anchors.rightMargin: 12
+                    verticalAlignment: TextInput.AlignVCenter
+                    color: Theme.foreground
+                    selectionColor: Qt.alpha(Theme.accent, 0.55)
+                    font.family: Theme.font
+                    font.pixelSize: Theme.rowFontSize
+                    clip: true
+                    onActiveFocusChanged: if (activeFocus) AudioEffects.loadCatalogue()
+                    Keys.onEscapePressed: event => {
+                        if (text === "") {
+                            event.accepted = false;
+                            return;
+                        }
+                        text = "";
+                    }
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: search.text === ""
+                        text: "Search AutoEQ for your headphones"
+                        color: Theme.fg(Theme.dimOpacity)
+                        font: search.font
+                    }
+                }
+            }
+
+            Searching {
+                running: AudioEffects.cataloguing
+            }
+
+            Note {
+                visible: AudioEffects.catalogueFailed || AudioEffects.fetchFailed
+                color: Theme.warning
+                text: AudioEffects.catalogueFailed ? "Could not reach AutoEQ." : "Could not download that one."
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 2
+
+                Repeater {
+                    model: AudioEffects.search(search.text)
+
+                    OptionRow {
+                        required property var modelData
+
+                        Layout.fillWidth: true
+                        icon: AudioEffects.fetching === modelData.path ? "\u{F01DA}" : "\u{F02CB}"
+                        text: modelData.name
+                        detail: [modelData.source, modelData.form].filter(part => part !== "").join(", ")
+                        selected: AudioEffects.settingsProfiles[AudioEffects.sinkName]?.path === modelData.path
+                        onClicked: AudioEffects.pick(modelData)
+                    }
+                }
+            }
+
+            SectionLabel {
+                Layout.topMargin: 12
+                text: "Microphone"
+            }
+
+            Row {
+                text: "Noise suppression"
+
+                Chip {
+                    text: AudioEffects.noiseOn ? "on" : "off"
+                    on: AudioEffects.noiseOn
+                    onClicked: AudioEffects.setNoise(!AudioEffects.noiseOn)
+                }
+            }
+
+            SettingSlider {
+                Layout.fillWidth: true
+                label: "Voice threshold"
+                unit: "%"
+                from: 0
+                to: 95
+                value: AudioEffects.threshold
+                onMoved: value => AudioEffects.setThreshold(Math.round(value))
+            }
+
+            Note {
+                text: "How sure it must be that it hears a voice before letting the sound through. Higher cuts more noise, and may clip the start of words."
+            }
+
+            SettingSlider {
+                Layout.fillWidth: true
+                label: "Hold after speaking"
+                unit: " ms"
+                from: 0
+                to: 1000
+                value: AudioEffects.hold
+                onMoved: value => AudioEffects.setHold(Math.round(value / 10) * 10)
+            }
+
+            Note {
+                text: "How long it stays open once you stop. Longer lets the room in as a faint static after each sentence; shorter may clip the ends of words."
+            }
+
+            Row {
+                text: "Listen to yourself"
+
+                Chip {
+                    text: AudioEffects.listening ? "on" : "off"
+                    on: AudioEffects.listening
+                    onClicked: AudioEffects.listening = !AudioEffects.listening
+                }
+            }
+
+            Note {
+                Layout.bottomMargin: 4
+                text: "Plays the microphone in your headphones as others hear it, while this page is open. Through speakers it would feed back."
             }
         }
     }

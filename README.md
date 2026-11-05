@@ -43,7 +43,7 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   and the media in its centre card, with a live spectrum (cava, seven styles).
 - Panels from the bar: Wi-Fi (networks, passwords, the connection editor for
   the rest), Bluetooth (pairing, connecting, batteries), sound (outputs,
-  inputs, a mixer), batteries, a calendar, and media with synced lyrics.
+  inputs, a mixer, the audio effects' switches), batteries, a calendar, and media with synced lyrics.
 - A dock at the bottom (or any other edge) with the open apps and a dot per
   window: a click focuses an app, goes through its windows or minimises it,
   and hovering lists its windows to pick or close. It can hide, list only the
@@ -63,7 +63,9 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   colour, the spectrum's style, how a new wallpaper comes in (fade, wipe,
   a circle from where it was picked, or any), fastfetch's look and the login screen's
   look; the sounds (on or off, hyprmonk's set or serpantinum's, their
-  volume and the notification tone); keyboard layouts, the mouse and focus; when the screen locks and the
+  volume and the notification tone); the audio effects (the headphone correction,
+  searched for in AutoEQ, and the noise suppression's threshold and hold,
+  with a way to hear yourself); keyboard layouts, the mouse and focus; when the screen locks and the
   screens go off; what recordings hear, their quality and where they go; how
   long notifications stay, their corner, how many show and how many are kept.
 - Quick actions: wallpaper, game mode, screen recording, power profile, audio
@@ -74,6 +76,11 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
 - Soft sounds for clicks, switches, cards and panels opening and closing,
   notifications and devices connecting, in two sets, quiet in game mode and
   do not disturb.
+- Audio effects with no EasyEffects: a headphone correction from AutoEQ
+  (the Arctis Nova 7's comes ready, any other is searched for in Settings)
+  and rnnoise's noise suppression for the microphone. Each is a PipeWire
+  filter in front of the device, which stays the default, so the volume keys
+  and every app keep working on it.
 - Notifications with a notification centre, an on-screen card for what just
   changed (volume, microphone, audio output, keyboard layout, Caps and Num
   Lock, game mode, stay awake, power profile), a lock screen (on a key and
@@ -324,13 +331,13 @@ cargo clippy --all-targets -- -D warnings
 |------|------|
 | `install.sh` | The installer: the menu and every step |
 | `config/hypr/` | Hyprland in Lua: `hyprland.lua` loads `look`, `input`, `floating`, `minimise`, `binds`, `rules`, `plugins`, `gamemode`; `hypridle.conf` |
-| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `bar/`, `dock/`, `panels/`, `launcher/`, `quickactions/`, `notifications/`, `osd/`, `lock/`, `power/`, `keyguide/`, `screenshot/`, `wallpaper/`, `polkit/`, `services/`, `widgets/`, `assets/` (the sounds, the cat's font) |
+| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `bar/`, `dock/`, `panels/`, `launcher/`, `quickactions/`, `notifications/`, `osd/`, `lock/`, `power/`, `keyguide/`, `screenshot/`, `wallpaper/`, `polkit/`, `services/`, `widgets/`, `assets/` (the sounds, the cat's font, AutoEQ's ready corrections) |
 | `config/matugen/` | Templates for Hyprland, the shell and kitty |
 | `config/kitty/` | kitty, with the Noir palette |
 | `config/zsh/`, `config/starship/` | zsh and its prompt |
 | `config/fastfetch/` | fastfetch's presets, picked in Settings > Appearance |
 | `config/uwsm/env` | The session's environment (NVIDIA, cursor, toolkits, SSH agent) |
-| `config/systemd/user/` | Units for the shell, hypridle, udiskie and clipboard history; they start only under Hyprland |
+| `config/systemd/user/` | Units for the shell, hypridle, udiskie, clipboard history and the two audio effects; they start only under Hyprland |
 | `crates/hyprmonk/` | The `hyprmonk` command |
 | `udev/` | Access rules for the devices `hyprmonk` reads |
 | `packages/` | `pacman.txt` (official repos), `aur.txt` (through paru), `apps.txt` (picked at install) |
@@ -342,10 +349,11 @@ cargo clippy --all-targets -- -D warnings
 
 In this order.
 
-1. **Headset and microphone effects.** Two switches in the sound panel, with
-   no EasyEffects: an equaliser preset for the headphones (AutoEQ's for the
-   Arctis Nova 7 first) and noise suppression for the microphone (rnnoise).
-   Each one shows as a device of its own and becomes the default while on.
+1. **Music EQ with presets.** Ten bands after the headphone correction, with
+   presets (Bass, Vocal, Rock and so on), changed live, as serpantinum-audio
+   does.
+2. **Night mode.** A compressor that evens out loud and quiet parts for late
+   listening (swh-plugins' LADSPA).
 
 **Later**
 
@@ -394,6 +402,12 @@ An open list, in no fixed order.
   any of them.
 - The serpantinum sound set, copied under its AGPL-3.0 with a note of where
   each file came from (`assets/sounds/serpantinum`).
+- The headphone corrections from [AutoEQ](https://github.com/jaakkopasanen/AutoEq)
+  (MIT, its licence in `config/quickshell/hyprmonk/assets/autoeq/`), the
+  Arctis Nova 7's from Rtings' measurement. The idea of
+  keeping the default device while the effects run from
+  [serpantinum-audio](https://github.com/ilyamiro/serpantinum-audio); no code
+  taken.
 - The Rival 3 Wireless battery protocol from [rivalcfg](https://github.com/flozz/rivalcfg).
 - The running cat's font from [runcat-text](https://github.com/AlejandroMinor/runcat-text)
   (BSD-2-Clause, its licence in `config/quickshell/hyprmonk/assets/runcat/`),

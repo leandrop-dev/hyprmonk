@@ -80,6 +80,30 @@ config. Hyprland options are also written to `settings.lua`, loaded after
   for a notification shown anyway. Each set is one WAV per kind, since Qt's
   SoundEffect plays WAV. Kept in `sounds`; over IPC, `qs -c hyprmonk ipc call
   sounds play <kind>` and `sounds set <on|set|tone|volume> <value>`.
+  The page also holds the audio effects (`services/AudioEffects.qml`, kept
+  in `audio-effects.json` in the state directory):
+  - The headphone correction, AutoEQ's for the output in use: the Arctis
+    Nova 7's comes ready (`assets/autoeq`), and any other is searched for in
+    AutoEQ's index (cached a week in `~/.cache/hyprmonk`) and downloaded
+    into the state directory's `audio/eq`. It follows the default output when
+    that has one; unplugged, the filter waits instead of correcting other
+    speakers.
+  - The microphone's noise suppression (rnnoise, from
+    noise-suppression-for-voice), with its voice threshold (0 to 95%, 50)
+    and how long it holds after speaking (0 to 1000 ms, 150; longer lets the
+    room in as a faint static). Both change on the running filter. Listen to
+    yourself plays the microphone back in the headphones while the page is
+    open.
+  Each effect is a PipeWire filter-chain, written to `audio/<effect>.conf` in
+  the state directory and run by its own user unit (`hyprmonk-headphone-eq`,
+  `hyprmonk-noise-suppression`), so a shell reload does not cut the sound.
+  They are WirePlumber smart filters: whatever goes to or comes from the
+  device passes through them, and the device stays the default, so apps are
+  best left on the system default. The shell plays its own sounds through
+  PulseAudio (`QT_AUDIO_BACKEND=pulseaudio` in its unit): Qt's PipeWire
+  backend pins its stream to the output and loses it when a filter comes or
+  goes. Over IPC, `qs -c hyprmonk ipc call effects toggle <correction|noise>`,
+  `effects threshold <0-95>`, `effects hold <0-1000>` and `effects status`.
 - [x] Display: resolution, refresh rate and scale, for each screen, picked first
   and applied together. An applied change is only tried until kept, and goes
   back after 15 seconds, so a mode the screen cannot show fixes itself and a

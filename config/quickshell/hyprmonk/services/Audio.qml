@@ -27,7 +27,8 @@ Singleton {
     readonly property string micIcon: micMuted ? "\u{F036D}" : "\u{F036C}"
 
     // Devices and apps, by name. A node's `properties` stay empty until it is
-    // tracked; its type is known at once.
+    // tracked; its type is known at once. The audio effects' own nodes
+    // (services/AudioEffects.qml, all named hyprmonk.*) are neither.
     readonly property var sinks: byType(PwNodeType.AudioSink)
     readonly property var sources: byType(PwNodeType.AudioSource)
     readonly property var playing: byType(PwNodeType.AudioOutStream)
@@ -35,7 +36,7 @@ Singleton {
 
     function byType(type: int): var {
         return Pipewire.nodes.values
-            .filter(n => n.type === type)
+            .filter(n => n.type === type && !n.name.startsWith("hyprmonk."))
             .sort((a, b) => nameOf(a).localeCompare(nameOf(b)));
     }
 
