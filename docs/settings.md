@@ -3,7 +3,8 @@
 A centred card (Super+comma, or quick actions > Settings), 880 by 680 (less
 on a short screen), with its pages down the side in three groups: Desktop
 (Display, Windows, Bar, Dock), Look and sound (Appearance, Sounds) and System
-(Input, Power, Recording, Notifications). Bar (Modules, Look), Appearance
+(Input, Power, Recording, Notifications). Display (Screens, Night light),
+Bar (Modules, Look), Appearance
 (Theme, Motion, Terminal, Login screen) and Sounds (Interface, Effects,
 Microphone) list their sub-pages under them while open; a sub-page is a part
 of its page (the page's `section`), so moving between them keeps what the
@@ -155,6 +156,20 @@ config. Hyprland options are also written to `settings.lua`, loaded after
   or Main screen only for every other screen, and a Keep this layout row counts
   down beside it. A screen kept mirroring or off keeps its own mode in
   `settings.json`, for when it is back beside the others.
+- [x] Display > Night light (`services/NightLight.qml`): off, between set
+  times or always, and its warmth, 2500 to 6000 K (5500 to begin with),
+  with a guide below: six warmths, what each suits, the nearest marked, a
+  click picking it.
+  hyprsunset holds the colour, run by `hyprmonk-sunset` while the night
+  light is on (it starts at login only then, by a marker file in the state
+  directory); the shell works out the warmth each minute and sends it with
+  `hyprctl hyprsunset temperature`, or `identity` outside the set times.
+  Between set times (20:00 to 07:00 to begin with, in quarter hours, round
+  midnight or not) it fades in over half an hour from the start and out over
+  the half hour before the end. Kept in `night-light.json` in the state
+  directory. Also a row in quick actions. Over IPC,
+  `qs -c hyprmonk ipc call nightlight mode <off|scheduled|always>` and
+  `nightlight status`.
 - [x] Input: up to four keyboard layouts, found by code or name (XKB's
   `base.lst`), the first the default; the mouse's sensitivity, acceleration
   (adaptive or flat) and natural scroll; focus following the pointer, or a

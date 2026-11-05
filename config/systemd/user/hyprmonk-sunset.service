@@ -1,0 +1,20 @@
+[Unit]
+Description=hyprmonk night light (hyprsunset)
+Documentation=https://github.com/leandrop-dev/hyprmonk
+PartOf=graphical-session.target
+After=graphical-session.target
+# Plasma reaches graphical-session.target too; only start under Hyprland.
+ConditionEnvironment=XDG_CURRENT_DESKTOP=Hyprland
+ConditionPathExists=/usr/bin/hyprsunset
+# Made by the shell while the night light is on (services/NightLight.qml)
+# and removed when it is turned off, so it starts at login only if left on.
+ConditionPathExists=%h/.local/state/hyprmonk/night-light.on
+
+[Service]
+# Neutral to begin with; the shell sets the warmth.
+ExecStart=/usr/bin/hyprsunset --identity
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

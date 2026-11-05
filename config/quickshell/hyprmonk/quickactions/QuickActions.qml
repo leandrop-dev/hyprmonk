@@ -65,6 +65,14 @@ Scope {
         },
         Action {
             section: "System"
+            icon: "\u{F0594}"
+            label: "Night light"
+            value: NightLight.modeLabels[NightLight.mode]
+            options: NightLight.modes.map(mode => NightLight.modeLabels[mode])
+            onPicked: option => NightLight.setMode(NightLight.modes.find(mode => NightLight.modeLabels[mode] === option))
+        },
+        Action {
+            section: "System"
             icon: "\u{F04C5}"
             label: "Power profile"
             value: Power.profileName

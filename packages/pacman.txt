@@ -82,6 +82,9 @@ polkit
 # Locking when idle and before suspend (the shell draws the lock screen)
 hypridle
 
+# The night light (Settings > Display), run by hyprmonk-sunset
+hyprsunset
+
 # Secrets: GNOME Keyring, unlocked at login by SDDM's PAM file; SSH keys
 # through gcr's agent (gcr-4 comes with it)
 gnome-keyring

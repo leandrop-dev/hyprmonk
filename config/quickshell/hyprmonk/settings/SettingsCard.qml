@@ -17,7 +17,8 @@ Overlay {
     id: window
 
     readonly property var pages: [
-        { group: "Desktop", name: "Display", icon: "\u{F0379}", file: "DisplayPage.qml" },
+        { group: "Desktop", name: "Display", icon: "\u{F0379}", file: "DisplayPage.qml",
+          subs: [{ key: "screens", name: "Screens" }, { key: "night", name: "Night light" }] },
         { group: "Desktop", name: "Windows", icon: "\u{F05AF}", file: "WindowsPage.qml" },
         { group: "Desktop", name: "Bar", icon: "\u{F0570}", file: "BarPage.qml",
           subs: [{ key: "modules", name: "Modules" }, { key: "look", name: "Look" }] },

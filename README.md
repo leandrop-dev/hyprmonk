@@ -57,6 +57,8 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
 - Settings, in three groups, the longer pages split into sub-pages: each
   screen's resolution, refresh rate and scale, and where screens
   sit by dragging them on a map (a change goes back by itself unless kept),
+  the night light (warmer colours between set times or always, faded in and
+  out),
   gaps, borders, blur, shadows, the layout (three tiling ones, or every
   window floating, resized from its borders) and animations, the bar's
   modules by drag and drop, at the top or the bottom, with its clock,
@@ -74,6 +76,7 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   output, microphone, keyboard layout, screens (extend, mirror or the main one
   only, kept or undone in 15 s), do not disturb, stay awake (the screen
   neither locks nor goes off until it is turned off; also a cup on the bar),
+  the night light,
   settings and the power menu.
 - Soft sounds for clicks, switches, cards and panels opening and closing,
   notifications and devices connecting, in two sets, quiet in game mode and
@@ -354,10 +357,9 @@ cargo clippy --all-targets -- -D warnings
 
 In this order.
 
-1. **Night light.** Warmer colours between set times, or off.
-2. **Brightness and gamma.** For each screen, in Settings > Display, with
+1. **Brightness and gamma.** For each screen, in Settings > Display, with
    ideas from [serpantinum-gamma](https://github.com/ilyamiro/serpantinum-gamma).
-3. **A font for everything.** One font picked in Settings for the shell,
+2. **A font for everything.** One font picked in Settings for the shell,
    GTK and Qt apps and the terminal, starting from the set serpantinum has:
    its freely licensed ones (Nerd Fonts, JetBrains Mono, Fira Code, Roboto
    and the like), installed from the repos rather than copied. Its SF Pro
@@ -368,6 +370,10 @@ In this order.
 An open list, in no fixed order.
 
 - Calendar events from all three sources: local, Google and CalDAV.
+- The shell in other languages, starting with Portuguese (Portugal): each
+  account picks its own, from its locale to begin with, so one person can
+  keep English while another has Portuguese. Every string the shell shows
+  goes through one lookup, with a file of translations for each language.
 - A phone module on the bar, beyond its battery: notifications, the clipboard,
   files, ringing it to find it. KDE Connect or an app of our own, still to
   decide.
@@ -380,8 +386,6 @@ An open list, in no fixed order.
   (MIT) and recoloured by the tone, translucent through Vencord's transparent
   window, as plasmonk-kde did it. Quick CSS is left for your own tweaks.
 - The cards' open and close animations on one shared curve and speed.
-- Settings in sub-pages where a page holds several things (Appearance >
-  Tone, Spectrum, Terminal, Login), and the sidebar grouped.
 - Apps the tone does not reach yet, starting from those serpantinum themes.
 - Fedora, with its own package list, last of all. Notes for then: some
   packages come from the Terra repository, and gpu-screen-recorder has no
@@ -419,6 +423,9 @@ An open list, in no fixed order.
   or preset values taken.
 - The Rival 3 Wireless battery protocol from [rivalcfg](https://github.com/flozz/rivalcfg).
 - The hardware panel's bars after serpantinum's upright ones; no code taken.
+- The night light's guide to warmth after a table in KTC's
+  [colour temperature for late-night gaming](https://us.ktcplay.com/blogs/support-tips/color-temperature-late-night-gaming);
+  in our own words.
 - The running cat's font from [runcat-text](https://github.com/AlejandroMinor/runcat-text)
   (BSD-2-Clause, its licence in `config/quickshell/hyprmonk/assets/runcat/`),
   with the sleeping cat added from [RunCat](https://kyome.io/runcat/index.html)'s
