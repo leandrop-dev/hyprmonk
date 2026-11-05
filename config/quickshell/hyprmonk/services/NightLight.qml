@@ -3,7 +3,8 @@
 // .service); this works out how warm it should be from minute to minute and
 // tells it through hyprctl. Between set times it fades in over half an hour
 // from the start and out over the half hour before the end. While it is off
-// hyprsunset is stopped, and the screens are left as they are.
+// (and nothing is dimmed) hyprsunset is stopped, and the screens are left as
+// they are.
 //
 // IPC: qs -c hyprmonk ipc call nightlight mode off|scheduled|always
 //      qs -c hyprmonk ipc call nightlight status
@@ -41,7 +42,10 @@ Singleton {
 
     // How far in it is now, from 0 (not at all) to 1 (the full warmth).
     property real level: 0
-    readonly property int kelvin: Math.round(neutral - level * (neutral - warmth))
+    // Even steps in mireds (a million over the kelvin), where equal steps look
+    // equally large; even kelvin would hurry the end of the fade-in. After
+    // serpantinum-gamma.
+    readonly property int kelvin: Math.round(1e6 / (1e6 / neutral + level * (1e6 / warmth - 1e6 / neutral)))
     readonly property bool warm: level > 0
 
     // A word on what it does next, for Settings.
@@ -102,7 +106,19 @@ Singleton {
     onToChanged: update()
     onKelvinChanged: send()
 
-    // While on, hyprsunset runs (and keeps running at the neutral colour
+    // hyprsunset also carries the dimming (services/Brightness.qml), which
+    // its identity keeps.
+    readonly property bool needed: mode !== "off" || Brightness.dim < 100
+
+    Connections {
+        target: Brightness
+
+        function onDimChanged(): void {
+            root.send();
+        }
+    }
+
+    // While needed, hyprsunset runs (and keeps running at the neutral colour
     // between set times, so the evening starts without a wait); the marker
     // lets its unit start at login. hyprsunset takes a moment to answer
     // after a start, hence the tries.
@@ -112,11 +128,12 @@ Singleton {
             queued = true;
             return;
         }
-        applying.command = mode === "off"
+        applying.command = !needed
             ? ["sh", "-c", 'rm -f "$1"; systemctl --user stop hyprmonk-sunset', "sh", marker]
             : ["sh", "-c", 'touch "$1"; systemctl --user start hyprmonk-sunset || exit 1; '
-                + 'for try in $(seq 25); do hyprctl hyprsunset $2 >/dev/null && exit 0; sleep 0.2; done; exit 1',
-                "sh", marker, warm ? "temperature " + kelvin : "identity"];
+                + 'for try in $(seq 25); do hyprctl hyprsunset $2 >/dev/null && break; sleep 0.2; done; '
+                + 'hyprctl hyprsunset gamma $3 >/dev/null',
+                "sh", marker, warm ? "temperature " + kelvin : "identity", String(Brightness.dim)];
         applying.running = true;
     }
 
@@ -139,7 +156,7 @@ Singleton {
             onStreamFinished: if (text.trim() !== "") console.warn("night light:", text.trim())
         }
         onExited: code => {
-            if (code !== 0 && root.mode !== "off") console.warn("night light: hyprsunset did not answer");
+            if (code !== 0 && root.needed) console.warn("night light: hyprsunset did not answer");
             if (root.queued) {
                 root.queued = false;
                 root.send();

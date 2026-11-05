@@ -57,8 +57,9 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
 - Settings, in three groups, the longer pages split into sub-pages: each
   screen's resolution, refresh rate and scale, and where screens
   sit by dragging them on a map (a change goes back by itself unless kept),
-  the night light (warmer colours between set times or always, faded in and
-  out),
+  each screen's own brightness and contrast (through DDC/CI) and dimming
+  below them, the night light (warmer colours between set times or always,
+  faded in and out),
   gaps, borders, blur, shadows, the layout (three tiling ones, or every
   window floating, resized from its borders) and animations, the bar's
   modules by drag and drop, at the top or the bottom, with its clock,
@@ -357,9 +358,7 @@ cargo clippy --all-targets -- -D warnings
 
 In this order.
 
-1. **Brightness and gamma.** For each screen, in Settings > Display, with
-   ideas from [serpantinum-gamma](https://github.com/ilyamiro/serpantinum-gamma).
-2. **A font for everything.** One font picked in Settings for the shell,
+1. **A font for everything.** One font picked in Settings for the shell,
    GTK and Qt apps and the terminal, starting from the set serpantinum has:
    its freely licensed ones (Nerd Fonts, JetBrains Mono, Fira Code, Roboto
    and the like), installed from the repos rather than copied. Its SF Pro
@@ -426,6 +425,8 @@ An open list, in no fixed order.
 - The night light's guide to warmth after a table in KTC's
   [colour temperature for late-night gaming](https://us.ktcplay.com/blogs/support-tips/color-temperature-late-night-gaming);
   in our own words.
+- The night light's fade in even steps of mireds, after
+  [serpantinum-gamma](https://github.com/ilyamiro/serpantinum-gamma); no code taken.
 - The running cat's font from [runcat-text](https://github.com/AlejandroMinor/runcat-text)
   (BSD-2-Clause, its licence in `config/quickshell/hyprmonk/assets/runcat/`),
   with the sleeping cat added from [RunCat](https://kyome.io/runcat/index.html)'s

@@ -85,6 +85,10 @@ hypridle
 # The night light (Settings > Display), run by hyprmonk-sunset
 hyprsunset
 
+# Each screen's own brightness and contrast over DDC/CI (Settings > Display);
+# its udev rule lets the logged-in user reach the screens
+ddcutil
+
 # Secrets: GNOME Keyring, unlocked at login by SDDM's PAM file; SSH keys
 # through gcr's agent (gcr-4 comes with it)
 gnome-keyring

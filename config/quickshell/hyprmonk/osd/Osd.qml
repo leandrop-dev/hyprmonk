@@ -167,6 +167,15 @@ Scope {
         }
     }
 
+    // The brightness keys; a step into the dimming shows an empty bar.
+    Connections {
+        target: Brightness
+
+        function onStepped(caption: string, value: int): void {
+            root.show("\u{F00DF}", "Brightness", caption, value);
+        }
+    }
+
     // Game mode also switches the power profile: say game mode, not both.
     Connections {
         target: GameMode

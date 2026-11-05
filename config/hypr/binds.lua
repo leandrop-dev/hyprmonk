@@ -111,6 +111,8 @@ local media = { locked = true }
 local held  = { locked = true, repeating = true }
 bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), "Volume up",   held)
 bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      "Volume down", held)
+bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd("qs -c hyprmonk ipc call brightness step 5"),  "Brightness up",   held)
+bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("qs -c hyprmonk ipc call brightness step -5"), "Brightness down", held)
 bind("XF86AudioMute",        hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     "Mute",        media)
 bind("XF86AudioMicMute",     hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   "Mute microphone", media)
 bind("XF86AudioPlay",        hl.dsp.exec_cmd("playerctl play-pause"), "Play/pause",     media)

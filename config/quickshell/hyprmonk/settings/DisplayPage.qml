@@ -1,8 +1,10 @@
-// Settings > Display, in two sub-pages:
+// Settings > Display, in three sub-pages:
 // - Screens (services/Display.qml): where each screen sits, which is the main
 //   one, and the resolution, refresh rate and scale of one. Nothing changes
 //   until applied; then it goes back by itself unless kept. Picking and
 //   applying again during that still goes back to where it started.
+// - Brightness (services/Brightness.qml): each screen's own brightness and
+//   contrast, through DDC/CI, and dimming on top for every screen.
 // - Night light (services/NightLight.qml): warmer colours off, between set
 //   times or always, and how warm.
 import QtQuick
@@ -14,12 +16,15 @@ import qs.widgets
 ColumnLayout {
     id: page
 
-    // The sub-page shown (SettingsCard.qml): screens or night.
+    // The sub-page shown (SettingsCard.qml): screens, brightness or night.
     property string section: "screens"
 
     spacing: 8
 
-    Component.onCompleted: Display.refresh()
+    Component.onCompleted: {
+        Display.refresh();
+        Brightness.refresh();
+    }
     Component.onDestruction: Display.clearChoice()
 
     component Note: Text {
@@ -125,6 +130,67 @@ ColumnLayout {
                 onClicked: Display.chosenScale = modelData
             }
         }
+    }
+
+    // services/Brightness.qml: each screen's own backlight and contrast, then
+    // the dimming on top.
+    Repeater {
+        model: page.section === "brightness" ? Display.monitors : []
+
+        ColumnLayout {
+            id: screen
+
+            required property var modelData
+            readonly property var ddc: Brightness.screens[modelData.name]
+
+            Layout.fillWidth: true
+            Layout.bottomMargin: 12
+            spacing: 8
+
+            SectionLabel {
+                text: (screen.modelData.model || screen.modelData.name) + " (" + screen.modelData.name + ")"
+            }
+
+            SettingSlider {
+                Layout.fillWidth: true
+                visible: screen.ddc?.brightness !== undefined
+                label: "Brightness"
+                to: screen.ddc?.brightnessMax ?? 100
+                value: screen.ddc?.brightness ?? 0
+                onMoved: value => Brightness.set(screen.modelData.name, "brightness", value)
+            }
+
+            SettingSlider {
+                Layout.fillWidth: true
+                visible: screen.ddc?.contrast !== undefined
+                label: "Contrast"
+                to: screen.ddc?.contrastMax ?? 100
+                value: screen.ddc?.contrast ?? 0
+                onMoved: value => Brightness.set(screen.modelData.name, "contrast", value)
+            }
+
+            Note {
+                visible: !screen.ddc
+                text: Brightness.reading || !Brightness.read ? "Asking the screen…"
+                    : "This screen does not answer over DDC/CI, so its own brightness cannot be set from here. Many monitors have DDC/CI as a switch in their menu."
+            }
+        }
+    }
+
+    SettingSlider {
+        Layout.fillWidth: true
+        visible: page.section === "brightness"
+        label: "Dim further"
+        from: Brightness.dimRange.from
+        to: Brightness.dimRange.to
+        value: Brightness.dim
+        shown: Brightness.dim === 100 ? "Off" : Brightness.dim + "%"
+        onMoved: value => Brightness.setDim(value)
+    }
+
+    Note {
+        visible: page.section === "brightness"
+        text: "Brightness and contrast are the monitor's own, as its buttons set them, and it keeps them. Dimming further darkens the picture itself, on every screen at once and below the monitor's lowest setting, for late nights; dark scenes lose some detail, so turn the brightness down first."
     }
 
     // services/NightLight.qml

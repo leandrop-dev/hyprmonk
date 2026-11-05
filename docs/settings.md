@@ -3,7 +3,7 @@
 A centred card (Super+comma, or quick actions > Settings), 880 by 680 (less
 on a short screen), with its pages down the side in three groups: Desktop
 (Display, Windows, Bar, Dock), Look and sound (Appearance, Sounds) and System
-(Input, Power, Recording, Notifications). Display (Screens, Night light),
+(Input, Power, Recording, Notifications). Display (Screens, Brightness, Night light),
 Bar (Modules, Look), Appearance
 (Theme, Motion, Terminal, Login screen) and Sounds (Interface, Effects,
 Microphone) list their sub-pages under them while open; a sub-page is a part
@@ -156,17 +156,31 @@ config. Hyprland options are also written to `settings.lua`, loaded after
   or Main screen only for every other screen, and a Keep this layout row counts
   down beside it. A screen kept mirroring or off keeps its own mode in
   `settings.json`, for when it is back beside the others.
+- [x] Display > Brightness (`services/Brightness.qml`): each screen's own
+  brightness and contrast, set in the monitor over DDC/CI with ddcutil (as its
+  buttons would, and kept by it), read when the page opens. A write takes
+  about a third of a second, so while a slider moves only the latest value
+  waits. A screen that does not answer says so. Below that, dimming every
+  screen at once (30 to 100%), through hyprsunset's colour matrix, kept in
+  `brightness.json`. No gamma: Hyprland gives programs no gamma ramps, only a
+  colour matrix, which cannot bend the curve. The brightness keys step the
+  focused screen by 5% (every screen that answers, when it does not), go
+  on into the dimming below its lowest and take that off first going up,
+  each step shown on screen. Over IPC,
+  `qs -c hyprmonk ipc call brightness set <screen> <0-100>`, `brightness step <-100-100>`,
+  `brightness dim <30-100>` and `brightness status`.
 - [x] Display > Night light (`services/NightLight.qml`): off, between set
   times or always, and its warmth, 2500 to 6000 K (5500 to begin with),
   with a guide below: six warmths, what each suits, the nearest marked, a
   click picking it.
   hyprsunset holds the colour, run by `hyprmonk-sunset` while the night
-  light is on (it starts at login only then, by a marker file in the state
+  light is on or the screens are dimmed (it starts at login only then, by a marker file in the state
   directory); the shell works out the warmth each minute and sends it with
   `hyprctl hyprsunset temperature`, or `identity` outside the set times.
   Between set times (20:00 to 07:00 to begin with, in quarter hours, round
   midnight or not) it fades in over half an hour from the start and out over
-  the half hour before the end. Kept in `night-light.json` in the state
+  the half hour before the end, in even steps of mireds (a million over the
+  kelvin), which look even to the eye. Kept in `night-light.json` in the state
   directory. Also a row in quick actions. Over IPC,
   `qs -c hyprmonk ipc call nightlight mode <off|scheduled|always>` and
   `nightlight status`.
