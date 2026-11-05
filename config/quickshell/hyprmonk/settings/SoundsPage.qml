@@ -1,8 +1,9 @@
 // Settings > Sounds (services/Sounds.qml): the interface's sounds on or off,
 // the set they come from, their volume and the notification tone, with a
 // chip to hear each one. Each change shows at once. Then the audio effects
-// (services/AudioEffects.qml): the headphone correction, searched for in
-// AutoEQ, and the microphone's noise suppression, with a way to hear it.
+// (services/AudioEffects.qml): the equaliser with its presets and bands,
+// the headphone correction, searched for in AutoEQ, and the microphone's
+// noise suppression, with a way to hear it.
 import QtQuick
 import QtQuick.Layouts
 import qs
@@ -154,6 +155,48 @@ ColumnLayout {
             }
 
             // services/AudioEffects.qml
+            SectionLabel {
+                Layout.topMargin: 12
+                text: "Equaliser"
+            }
+
+            Row {
+                text: "On every output, before the correction"
+
+                Chip {
+                    text: AudioEffects.eqOn ? "on" : "off"
+                    on: AudioEffects.eqOn
+                    onClicked: AudioEffects.setEq(!AudioEffects.eqOn)
+                }
+            }
+
+            Flow {
+                Layout.fillWidth: true
+                spacing: 6
+
+                Repeater {
+                    model: AudioEffects.presetNames.filter(name => name !== "custom" || AudioEffects.preset === "custom" || AudioEffects.hasCustom)
+
+                    Chip {
+                        required property string modelData
+
+                        text: AudioEffects.presetLabels[modelData]
+                        on: modelData === AudioEffects.preset
+                        onClicked: AudioEffects.setPreset(modelData)
+                    }
+                }
+            }
+
+            Equaliser {
+                Layout.fillWidth: true
+                Layout.topMargin: 4
+                opacity: AudioEffects.eqOn ? 1 : Theme.dimOpacity
+            }
+
+            Note {
+                text: "Moving a band makes the preset Custom, kept for next time. The sound is lowered by the largest boost so that it never clips."
+            }
+
             SectionLabel {
                 Layout.topMargin: 12
                 text: "Headphone correction"

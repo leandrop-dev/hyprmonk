@@ -82,6 +82,13 @@ config. Hyprland options are also written to `settings.lua`, loaded after
   sounds play <kind>` and `sounds set <on|set|tone|volume> <value>`.
   The page also holds the audio effects (`services/AudioEffects.qml`, kept
   in `audio-effects.json` in the state directory):
+  - The equaliser, on whatever the default output is and before the
+    correction: ten peaking bands an octave apart (31 Hz to 16 kHz, Q 1.41,
+    ±12 dB), a preset (Flat, Bass, Treble, Vocal, Rock, Pop, Jazz,
+    Classical) or Custom, which moving a band starts from what is heard and
+    keeps. A preamp lowers the sound by the largest boost so that it never
+    clips. Presets and bands change on the running filter. The sound panel
+    has its switch and presets.
   - The headphone correction, AutoEQ's for the output in use: the Arctis
     Nova 7's comes ready (`assets/autoeq`), and any other is searched for in
     AutoEQ's index (cached a week in `~/.cache/hyprmonk`) and downloaded
@@ -95,14 +102,19 @@ config. Hyprland options are also written to `settings.lua`, loaded after
     yourself plays the microphone back in the headphones while the page is
     open.
   Each effect is a PipeWire filter-chain, written to `audio/<effect>.conf` in
-  the state directory and run by its own user unit (`hyprmonk-headphone-eq`,
+  the state directory and run by its own user unit (`hyprmonk-music-eq`, `hyprmonk-headphone-eq`,
   `hyprmonk-noise-suppression`), so a shell reload does not cut the sound.
+  Before one is stopped or restarted, WirePlumber is told to pass it by
+  (`filter.smart.disabled`) and given 1.5 s to notice: a filter that goes
+  with a player still on it counts as an unplugged device, and WirePlumber
+  pauses the player.
   They are WirePlumber smart filters: whatever goes to or comes from the
   device passes through them, and the device stays the default, so apps are
   best left on the system default. The shell plays its own sounds through
   PulseAudio (`QT_AUDIO_BACKEND=pulseaudio` in its unit): Qt's PipeWire
   backend pins its stream to the output and loses it when a filter comes or
-  goes. Over IPC, `qs -c hyprmonk ipc call effects toggle <correction|noise>`,
+  goes. Over IPC, `qs -c hyprmonk ipc call effects toggle <eq|correction|noise>`,
+  `effects preset <name>`, `effects band <0-9> <dB>`,
   `effects threshold <0-95>`, `effects hold <0-1000>` and `effects status`.
 - [x] Display: resolution, refresh rate and scale, for each screen, picked first
   and applied together. An applied change is only tried until kept, and goes

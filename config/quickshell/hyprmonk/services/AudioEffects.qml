@@ -1,13 +1,15 @@
-// Audio effects, with no EasyEffects: a headphone correction and the
-// microphone's noise suppression. Each is a PipeWire filter-chain run by its
+// Audio effects, with no EasyEffects: an equaliser, a headphone correction
+// and the microphone's noise suppression. Each is a PipeWire filter-chain run by its
 // own user unit (config/systemd/user/hyprmonk-<effect>.service), from a conf
 // this writes to the state directory while the effect is on and removes when
 // it is turned off, so a unit starts at login only if it was left on. The
 // units outlive the shell: a reload does not cut the sound.
 //
-// Both are WirePlumber smart filters: whatever goes to the device passes
+// All are WirePlumber smart filters: whatever goes to the device passes
 // through the filter, and the device stays the default (the volume keys
-// keep working on it).
+// keep working on it). On the output, the equaliser comes first and the
+// correction after it.
+// - eq: ten bands with presets, on the default output (below).
 // - correction: AutoEQ's correction for the headphones (Equalizer APO's
 //   format, read as it is by PipeWire's param_eq), picked per output device
 //   in Settings > Sounds; the Arctis Nova 7's comes ready (assets/autoeq).
@@ -20,8 +22,9 @@
 //   room in as a faint static, shorter clips the ends of words).
 //
 // Kept in audio-effects.json.
-// IPC: qs -c hyprmonk ipc call effects toggle correction|noise
-//      | threshold <0-95> | hold <0-1000> | status
+// IPC: qs -c hyprmonk ipc call effects toggle eq|correction|noise
+//      | preset <name> | band <0-9> <dB> | threshold <0-95> | hold <0-1000>
+//      | status
 pragma Singleton
 
 import QtQuick
@@ -188,10 +191,85 @@ Singleton {
     // written for the next start, and the filter told.
     function tune(): void {
         if (!settingsRead || !settings.noise || sourceName === "") return;
-        const file = `${dir}/noise-suppression.conf`;
-        const props = `{ params = [ "rnnoise:VAD Threshold (%)" ${settings.threshold} "rnnoise:VAD Grace Period (ms)" ${settings.hold} ] }`;
-        queue("noise-suppression", ["sh", "-c", 'printf "%s" "$2" > "$1" && pw-cli set-param hyprmonk.noise-suppression Props "$3" >/dev/null',
-            "sh", file, noiseConf(sourceName), props]);
+        live("noise-suppression", noiseConf(sourceName), "hyprmonk.noise-suppression",
+            ["rnnoise:VAD Threshold (%)", settings.threshold, "rnnoise:VAD Grace Period (ms)", settings.hold]);
+    }
+
+    // Writes the effect's conf for its next start, and sets `params` (name,
+    // value, ...) on its running node.
+    function live(effect: string, text: string, node: string, params: var): void {
+        const props = `{ params = [ ${params.map(param => typeof param === "string" ? JSON.stringify(param) : param).join(" ")} ] }`;
+        queue(effect, ["sh", "-c", 'printf "%s" "$2" > "$1" && pw-cli set-param "$3" Props "$4" >/dev/null',
+            "sh", `${dir}/${effect}.conf`, text, node, props]);
+    }
+
+    // The equaliser: ten bands an octave apart, before the correction, on
+    // whatever the default output is. A preamp in front lowers the sound by
+    // the largest boost, so that it never clips. Presets and bands change on
+    // the running filter.
+    readonly property var bands: [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
+    readonly property int bandRange: 12  // dB, either way
+    readonly property var presets: ({
+        flat:      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        bass:      [6, 5, 4, 2, 0, 0, 0, 0, 0, 0],
+        treble:    [0, 0, 0, 0, 0, 0, 2, 4, 5, 6],
+        vocal:     [-2, -2, -1, 0, 2, 4, 4, 2, 0, -1],
+        rock:      [4, 3, 2, 0, -1, -1, 1, 3, 4, 4],
+        pop:       [-1, 0, 2, 3, 4, 3, 1, 0, -1, -1],
+        jazz:      [3, 2, 1, 2, -1, -1, 0, 1, 2, 3],
+        classical: [3, 2, 1, 0, 0, 0, -1, -1, 1, 2]
+    })
+    readonly property var presetNames: Object.keys(presets).concat("custom")
+    readonly property var presetLabels: ({ flat: "Flat", bass: "Bass", treble: "Treble", vocal: "Vocal", rock: "Rock",
+        pop: "Pop", jazz: "Jazz", classical: "Classical", custom: "Custom" })
+
+    readonly property bool eqOn: settings.eq
+    readonly property string preset: settings.preset in presets || settings.preset === "custom" ? settings.preset : "flat"
+    readonly property var gains: preset === "custom" ? bands.map((band, i) => settings.custom[i] ?? 0) : presets[preset]
+    readonly property bool hasCustom: settings.custom.length > 0
+    // The device the running equaliser is on.
+    property string equalising: ""
+
+    function setEq(on: bool): void {
+        settings.eq = on;
+        applyEq();
+    }
+
+    function setPreset(name: string): void {
+        if (!presetNames.includes(name)) return;
+        settings.preset = name;
+        tuneEq();
+    }
+
+    // Moving a band starts Custom from what is heard.
+    function setBand(index: int, gain: real): void {
+        const custom = gains.slice();
+        custom[index] = Math.max(-bandRange, Math.min(bandRange, Math.round(gain * 2) / 2));
+        settings.custom = custom;
+        settings.preset = "custom";
+        tuneEq();
+    }
+
+    function applyEq(): void {
+        if (!settingsRead) return;
+        if (!settings.eq) {
+            equalising = "";
+            run("music-eq", "");
+            return;
+        }
+        if (sinkName === "") return;  // no output yet
+        equalising = sinkName;
+        run("music-eq", eqConf(sinkName));
+    }
+
+    function tuneEq(): void {
+        if (!settingsRead || !settings.eq || equalising === "") return;
+        live("music-eq", eqConf(equalising), "hyprmonk.music-eq",
+            ["pre:Mult", preamp(gains)].concat(...gains.map((gain, i) => [`b${i + 1}:Gain`, gain])));
+    }
+
+    function preamp(levels: var): real {
+        return Math.pow(10, -Math.max(0, ...levels) / 20);
     }
 
     // The microphone played back in the headphones, through the noise
@@ -258,9 +336,49 @@ ${module}
                 filter.smart      = true
                 filter.smart.name = "hyprmonk-headphone-eq"
                 filter.smart.target = { node.name = ${JSON.stringify(device)} }
+                # After the equaliser: it shapes the music, this the headphones.
+                filter.smart.after  = [ "hyprmonk-music-eq" ]
             }
             playback.props = {
                 node.name          = "hyprmonk.headphone-eq.output"
+                node.passive       = true
+                node.dont-fallback = true
+            }
+        }
+    }`);
+    }
+
+    // Each band a peaking filter an octave wide (Q 1.41), one after the other;
+    // the graph is copied for each channel.
+    function eqConf(device: string): string {
+        const nodes = gains.map((gain, i) =>
+            `                    { type = builtin name = b${i + 1} label = bq_peaking control = { "Freq" = ${bands[i]} "Q" = 1.41 "Gain" = ${gain} } }`);
+        const links = gains.map((gain, i) =>
+            `                    { output = "${i === 0 ? "pre" : "b" + i}:Out" input = "b${i + 1}:In" }`);
+        return conf(`    { name = libpipewire-module-filter-chain
+        args = {
+            node.description = "Equaliser"
+            media.name       = "Equaliser"
+            filter.graph = {
+                nodes = [
+                    { type = builtin name = pre label = linear control = { "Mult" = ${preamp(gains)} } }
+${nodes.join("\n")}
+                ]
+                links = [
+${links.join("\n")}
+                ]
+            }
+            audio.channels = 2
+            audio.position = [ FL FR ]
+            capture.props = {
+                node.name           = "hyprmonk.music-eq"
+                media.class         = Audio/Sink
+                filter.smart        = true
+                filter.smart.name   = "hyprmonk-music-eq"
+                filter.smart.target = { node.name = ${JSON.stringify(device)} }
+            }
+            playback.props = {
+                node.name          = "hyprmonk.music-eq.output"
                 node.passive       = true
                 node.dont-fallback = true
             }
@@ -303,14 +421,23 @@ ${module}
     // meanwhile runs after it.
     property var pending: ({})
 
+    // Before a running filter is stopped or started again, WirePlumber is
+    // told to pass it by (`filter.smart.disabled` in the filters metadata),
+    // so the streams move on to the device first: a filter that goes away
+    // with players still on it counts as a device unplugged, and WirePlumber
+    // pauses them (linking/mpris-pause.lua). It notes the move a moment
+    // later than it makes it, hence the wait.
+    readonly property string aside: 'aside() { systemctl --user is-active -q "$1" || return 0; id=$(pw-cli info "$2" | sed -n "1s/^[[:space:]]*id: //p"); [ -n "$id" ] || return 0; pw-metadata -n filters "$id" filter.smart.disabled true >/dev/null; sleep 1.5; }; '
+
     function run(effect: string, text: string): void {
         const unit = `hyprmonk-${effect}.service`;
         const file = `${dir}/${effect}.conf`;
+        const node = `hyprmonk.${effect}`;
         queue(effect, text === ""
-            ? ["sh", "-c", 'rm -f "$1"; systemctl --user stop "$2"', "sh", file, unit]
+            ? ["sh", "-c", aside + 'aside "$2" "$3"; rm -f "$1"; systemctl --user stop "$2"', "sh", file, unit, node]
             // Restarted only when the conf changed: the shell loading again
             // starts it if it is not running, and leaves it be if it is.
-            : ["sh", "-c", 'mkdir -p "$(dirname "$1")" && if printf "%s" "$3" | cmp -s - "$1"; then systemctl --user start "$2"; else printf "%s" "$3" > "$1" && systemctl --user restart "$2"; fi', "sh", file, unit, text]);
+            : ["sh", "-c", aside + 'mkdir -p "$(dirname "$1")" && if printf "%s" "$3" | cmp -s - "$1"; then systemctl --user start "$2"; else printf "%s" "$3" > "$1" && aside "$2" "$4" && systemctl --user restart "$2"; fi', "sh", file, unit, text, node]);
     }
 
     function queue(effect: string, command: var): void {
@@ -323,7 +450,7 @@ ${module}
         job.running = true;
     }
 
-    readonly property var jobs: ({ "headphone-eq": correctionJob, "noise-suppression": noiseJob })
+    readonly property var jobs: ({ "headphone-eq": correctionJob, "noise-suppression": noiseJob, "music-eq": eqJob })
 
     function warn(effect: string, errors: string): void {
         if (errors.trim() !== "") console.warn(`effects: ${effect}:`, errors.trim());
@@ -341,17 +468,25 @@ ${module}
     Process {
         id: correctionJob
         stderr: StdioCollector { onStreamFinished: root.warn("headphone-eq", text) }
-        onExited: root.finished("headphone-eq", this)
+        onExited: root.finished("headphone-eq", correctionJob)
     }
 
     Process {
         id: noiseJob
         stderr: StdioCollector { onStreamFinished: root.warn("noise-suppression", text) }
-        onExited: root.finished("noise-suppression", this)
+        onExited: root.finished("noise-suppression", noiseJob)
+    }
+
+    Process {
+        id: eqJob
+        stderr: StdioCollector { onStreamFinished: root.warn("music-eq", text) }
+        onExited: root.finished("music-eq", eqJob)
     }
 
     // A new default output with a correction of its own moves the filter there.
     onProfileChanged: if (settings.correction && profile && sinkName !== correcting) applyCorrection()
+    // The equaliser follows the default output, whatever it is.
+    onSinkNameChanged: if (settings.eq && sinkName !== "" && sinkName !== equalising) applyEq()
     // And a new default microphone moves the noise suppression.
     onSourceNameChanged: if (settings.noise) applyNoise()
 
@@ -361,6 +496,7 @@ ${module}
         settingsRead = true;
         applyCorrection();
         applyNoise();
+        applyEq();
     }
 
     FileView {
@@ -377,6 +513,9 @@ ${module}
             property bool noise: false
             property int threshold: 50  // VAD threshold, 0 to 95 %
             property int hold: 150  // VAD grace period, 0 to 1000 ms
+            property bool eq: false
+            property string preset: "flat"  // one of presets, or custom
+            property var custom: []  // custom's gains, in dB, by band
         }
     }
 
@@ -392,7 +531,19 @@ ${module}
                 root.setNoise(!root.noiseOn);
                 return root.noiseOn;
             }
+            if (effect === "eq") {
+                root.setEq(!root.eqOn);
+                return root.eqOn;
+            }
             return false;
+        }
+
+        function preset(name: string): void {
+            root.setPreset(name);
+        }
+
+        function band(index: int, gain: real): void {
+            root.setBand(index, gain);
         }
 
         function threshold(percent: int): void {
@@ -405,7 +556,8 @@ ${module}
 
         function status(): string {
             return `correction ${root.correctionOn ? "on" : "off"} ${root.correcting} (${root.profileFor(root.correcting || root.sinkName)?.name ?? "none"})\n`
-                + `noise ${root.noiseOn ? "on" : "off"} ${root.sourceName} (threshold ${root.threshold} %, hold ${root.hold} ms)`;
+                + `noise ${root.noiseOn ? "on" : "off"} ${root.sourceName} (threshold ${root.threshold} %, hold ${root.hold} ms)\n`
+                + `eq ${root.eqOn ? "on" : "off"} ${root.equalising} (${root.preset}: ${root.gains.join(" ")})`;
         }
     }
 }

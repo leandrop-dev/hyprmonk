@@ -1,0 +1,18 @@
+[Unit]
+Description=hyprmonk equaliser (a PipeWire filter-chain)
+Documentation=https://github.com/leandrop-dev/hyprmonk
+PartOf=graphical-session.target
+After=graphical-session.target pipewire.service wireplumber.service
+# Plasma reaches graphical-session.target too; only start under Hyprland.
+ConditionEnvironment=XDG_CURRENT_DESKTOP=Hyprland
+# Written by the shell while the equaliser is on (services/AudioEffects.qml)
+# and removed when it is turned off, so it starts at login only if left on.
+ConditionPathExists=%h/.local/state/hyprmonk/audio/music-eq.conf
+
+[Service]
+ExecStart=/usr/bin/pipewire -c %h/.local/state/hyprmonk/audio/music-eq.conf
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

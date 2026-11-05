@@ -88,6 +88,50 @@ ColumnLayout {
         }
     }
 
+    // The equaliser, on any output, and while it is on its presets (the
+    // bands themselves are in Settings > Sounds).
+    RowLayout {
+        Layout.fillWidth: true
+        Layout.leftMargin: 12
+        visible: panel.output && panel.device !== null
+        spacing: 8
+
+        Text {
+            Layout.fillWidth: true
+            text: "Equaliser"
+            color: Theme.foreground
+            font.family: Theme.font
+            font.pixelSize: Theme.rowFontSize
+            elide: Text.ElideRight
+        }
+
+        Chip {
+            text: AudioEffects.eqOn ? "on" : "off"
+            on: AudioEffects.eqOn
+            onClicked: AudioEffects.setEq(!AudioEffects.eqOn)
+        }
+    }
+
+    Flow {
+        Layout.fillWidth: true
+        Layout.leftMargin: 12
+        visible: panel.output && panel.device !== null && AudioEffects.eqOn
+        spacing: 6
+
+        Repeater {
+            // Custom only once there is one.
+            model: AudioEffects.presetNames.filter(name => name !== "custom" || AudioEffects.preset === "custom" || AudioEffects.hasCustom)
+
+            Chip {
+                required property string modelData
+
+                text: AudioEffects.presetLabels[modelData]
+                on: modelData === AudioEffects.preset
+                onClicked: AudioEffects.setPreset(modelData)
+            }
+        }
+    }
+
     SectionLabel {
         Layout.topMargin: 6
         visible: panel.apps.length > 0
