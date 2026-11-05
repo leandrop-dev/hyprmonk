@@ -2,6 +2,7 @@
 // the set they come from, their volume and the notification tone, with a
 // chip to hear each one. Each change shows at once. Then the audio effects
 // (services/AudioEffects.qml): the equaliser with its presets and bands,
+// night mode and its strength,
 // the headphone correction, searched for in AutoEQ, and the microphone's
 // noise suppression, with a way to hear it.
 import QtQuick
@@ -195,6 +196,41 @@ ColumnLayout {
 
             Note {
                 text: "Moving a band makes the preset Custom, kept for next time. The sound is lowered by the largest boost so that it never clips."
+            }
+
+            SectionLabel {
+                Layout.topMargin: 12
+                text: "Night mode"
+            }
+
+            Row {
+                text: "Quiet parts up, loud parts down"
+
+                Chip {
+                    text: AudioEffects.nightOn ? "on" : "off"
+                    on: AudioEffects.nightOn
+                    onClicked: AudioEffects.setNight(!AudioEffects.nightOn)
+                }
+            }
+
+            Row {
+                text: "Strength"
+
+                Repeater {
+                    model: AudioEffects.strengthNames
+
+                    Chip {
+                        required property string modelData
+
+                        text: AudioEffects.strengthLabels[modelData]
+                        on: modelData === AudioEffects.strength
+                        onClicked: AudioEffects.setStrength(modelData)
+                    }
+                }
+            }
+
+            Note {
+                text: "For late listening: speech stays clear and bangs do not jump out, so the volume can stay low. On every output, after the equaliser."
             }
 
             SectionLabel {

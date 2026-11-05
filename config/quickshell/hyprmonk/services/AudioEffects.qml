@@ -10,6 +10,8 @@
 // keep working on it). On the output, the equaliser comes first and the
 // correction after it.
 // - eq: ten bands with presets, on the default output (below).
+// - night: a compressor and limiter for late listening, after the equaliser
+//   (below).
 // - correction: AutoEQ's correction for the headphones (Equalizer APO's
 //   format, read as it is by PipeWire's param_eq), picked per output device
 //   in Settings > Sounds; the Arctis Nova 7's comes ready (assets/autoeq).
@@ -22,9 +24,9 @@
 //   room in as a faint static, shorter clips the ends of words).
 //
 // Kept in audio-effects.json.
-// IPC: qs -c hyprmonk ipc call effects toggle eq|correction|noise
-//      | preset <name> | band <0-9> <dB> | threshold <0-95> | hold <0-1000>
-//      | status
+// IPC: qs -c hyprmonk ipc call effects toggle eq|night|correction|noise
+//      | preset <name> | band <0-9> <dB> | strength light|medium|strong
+//      | threshold <0-95> | hold <0-1000> | status
 pragma Singleton
 
 import QtQuick
@@ -272,6 +274,50 @@ Singleton {
         return Math.pow(10, -Math.max(0, ...levels) / 20);
     }
 
+    // Night mode: a compressor (swh-plugins' SC4) that brings quiet parts up
+    // and loud ones down, so speech stays clear and bangs do not jump out,
+    // then a limiter that keeps peaks under -1 dB. After the equaliser and
+    // before the correction, on whatever the default output is. Its strength
+    // changes on the running filter.
+    readonly property var strengths: ({
+        light:  { threshold: -20, ratio: 2, makeup: 5 },
+        medium: { threshold: -28, ratio: 4, makeup: 10 },
+        strong: { threshold: -36, ratio: 8, makeup: 15 }
+    })
+    readonly property var strengthNames: Object.keys(strengths)
+    readonly property var strengthLabels: ({ light: "Light", medium: "Medium", strong: "Strong" })
+
+    readonly property bool nightOn: settings.night
+    readonly property string strength: settings.strength in strengths ? settings.strength : "medium"
+    // The device the running night mode is on.
+    property string darkening: ""
+
+    function setNight(on: bool): void {
+        settings.night = on;
+        applyNight();
+    }
+
+    function setStrength(name: string): void {
+        if (!(name in strengths)) return;
+        settings.strength = name;
+        if (!settingsRead || !settings.night || darkening === "") return;
+        const level = strengths[strength];
+        live("night-mode", nightConf(darkening), "hyprmonk.night-mode",
+            ["comp:Threshold level (dB)", level.threshold, "comp:Ratio (1:n)", level.ratio, "comp:Makeup gain (dB)", level.makeup]);
+    }
+
+    function applyNight(): void {
+        if (!settingsRead) return;
+        if (!settings.night) {
+            darkening = "";
+            run("night-mode", "");
+            return;
+        }
+        if (sinkName === "") return;  // no output yet
+        darkening = sinkName;
+        run("night-mode", nightConf(sinkName));
+    }
+
     // The microphone played back in the headphones, through the noise
     // suppression when it is on: what others hear. Settings > Sounds stops
     // it when it closes.
@@ -336,8 +382,8 @@ ${module}
                 filter.smart      = true
                 filter.smart.name = "hyprmonk-headphone-eq"
                 filter.smart.target = { node.name = ${JSON.stringify(device)} }
-                # After the equaliser: it shapes the music, this the headphones.
-                filter.smart.after  = [ "hyprmonk-music-eq" ]
+                # Last: the others shape the sound, this the headphones.
+                filter.smart.after  = [ "hyprmonk-music-eq" "hyprmonk-night-mode" ]
             }
             playback.props = {
                 node.name          = "hyprmonk.headphone-eq.output"
@@ -386,6 +432,48 @@ ${links.join("\n")}
     }`);
     }
 
+    // The compressor reads the level as RMS, more like what is heard than
+    // peaks; the limiter looks ahead a few milliseconds.
+    function nightConf(device: string): string {
+        const level = strengths[strength];
+        return conf(`    { name = libpipewire-module-filter-chain
+        args = {
+            node.description = "Night mode"
+            media.name       = "Night mode"
+            filter.graph = {
+                nodes = [
+                    { type = ladspa name = comp plugin = sc4_1882 label = sc4
+                      control = { "RMS/peak" = 0 "Attack time (ms)" = 10 "Release time (ms)" = 300 "Knee radius (dB)" = 6
+                                  "Threshold level (dB)" = ${level.threshold} "Ratio (1:n)" = ${level.ratio} "Makeup gain (dB)" = ${level.makeup} } }
+                    { type = ladspa name = limit plugin = fast_lookahead_limiter_1913 label = fastLookaheadLimiter
+                      control = { "Input gain (dB)" = 0 "Limit (dB)" = -1 "Release time (s)" = 0.05 } }
+                ]
+                links = [
+                    { output = "comp:Left output" input = "limit:Input 1" }
+                    { output = "comp:Right output" input = "limit:Input 2" }
+                ]
+                inputs  = [ "comp:Left input" "comp:Right input" ]
+                outputs = [ "limit:Output 1" "limit:Output 2" ]
+            }
+            audio.channels = 2
+            audio.position = [ FL FR ]
+            capture.props = {
+                node.name           = "hyprmonk.night-mode"
+                media.class         = Audio/Sink
+                filter.smart        = true
+                filter.smart.name   = "hyprmonk-night-mode"
+                filter.smart.target = { node.name = ${JSON.stringify(device)} }
+                filter.smart.after  = [ "hyprmonk-music-eq" ]
+            }
+            playback.props = {
+                node.name          = "hyprmonk.night-mode.output"
+                node.passive       = true
+                node.dont-fallback = true
+            }
+        }
+    }`);
+    }
+
     // Stereo whatever the microphone has; PipeWire converts a mono one.
     function noiseConf(device: string): string {
         return conf(`    { name = libpipewire-module-filter-chain
@@ -426,18 +514,23 @@ ${links.join("\n")}
     // so the streams move on to the device first: a filter that goes away
     // with players still on it counts as a device unplugged, and WirePlumber
     // pauses them (linking/mpris-pause.lua). It notes the move a moment
-    // later than it makes it, hence the wait.
-    readonly property string aside: 'aside() { systemctl --user is-active -q "$1" || return 0; id=$(pw-cli info "$2" | sed -n "1s/^[[:space:]]*id: //p"); [ -n "$id" ] || return 0; pw-metadata -n filters "$id" filter.smart.disabled true >/dev/null; sleep 1.5; }; '
+    // later than it makes it, hence the wait. Afterwards the mark is taken
+    // off, as PipeWire hands the same id to a node made later (the filter
+    // started again would be passed by too).
+    readonly property string aside: 'id=; aside() { systemctl --user is-active -q "$1" || return 0; id=$(pw-cli info "$2" | sed -n "1s/^[[:space:]]*id: //p"); [ -n "$id" ] || return 0; pw-metadata -n filters "$id" filter.smart.disabled true >/dev/null; sleep 1.5; }; '
+        + 'back() { [ -z "$id" ] || pw-metadata -n filters -d "$id" filter.smart.disabled >/dev/null; }; '
 
     function run(effect: string, text: string): void {
         const unit = `hyprmonk-${effect}.service`;
         const file = `${dir}/${effect}.conf`;
         const node = `hyprmonk.${effect}`;
         queue(effect, text === ""
-            ? ["sh", "-c", aside + 'aside "$2" "$3"; rm -f "$1"; systemctl --user stop "$2"', "sh", file, unit, node]
+            ? ["sh", "-c", aside + 'aside "$2" "$3"; rm -f "$1"; systemctl --user stop "$2"; back', "sh", file, unit, node]
             // Restarted only when the conf changed: the shell loading again
-            // starts it if it is not running, and leaves it be if it is.
-            : ["sh", "-c", aside + 'mkdir -p "$(dirname "$1")" && if printf "%s" "$3" | cmp -s - "$1"; then systemctl --user start "$2"; else printf "%s" "$3" > "$1" && aside "$2" "$4" && systemctl --user restart "$2"; fi', "sh", file, unit, text, node]);
+            // starts it if it is not running, and leaves it be if it is. The
+            // conf is written only once the filter is passed by, so a reload
+            // cutting this short finds it unchanged, and does it again.
+            : ["sh", "-c", aside + 'mkdir -p "$(dirname "$1")" && if printf "%s" "$3" | cmp -s - "$1"; then systemctl --user start "$2"; else aside "$2" "$4"; printf "%s" "$3" > "$1" && systemctl --user restart "$2"; back; fi', "sh", file, unit, text, node]);
     }
 
     function queue(effect: string, command: var): void {
@@ -450,7 +543,7 @@ ${links.join("\n")}
         job.running = true;
     }
 
-    readonly property var jobs: ({ "headphone-eq": correctionJob, "noise-suppression": noiseJob, "music-eq": eqJob })
+    readonly property var jobs: ({ "headphone-eq": correctionJob, "noise-suppression": noiseJob, "music-eq": eqJob, "night-mode": nightJob })
 
     function warn(effect: string, errors: string): void {
         if (errors.trim() !== "") console.warn(`effects: ${effect}:`, errors.trim());
@@ -483,10 +576,19 @@ ${links.join("\n")}
         onExited: root.finished("music-eq", eqJob)
     }
 
+    Process {
+        id: nightJob
+        stderr: StdioCollector { onStreamFinished: root.warn("night-mode", text) }
+        onExited: root.finished("night-mode", nightJob)
+    }
+
     // A new default output with a correction of its own moves the filter there.
     onProfileChanged: if (settings.correction && profile && sinkName !== correcting) applyCorrection()
-    // The equaliser follows the default output, whatever it is.
-    onSinkNameChanged: if (settings.eq && sinkName !== "" && sinkName !== equalising) applyEq()
+    // The equaliser and night mode follow the default output, whatever it is.
+    onSinkNameChanged: {
+        if (settings.eq && sinkName !== "" && sinkName !== equalising) applyEq();
+        if (settings.night && sinkName !== "" && sinkName !== darkening) applyNight();
+    }
     // And a new default microphone moves the noise suppression.
     onSourceNameChanged: if (settings.noise) applyNoise()
 
@@ -497,6 +599,7 @@ ${links.join("\n")}
         applyCorrection();
         applyNoise();
         applyEq();
+        applyNight();
     }
 
     FileView {
@@ -516,6 +619,8 @@ ${links.join("\n")}
             property bool eq: false
             property string preset: "flat"  // one of presets, or custom
             property var custom: []  // custom's gains, in dB, by band
+            property bool night: false
+            property string strength: "medium"  // one of strengths
         }
     }
 
@@ -535,7 +640,15 @@ ${links.join("\n")}
                 root.setEq(!root.eqOn);
                 return root.eqOn;
             }
+            if (effect === "night") {
+                root.setNight(!root.nightOn);
+                return root.nightOn;
+            }
             return false;
+        }
+
+        function strength(name: string): void {
+            root.setStrength(name);
         }
 
         function preset(name: string): void {
@@ -557,7 +670,8 @@ ${links.join("\n")}
         function status(): string {
             return `correction ${root.correctionOn ? "on" : "off"} ${root.correcting} (${root.profileFor(root.correcting || root.sinkName)?.name ?? "none"})\n`
                 + `noise ${root.noiseOn ? "on" : "off"} ${root.sourceName} (threshold ${root.threshold} %, hold ${root.hold} ms)\n`
-                + `eq ${root.eqOn ? "on" : "off"} ${root.equalising} (${root.preset}: ${root.gains.join(" ")})`;
+                + `eq ${root.eqOn ? "on" : "off"} ${root.equalising} (${root.preset}: ${root.gains.join(" ")})\n`
+                + `night ${root.nightOn ? "on" : "off"} ${root.darkening} (${root.strength})`;
         }
     }
 }

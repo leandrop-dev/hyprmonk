@@ -89,6 +89,12 @@ config. Hyprland options are also written to `settings.lua`, loaded after
     keeps. A preamp lowers the sound by the largest boost so that it never
     clips. Presets and bands change on the running filter. The sound panel
     has its switch and presets.
+  - Night mode, after the equaliser and before the correction, on whatever
+    the default output is: swh-plugins' SC4 compressor (RMS, 10 ms attack,
+    300 ms release, 6 dB knee) and a lookahead limiter at -1 dB. Its
+    strength, Light (-20 dB, 2:1, +5 dB), Medium (-28 dB, 4:1, +10 dB) or
+    Strong (-36 dB, 8:1, +15 dB), changes on the running filter. The sound
+    panel has its switch.
   - The headphone correction, AutoEQ's for the output in use: the Arctis
     Nova 7's comes ready (`assets/autoeq`), and any other is searched for in
     AutoEQ's index (cached a week in `~/.cache/hyprmonk`) and downloaded
@@ -102,19 +108,22 @@ config. Hyprland options are also written to `settings.lua`, loaded after
     yourself plays the microphone back in the headphones while the page is
     open.
   Each effect is a PipeWire filter-chain, written to `audio/<effect>.conf` in
-  the state directory and run by its own user unit (`hyprmonk-music-eq`, `hyprmonk-headphone-eq`,
-  `hyprmonk-noise-suppression`), so a shell reload does not cut the sound.
+  the state directory and run by its own user unit (`hyprmonk-music-eq`, `hyprmonk-night-mode`,
+  `hyprmonk-headphone-eq`, `hyprmonk-noise-suppression`), so a shell reload does not cut the sound.
   Before one is stopped or restarted, WirePlumber is told to pass it by
-  (`filter.smart.disabled`) and given 1.5 s to notice: a filter that goes
-  with a player still on it counts as an unplugged device, and WirePlumber
-  pauses the player.
+  (`filter.smart.disabled`, taken off afterwards, since PipeWire reuses
+  node ids) and given 1.5 s to notice: a filter that goes with a player
+  still on it counts as an unplugged device, and WirePlumber pauses the
+  player. The conf is written only after that, so a reload cutting it short
+  leaves it to be done again.
   They are WirePlumber smart filters: whatever goes to or comes from the
   device passes through them, and the device stays the default, so apps are
   best left on the system default. The shell plays its own sounds through
   PulseAudio (`QT_AUDIO_BACKEND=pulseaudio` in its unit): Qt's PipeWire
   backend pins its stream to the output and loses it when a filter comes or
-  goes. Over IPC, `qs -c hyprmonk ipc call effects toggle <eq|correction|noise>`,
+  goes. Over IPC, `qs -c hyprmonk ipc call effects toggle <eq|night|correction|noise>`,
   `effects preset <name>`, `effects band <0-9> <dB>`,
+  `effects strength <light|medium|strong>`,
   `effects threshold <0-95>`, `effects hold <0-1000>` and `effects status`.
 - [x] Display: resolution, refresh rate and scale, for each screen, picked first
   and applied together. An applied change is only tried until kept, and goes

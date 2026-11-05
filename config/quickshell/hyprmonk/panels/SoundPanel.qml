@@ -132,6 +132,29 @@ ColumnLayout {
         }
     }
 
+    // Night mode, on any output.
+    RowLayout {
+        Layout.fillWidth: true
+        Layout.leftMargin: 12
+        visible: panel.output && panel.device !== null
+        spacing: 8
+
+        Text {
+            Layout.fillWidth: true
+            text: "Night mode"
+            color: Theme.foreground
+            font.family: Theme.font
+            font.pixelSize: Theme.rowFontSize
+            elide: Text.ElideRight
+        }
+
+        Chip {
+            text: AudioEffects.nightOn ? "on" : "off"
+            on: AudioEffects.nightOn
+            onClicked: AudioEffects.setNight(!AudioEffects.nightOn)
+        }
+    }
+
     SectionLabel {
         Layout.topMargin: 6
         visible: panel.apps.length > 0

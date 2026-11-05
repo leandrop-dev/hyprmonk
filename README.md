@@ -64,7 +64,7 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   a circle from where it was picked, or any), fastfetch's look and the login screen's
   look; the sounds (on or off, hyprmonk's set or serpantinum's, their
   volume and the notification tone); the audio effects (the equaliser, with presets
-  and ten bands, the headphone correction, searched for in AutoEQ, and the noise suppression's threshold and hold,
+  and ten bands, night mode and its strength, the headphone correction, searched for in AutoEQ, and the noise suppression's threshold and hold,
   with a way to hear yourself); keyboard layouts, the mouse and focus; when the screen locks and the
   screens go off; what recordings hear, their quality and where they go; how
   long notifications stay, their corner, how many show and how many are kept.
@@ -78,7 +78,8 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   do not disturb.
 - Audio effects with no EasyEffects: an equaliser with presets (Flat, Bass,
   Treble, Vocal, Rock, Pop, Jazz, Classical or your own ten bands), changed
-  live on any output, a headphone correction from AutoEQ
+  live on any output, a night mode that brings quiet parts up and loud ones
+  down for late listening, a headphone correction from AutoEQ
   (the Arctis Nova 7's comes ready, any other is searched for in Settings)
   and rnnoise's noise suppression for the microphone. Each is a PipeWire
   filter in front of the device, which stays the default, so the volume keys
@@ -339,7 +340,7 @@ cargo clippy --all-targets -- -D warnings
 | `config/zsh/`, `config/starship/` | zsh and its prompt |
 | `config/fastfetch/` | fastfetch's presets, picked in Settings > Appearance |
 | `config/uwsm/env` | The session's environment (NVIDIA, cursor, toolkits, SSH agent) |
-| `config/systemd/user/` | Units for the shell, hypridle, udiskie, clipboard history and the three audio effects; they start only under Hyprland |
+| `config/systemd/user/` | Units for the shell, hypridle, udiskie, clipboard history and the four audio effects; they start only under Hyprland |
 | `crates/hyprmonk/` | The `hyprmonk` command |
 | `udev/` | Access rules for the devices `hyprmonk` reads |
 | `packages/` | `pacman.txt` (official repos), `aur.txt` (through paru), `apps.txt` (picked at install) |
@@ -351,17 +352,17 @@ cargo clippy --all-targets -- -D warnings
 
 In this order.
 
-1. **Night mode.** A compressor that evens out loud and quiet parts for late
-2. **Settings, tidied.** Pages grouped into sections with sub-pages (say,
-   Appearance > Theme), so each holds less and things are easier to find.
-3. **A larger Settings window.** More room and less scrolling, and where a
+1. **Settings, tidied.** Pages grouped into sections with sub-pages (say,
+   Appearance > Theme), so each holds less and things are easier to find,
+   with a plain note where a name needs one (Night mode).
+2. **A larger Settings window.** More room and less scrolling, and where a
    page still scrolls, a sign that there is more below.
-4. **The hardware drawer as a panel.** A second way to show it, picked in
+3. **The hardware drawer as a panel.** A second way to show it, picked in
    Settings: a panel under the cat with a horizontal bar for each reading,
    its name and value inside, filling as it changes (serpantinum has
    vertical ones).
-5. **Night light.** Warmer colours between set times, or off.
-6. **Brightness and gamma.** For each screen, in Settings > Display, with
+4. **Night light.** Warmer colours between set times, or off.
+5. **Brightness and gamma.** For each screen, in Settings > Display, with
    ideas from [serpantinum-gamma](https://github.com/ilyamiro/serpantinum-gamma).
 
 **Later**
