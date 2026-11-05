@@ -248,16 +248,18 @@ The list keeps the dark tones and the light ones under their own headings.
 The tone reaches past the shell: Hyprland's window borders and the Floating
 layout's title bars, kitty (live, in open terminals, and translucent at the
 tone's card opacity), the starship prompt and zsh's highlighting (from the next
-prompt), fastfetch (the same, in the look picked), btop (live), Vesktop through its
-Quick CSS (live), Zed (live), Zen and Heroic (at their next start), GTK apps
+prompt), fastfetch (the same, in the look picked), btop (live), Vesktop through a
+theme of its own, Midnight recoloured (live, and translucent at the card
+opacity), Zed (live), Zen and Heroic (at their next start), GTK apps
 through adw-gtk3, Qt and KDE apps through qt6ct with Breeze and a KDE colour
 scheme, the Yaru icons in the nearest colour, and the login screen's Desktop
 look (the wallpaper blurred, in the tone's colours). Everything generated goes
 to `~/.local/state/hyprmonk/theme/`, never into the repo, but for the files apps
-keep in their own folders: the `hyprmonk` themes of btop, Zed and Heroic, a
-first `btop.conf` and Zed `settings.json` if there is none, Heroic's theme
-choice if it has none, Vesktop's `quickCss.css`, which is left alone if it
-already holds CSS of your own, and `hyprmonk.css` in Zen's profile, with a
+keep in their own folders: the `hyprmonk` themes of btop, Zed, Heroic and
+Vesktop, a first `btop.conf` and Zed `settings.json` if there is none, Heroic's
+theme choice if it has none, Vesktop's theme and transparent window turned on
+if it has no theme on (at its next start; Quick CSS is left for your own
+tweaks), and `hyprmonk.css` in Zen's profile, with a
 `userChrome.css` and `userContent.css` that import it if you have neither.
 
 ### Steam (optional)
@@ -344,7 +346,7 @@ cargo clippy --all-targets -- -D warnings
 |------|------|
 | `install.sh` | The installer: the menu and every step |
 | `config/hypr/` | Hyprland in Lua: `hyprland.lua` loads `look`, `input`, `floating`, `minimise`, `binds`, `rules`, `plugins`, `gamemode`; `hypridle.conf` |
-| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `bar/`, `dock/`, `panels/`, `launcher/`, `quickactions/`, `notifications/`, `osd/`, `lock/`, `power/`, `keyguide/`, `screenshot/`, `wallpaper/`, `polkit/`, `services/`, `widgets/`, `assets/` (the sounds, the cat's font, AutoEQ's ready corrections) |
+| `config/quickshell/hyprmonk/` | The shell (`qs -c hyprmonk`): `bar/`, `dock/`, `panels/`, `launcher/`, `quickactions/`, `notifications/`, `osd/`, `lock/`, `power/`, `keyguide/`, `screenshot/`, `wallpaper/`, `polkit/`, `services/`, `widgets/`, `assets/` (the sounds, the cat's font, AutoEQ's ready corrections, Vesktop's theme template) |
 | `config/matugen/` | Templates for Hyprland, the shell and kitty |
 | `config/kitty/` | kitty, with the Noir palette |
 | `config/zsh/`, `config/starship/` | zsh and its prompt |
@@ -373,10 +375,6 @@ An open list, in no fixed order.
   game launcher for every store with Proton and mods, and Cloister, a file
   manager to take over from Nautilus. hyprmonk will install them, give them
   keys and the tone (Zendo needs the tone's colours written to a file).
-- Vesktop through a theme of its own instead of Quick CSS: a theme file in
-  Vencord's themes folder, based on [Midnight](https://github.com/refact0r/midnight-discord)
-  (MIT) and recoloured by the tone, translucent through Vencord's transparent
-  window, as plasmonk-kde did it. Quick CSS is left for your own tweaks.
 - The cards' open and close animations on one shared curve and speed.
 - Apps the tone does not reach yet, starting from those serpantinum themes.
 - Fedora, with its own package list, last of all. Notes for then: some
@@ -406,6 +404,9 @@ An open list, in no fixed order.
   any of them.
 - The serpantinum sound set, copied under its AGPL-3.0 with a note of where
   each file came from (`assets/sounds/serpantinum`).
+- Vesktop's theme from [Midnight](https://github.com/refact0r/midnight-discord)
+  by refact0r (MIT, its licence in `config/quickshell/hyprmonk/assets/vesktop/`),
+  recoloured by the tone; its styles are imported from Midnight's site.
 - The headphone corrections from [AutoEQ](https://github.com/jaakkopasanen/AutoEq)
   (MIT, its licence in `config/quickshell/hyprmonk/assets/autoeq/`), the
   Arctis Nova 7's from Rtings' measurement. The idea of

@@ -315,39 +315,40 @@ Scope {
         return lines.join("\n") + "\n";
     }
 
-    // Vesktop's Quick CSS, which it applies live and needs no setting for:
-    // Discord's own colour names, the ones its code uses today, and little
-    // else. It is written only over itself or nothing, so a file with CSS of
-    // someone's own stays.
-    readonly property string vesktopMark: "/* Written by the shell (ThemeOutputs.qml)"
+    // Vesktop's theme (~/.config/vesktop/themes/hyprmonk.theme.css), which
+    // Vencord reloads when the folder changes: Midnight
+    // (assets/vesktop/hyprmonk.theme.css, its options and colours as
+    // @TOKENS@) in the tone's colours, its main backgrounds at the tone's card
+    // opacity like kitty so the blur shows through Vencord's transparent
+    // window, and popups solid. The interface font when one is picked (else
+    // Discord's), the monospace one for code.
+    property string vesktopTemplate: ""
     readonly property string vesktop: {
+        if (vesktopTemplate === "") return "";
         const p = qtPalette;
         const c = value => Qt.color(value).toString();
-        const colours = {
-            "background-base-lowest": c(p.view), "background-base-lower": c(p.window),
-            "background-base-low": c(p.window), "chat-background-default": c(p.window),
-            "background-surface-high": c(p.button), "background-surface-higher": c(p.button),
-            "background-surface-highest": c(p.tooltip), "card-background-default": c(p.alternate),
-            "background-mod-subtle": mix(0.06), "background-mod-normal": mix(0.1), "background-mod-strong": mix(0.14),
-            "border-subtle": mix(0.08), "border-normal": mix(0.14), "border-strong": mix(0.25), "border-focus": c(p.accent),
-            "text-default": c(p.text), "text-strong": c(p.text), "text-muted": c(p.muted), "text-subtle": c(p.muted),
-            "text-link": c(p.accent), "text-brand": c(p.accent), "text-danger": c(p.negative),
-            "text-feedback-critical": c(p.negative), "brand-500": c(p.accent),
-            "interactive-icon-default": c(p.muted), "interactive-icon-hover": c(p.text),
-            "interactive-icon-active": c(p.text), "interactive-hover": c(p.text), "interactive-muted": mix(0.3),
-            "channels-default": c(p.muted), "input-background-default": c(p.alternate), "input-border-default": mix(0.14),
-            "control-primary-background-default": c(p.accent), "control-primary-background-hover": c(p.accent),
-            "control-primary-border-default": c(p.accent), "control-primary-border-hover": c(p.accent),
-            "control-primary-text-default": c(p.accentText), "control-primary-text-hover": c(p.accentText),
-            "control-secondary-background-default": c(p.button), "control-secondary-background-hover": mix(0.14),
-            "control-secondary-text-default": c(p.text), "control-secondary-text-hover": c(p.text),
-            "status-positive": c(p.positive), "status-danger": c(p.negative)
+        const grey = amount => Qt.tint(p.window, Qt.alpha(p.text, amount)).toString();
+        const rgba = (value, opacity) => {
+            const v = Qt.color(value);
+            return `rgba(${Math.round(v.r * 255)}, ${Math.round(v.g * 255)}, ${Math.round(v.b * 255)}, ${+opacity.toFixed(2)})`;
         };
-        const lines = [root.vesktopMark + " for the saved tone. Do not edit. */",
-                       ".theme-dark, .theme-darker, .theme-midnight, .theme-light, .visual-refresh {"];
-        for (const name in colours) lines.push(`    --${name}: ${colours[name]} !important;`);
-        return lines.join("\n") + "\n}\n";
+        const opacity = Theme.savedCardOpacity;
+        const accent = Qt.color(p.accent);
+        const tokens = {
+            FONT: Theme.appFont, MONO_FONT: Theme.monoFont, TRANSLUCENT: opacity < 1 ? "on" : "off",
+            TEXT_0: c(p.accentText), TEXT_1: c(p.text), TEXT_2: grey(0.9), TEXT_3: grey(0.8), TEXT_4: c(p.muted), TEXT_5: grey(0.4),
+            BG_1: grey(0.14), BG_2: grey(0.09), BG_3: rgba(grey(0.04), opacity), BG_4: rgba(p.window, opacity),
+            BG_FLOATING: c(p.window),
+            HOVER: rgba(p.text, 0.06), ACTIVE: rgba(p.text, 0.1), ACTIVE_2: rgba(p.text, 0.15), BUTTON_BORDER: rgba(p.text, 0.1),
+            ACCENT_1: Qt.lighter(accent, 1.15).toString(), ACCENT_2: c(accent), ACCENT_3: c(accent),
+            ACCENT_4: Qt.lighter(accent, 1.1).toString(), ACCENT_5: Qt.darker(accent, 1.15).toString()
+        };
+        return vesktopTemplate.replace(/@([A-Z0-9_]+)@/g, (whole, name) => name in tokens ? tokens[name] : whole);
     }
+
+    // Quick CSS held the colours before the theme; the shell's own is
+    // emptied, so it is left for one's own tweaks.
+    readonly property string vesktopMark: "/* Written by the shell (ThemeOutputs.qml)"
 
     // Zed's theme (~/.config/zed/themes), named `hyprmonk` for every tone. A
     // tone's terminal colours colour the code; without them, its own few.
@@ -585,7 +586,7 @@ Scope {
     Process {
         id: folders
         command: ["mkdir", "-p", root.dir, root.config + "/gtk-3.0", root.config + "/gtk-4.0", root.config + "/qt6ct",
-                  root.config + "/btop/themes", root.config + "/vesktop/settings", root.config + "/zed/themes",
+                  root.config + "/btop/themes", root.config + "/vesktop/settings", root.config + "/vesktop/themes", root.config + "/zed/themes",
                   root.config + "/heroic/themes", root.config + "/heroic/store"]
         onExited: {
             gsettings.running = true;
@@ -606,8 +607,9 @@ Scope {
             heroicTheme.write();
             heroicConfig.running = true;
             if (!steamTheme.write()) steamSkin.running = true;
-            const quickCss = vesktopCss.text();
-            if (quickCss !== root.vesktop && (!quickCss || quickCss.startsWith(root.vesktopMark))) vesktopWrite.running = true;
+            if (root.vesktop) vesktopTheme.write();
+            if (vesktopCss.text().startsWith(root.vesktopMark)) vesktopClear.running = true;
+            vesktopConfig.running = true;
             if (root.login && root.loginReady) loginLook.write();
             if (root.wallpaper) loginPicture.running = true;
         }
@@ -788,8 +790,22 @@ Scope {
             "sh", steamTheme.path, Quickshell.env("HOME") + "/.local/share/Steam/steamui/adwaita"]
     }
 
-    // Read at once and kept up to date: whether it may be written depends on
-    // what it holds.
+    FileView {
+        path: Qt.resolvedUrl("assets/vesktop/hyprmonk.theme.css").toString().replace(/^file:\/\//, "")
+        printErrors: false
+        watchChanges: true
+        onFileChanged: reload()
+        onLoaded: root.vesktopTemplate = text()
+    }
+
+    // A new file over the old one is fine here: Vencord watches the folder.
+    Output {
+        id: vesktopTheme
+        path: root.config + "/vesktop/themes/hyprmonk.theme.css"
+        content: root.vesktop
+    }
+
+    // Quick CSS: read at once, to see whether it holds the shell's old colours.
     FileView {
         id: vesktopCss
         path: root.config + "/vesktop/settings/quickCss.css"
@@ -799,12 +815,23 @@ Scope {
         onFileChanged: reload()
     }
 
-    // In place, not by FileView: that saves a new file over the old one, and
-    // Vencord watches the file it first opened, so it would miss every change
-    // from then on.
+    // Emptied in place, not by FileView: Vencord watches the file it first
+    // opened, and would miss a new one put over it.
     Process {
-        id: vesktopWrite
-        command: ["sh", "-c", 'printf %s "$1" > "$2"', "sh", root.vesktop, vesktopCss.path]
+        id: vesktopClear
+        command: ["sh", "-c", ': > "$1"', "sh", vesktopCss.path]
+    }
+
+    // The theme turned on, with Vencord's transparent window, for a Vesktop
+    // with no theme on: a choice of someone's own stays. Read at Vesktop's
+    // start, and written whole by it, so it can undo this while running; it
+    // is done again at the next chance.
+    Process {
+        id: vesktopConfig
+        command: ["sh", "-c", `f="$1"; [ -e "$f" ] || exit 0
+            jq -e '(.enabledThemes // []) | length > 0' "$f" > /dev/null && exit 0
+            jq '.enabledThemes = ["hyprmonk.theme.css"] | .transparent = true' "$f" > "$f.new" && mv "$f.new" "$f"`,
+            "sh", root.config + "/vesktop/settings/settings.json"]
     }
 
     FileView {
