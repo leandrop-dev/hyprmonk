@@ -43,9 +43,9 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   and the media in its centre card, with a live spectrum (cava, seven styles).
 - Panels from the bar: Wi-Fi (networks, passwords, the connection editor for
   the rest), Bluetooth (pairing, connecting, batteries), sound (outputs,
-  inputs, a mixer, the audio effects' switches), batteries, a calendar
-  (national holidays for a chosen country, events from Google or any iCal
-  link, and events of your own), and media with synced lyrics.
+  inputs, a mixer, the audio effects' switches), notifications, batteries, a
+  calendar (national holidays for a chosen country, events from Google or any
+  iCal link, and events of your own), and media with synced lyrics.
 - A dock at the bottom (or any other edge) with the open apps and a dot per
   window: a click focuses an app, goes through its windows or minimises it,
   and hovering lists its windows to pick or close. It can hide, list only the
@@ -94,7 +94,7 @@ costs nothing extra, and things change often. See the [Roadmap](#roadmap).
   and rnnoise's noise suppression for the microphone. Each is a PipeWire
   filter in front of the device, which stays the default, so the volume keys
   and every app keep working on it.
-- Notifications with a notification centre, an on-screen card for what just
+- Notifications with a panel from the bar's bell, an on-screen card for what just
   changed (volume, microphone, audio output, keyboard layout, Caps and Num
   Lock, game mode, stay awake, power profile), a lock screen (on a key and
   when idle), a power menu, a key guide built from the bindings themselves,
@@ -183,7 +183,7 @@ this is only the start.
 | `Super` `,` | Settings |
 | `Super` `W` | Wallpapers |
 | `Super` `Tab` | Overview |
-| `Super` `N` / `Super` `Shift` `N` | Notification centre / clear notifications |
+| `Super` `N` / `Super` `Shift` `N` | Notifications panel / clear notifications |
 | `Super` `Q` | Close window |
 | `Super` `F` / `Super` `Shift` `F` | Maximize / fullscreen |
 | `Super` `V` | Toggle floating |
@@ -375,7 +375,6 @@ An open list, in no fixed order.
   game launcher for every store with Proton and mods, and Cloister, a file
   manager to take over from Nautilus. hyprmonk will install them, give them
   keys and the tone (Zendo needs the tone's colours written to a file).
-- The cards' open and close animations on one shared curve and speed.
 - Apps the tone does not reach yet, starting from those serpantinum themes.
 - Fedora, with its own package list, last of all. Notes for then: some
   packages come from the Terra repository, and gpu-screen-recorder has no

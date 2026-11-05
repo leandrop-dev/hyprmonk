@@ -41,7 +41,9 @@ Singleton {
     }
     // Shown as pop-ups right now, newest first.
     property var popups: []
-    property bool centerOpen: false
+    // The notifications panel is open (panels/NotificationsPanel.qml): the
+    // pop-ups wait meanwhile.
+    readonly property bool centerOpen: Panels.open === "notifications"
     property alias doNotDisturb: settings.doNotDisturb
 
     // When each one arrived, by id, for "5m ago".
@@ -199,7 +201,7 @@ Singleton {
         target: "notifications"
 
         function toggle(): void {
-            root.centerOpen = !root.centerOpen;
+            Panels.toggle("notifications");
         }
 
         function clear(): void {

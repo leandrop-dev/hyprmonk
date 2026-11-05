@@ -12,9 +12,13 @@ hl.window_rule({
 if theme.cardBlur ~= false then
     hl.layer_rule({ name = "hyprmonk-blur", match = { namespace = "^hyprmonk-.*" }, blur = true, ignore_alpha = 0.01 })
 end
--- The screenshot mode's card leaves at once, not fading: the picture is
--- taken right after.
-hl.layer_rule({ name = "hyprmonk-screenshot", match = { namespace = "^hyprmonk-screenshot$" }, no_anim = true })
+-- The cards that open and close by the shell's own animation
+-- (services/Motion.qml) come and go without Hyprland's fade on top, a second
+-- animation; the others (the notification popups, polkit, the bar and
+-- the dock) keep it, on the same curve. The screenshot mode's card also has
+-- to leave at once: the picture is taken right after.
+hl.layer_rule({ name = "hyprmonk-cards", no_anim = true,
+    match = { namespace = "^hyprmonk-(overlay|launcher|power|quickactions|settings|wallpapers|keyguide|osd|screenshot)$" } })
 
 -- satty (screenshots, to annotate before saving): a floating card, which the
 -- Floating layout leaves floating when it ends.

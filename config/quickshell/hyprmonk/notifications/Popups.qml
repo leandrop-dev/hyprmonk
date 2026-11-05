@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs
+import qs.widgets
 import qs.services
 
 PanelWindow {
@@ -71,8 +72,8 @@ PanelWindow {
 
                 ParallelAnimation {
                     id: enter
-                    NumberAnimation { target: slide; property: "x"; to: 0; duration: 220; easing.type: Easing.OutCubic }
-                    NumberAnimation { target: popup; property: "opacity"; to: 1; duration: 180 }
+                    CardAnimation { target: slide; property: "x"; to: 0 }
+                    CardAnimation { target: popup; property: "opacity"; to: 1 }
                 }
             }
         }

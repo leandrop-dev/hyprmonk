@@ -19,6 +19,7 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs
+import qs.widgets
 import qs.services
 
 PanelWindow {
@@ -133,7 +134,7 @@ PanelWindow {
         readonly property real away: (1 - openness) * (dock.cardDepth + Theme.barGap * 2)
 
         Behavior on openness {
-            NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
+            CardAnimation {}
         }
 
         // A gap from the screen's edge, as the bar's cards have.

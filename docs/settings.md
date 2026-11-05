@@ -33,7 +33,12 @@ config. Hyprland options are also written to `settings.lua`, loaded after
   (1.5 times) speed. A speed goes through
   `hyprmonk_animations` in `look.lua`, which sets every animation at that
   many times its time. Game mode holds shadows and animations off whatever
-  these say.
+  these say. The shell's cards (the bar's panels and drawers, the dock, the
+  cards in the middle of the screen, the OSD, the screenshot bar and the
+  notification pop-ups) open and close on one curve, the windows'
+  easeOutQuint, in 220 ms times the same speed, or at once with animations
+  off (`services/Motion.qml`, `widgets/CardAnimation.qml`); Hyprland's own
+  fade is off for those that animate themselves (`hypr/rules.lua`).
 - [x] Appearance (was Tone, and quick actions' Appearance, Spectrum, Fastfetch
   and Login look rows): the tone, shown while the pointer is over it; the
   saved tone's card opacity, blur behind the cards on or off, and text colour,

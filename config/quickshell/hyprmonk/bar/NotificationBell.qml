@@ -1,4 +1,5 @@
-// The bell: a badge with how many notifications are open. Click: the centre.
+// The bell: a badge with how many notifications are open. Click: the
+// notifications panel.
 // Right click: do not disturb.
 import QtQuick
 import qs
@@ -17,7 +18,7 @@ Module {
         if (button === Qt.RightButton)
             Notifications.doNotDisturb = !Notifications.doNotDisturb;
         else
-            Notifications.centerOpen = !Notifications.centerOpen;
+            Panels.toggle("notifications");
     }
 
     Rectangle {

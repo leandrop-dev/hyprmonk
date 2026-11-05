@@ -75,7 +75,7 @@ PanelWindow {
         clip: true
 
         Behavior on height {
-            NumberAnimation { duration: 160; easing.type: Easing.OutCubic }
+            CardAnimation {}
         }
 
         opacity: overlay.open ? 1 : 0
@@ -86,12 +86,12 @@ PanelWindow {
             angle: overlay.open ? 0 : -90
 
             Behavior on angle {
-                NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
+                CardAnimation {}
             }
         }
 
         Behavior on opacity {
-            NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
+            CardAnimation {}
         }
     }
 }

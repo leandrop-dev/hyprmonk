@@ -1,7 +1,7 @@
-// One app's notifications in the centre. A single one is a plain card. Two
-// or more get a header (the app, how many, Show all, × to clear them) and
-// fold to the newest card with the edges of the rest behind it; Show all
-// (or a click on those edges) lists every one.
+// One app's notifications in the notifications panel. A single one is a plain
+// card. Two or more get a header (the app, how many, Show all, × to clear
+// them) and fold to the newest card with the edges of the rest behind it;
+// Show all (or a click on those edges) lists every one.
 import QtQuick
 import QtQuick.Layouts
 import Quickshell

@@ -39,7 +39,6 @@ Scope {
         reset();
         Overlays.close();
         Panels.close();
-        Notifications.centerOpen = false;
         session.locked = true;
         // Set here, not from the lock's signal: it is not sent on unlock.
         Session.locked = true;

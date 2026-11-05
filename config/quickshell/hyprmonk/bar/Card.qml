@@ -5,6 +5,7 @@
 import QtQuick
 import QtQuick.Layouts
 import qs
+import qs.widgets
 
 Rectangle {
     id: card
@@ -44,7 +45,7 @@ Rectangle {
     onPageChanged: scroller.contentY = 0
 
     Behavior on openness {
-        NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
+        CardAnimation {}
     }
 
     readonly property real baseWidth: row.implicitWidth + Theme.cardPadding * 2

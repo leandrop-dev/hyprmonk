@@ -182,8 +182,7 @@ Singleton {
 
     // Panels and pop-ups
     readonly property int panelRadius: 16
-    readonly property int notificationWidth: 500         // pop-ups and the centre
-    readonly property int notificationCenterHeight: 600  // most the centre grows to
+    readonly property int notificationWidth: 500         // pop-ups and the notifications panel
 
     // Bar panels: a card grows down into one, and widens to at least this
     readonly property int barPanelWidth: 444

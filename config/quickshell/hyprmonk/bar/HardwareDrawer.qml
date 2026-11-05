@@ -7,6 +7,7 @@
 import QtQuick
 import QtQuick.Layouts
 import qs
+import qs.widgets
 import qs.services
 
 RowLayout {
@@ -26,7 +27,7 @@ RowLayout {
     Component.onDestruction: if (open) Hardware.unwatch()
 
     Behavior on reveal {
-        NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
+        CardAnimation {}
     }
 
     Runcat {

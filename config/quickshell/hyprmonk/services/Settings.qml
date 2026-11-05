@@ -196,7 +196,7 @@ Singleton {
         { key: "batteries", label: "Batteries", icon: "\u{F0079}", panel: "batteries" },
         { key: "volume", label: "Volume", icon: "\u{F057E}", panel: "sound" },
         { key: "microphone", label: "Microphone", icon: "\u{F036C}", panel: "microphone" },
-        { key: "notifications", label: "Notifications", icon: "\u{F009A}" },
+        { key: "notifications", label: "Notifications", icon: "\u{F009A}", panel: "notifications" },
         { key: "clock", label: "Clock", icon: "\u{F00ED}", panel: "calendar" },
         { key: "quickactions", label: "Quick actions", icon: "\u{F1542}" },
         { key: "power", label: "Power", icon: "\u{F0425}" }

@@ -13,6 +13,7 @@ import Quickshell.Io
 import Quickshell.Services.Mpris
 import Quickshell.Wayland
 import qs
+import qs.widgets
 import qs.services
 
 Scope {
@@ -246,8 +247,8 @@ Scope {
 
             opacity: root.open ? 1 : 0
             scale: root.open ? 1 : 0.96
-            Behavior on opacity { NumberAnimation { duration: 150 } }
-            Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+            Behavior on opacity { CardAnimation {} }
+            Behavior on scale { CardAnimation {} }
 
             ColumnLayout {
                 id: column

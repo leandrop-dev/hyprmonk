@@ -15,6 +15,7 @@ import Quickshell.Wayland
 import qs
 import qs.panels
 import qs.services
+import qs.widgets
 
 PanelWindow {
     id: bar
@@ -40,9 +41,15 @@ PanelWindow {
         bluetooth: bluetoothPanel,
         batteries: batteryPanel,
         calendar: calendarPanel,
+        notifications: notificationsPanel,
         hardware: hardwarePanel,
         tray: trayMenu
     })
+    // Notifications take the pop-ups' width; the others the usual one. Kept
+    // after closing, so the card folds away at the width it had.
+    readonly property string widthFrom: Panels.open
+    property int panelWidth: Theme.barPanelWidth
+    onWidthFromChanged: if (widthFrom !== "") panelWidth = widthFrom === "notifications" ? Theme.notificationWidth : Theme.barPanelWidth
     readonly property Component openPanel: panelOpen ? panels[Panels.open] ?? null : null
     // Not with none open: modules without a panel would match "".
     readonly property bool panelOnLeft: Panels.open !== "" && Settings.bar.left.some(key => Settings.barPanel(key) === Panels.open)
@@ -97,6 +104,7 @@ PanelWindow {
         atBottom: bar.atBottom
         visible: Settings.bar.left.length > 0
         panel: bar.panelOnLeft ? bar.openPanel : null
+        panelWidth: bar.panelWidth
 
         // Up to the right card: on a small screen the hardware drawer's far
         // end stays folded away.
@@ -157,7 +165,7 @@ PanelWindow {
             implicitHeight: media.implicitHeight
 
             Behavior on reveal {
-                NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
+                CardAnimation {}
             }
 
             Media {
@@ -180,6 +188,7 @@ PanelWindow {
         atBottom: bar.atBottom
         visible: Settings.bar.right.length > 0 || panel !== null
         panel: bar.panelOnLeft ? null : bar.openPanel
+        panelWidth: bar.panelWidth
 
         BarModules {
             model: Settings.bar.right
@@ -217,6 +226,11 @@ PanelWindow {
     Component {
         id: calendarPanel
         CalendarPanel {}
+    }
+
+    Component {
+        id: notificationsPanel
+        NotificationsPanel {}
     }
 
     Component {

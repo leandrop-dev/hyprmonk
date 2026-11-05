@@ -55,7 +55,6 @@ ShellRoot {
     }
 
     Popups {}
-    Center {}
     Osd {}
     Launcher {}
     QuickActions {}
