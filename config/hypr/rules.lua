@@ -30,3 +30,27 @@ hl.window_rule({
     size  = "(monitor_w*0.7) (monitor_h*0.7)",
     center = true,
 })
+
+-- Games (docs/zendo-games.md): Windows games under Proton are steam_app_<id>
+-- (steam_app_default when umu does not know them), games inside gamescope
+-- are gamescope; checked from Zendo on 2026-11-06. A tile would give them a size some keep as their own
+-- setting (Unity's), so they float, centred at the size they ask for, and
+-- go full screen when they ask to. The Floating layout leaves them out
+-- (floating.lua), and they stay floating when it ends.
+hl.window_rule({
+    name   = "games",
+    match  = { class = "^(steam_app_.*|gamescope)$" },
+    float  = true,
+    center = true,
+    tag    = "-hyprmonk-floating",
+})
+
+-- Zendo, the game launcher, floats as a window of its own, as do its sign-in
+-- windows (all of class zendo).
+hl.window_rule({
+    name   = "zendo",
+    match  = { class = "^zendo$" },
+    float  = true,
+    center = true,
+    tag    = "-hyprmonk-floating",
+})
