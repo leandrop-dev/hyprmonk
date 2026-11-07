@@ -1,7 +1,7 @@
 // The saved Appearance tone outside the shell: GTK and Qt apps (theme,
 // colours and icons), Hyprland's window borders, kitty, zsh's prompt and
-// highlighting, fastfetch, btop, Vesktop, Zed, Zen, Heroic, Steam's skin, and the
-// login screen's Desktop look. A tone with its own accent
+// highlighting, fastfetch, btop, Vesktop, Zed, Zen, Heroic, Steam's skin,
+// Zendo, and the login screen's Desktop look. A tone with its own accent
 // writes its colours over the wallpaper's (which matugen writes); one without
 // writes nothing over them. Only the saved tone counts, so a preview does not
 // repaint every app.
@@ -557,6 +557,21 @@ Scope {
         return "# Written by the shell (ThemeOutputs.qml) for the saved tone. Do not edit.\n" + lines.join("\n");
     }
 
+    // Zendo's window, when its Settings follow hyprmonk (theme/tone.json,
+    // docs/zendo-tone.md). Zendo looks at the file every 2 seconds. Matugen's
+    // error is the dark scheme's, so only the dark Wallpaper tone brings a
+    // red; the others leave Zendo its own.
+    readonly property string zendo: JSON.stringify(Object.assign({
+        version: 1,
+        name: Theme.savedTone,
+        label: saved.label,
+        light: saved.light,
+        background: hex(saved.background),
+        foreground: hex(saved.foreground),
+        accent: hex(saved.accent ?? Theme.wallpaperAccent),
+        positive: hex(Theme.positiveOf(saved))
+    }, saved.accent || saved.light ? {} : { negative: hex(Theme.wallpaperColours.error) }), null, 2) + "\n"
+
     onIconThemeChanged: apply.restart()
     onHyprlandChanged: apply.restart()
     onKittyChanged: apply.restart()
@@ -571,6 +586,7 @@ Scope {
     onZenChanged: apply.restart()
     onHeroicChanged: apply.restart()
     onSteamChanged: apply.restart()
+    onZendoChanged: apply.restart()
     onLoginReadyChanged: apply.restart()
     onWallpaperChanged: apply.restart()
 
@@ -612,6 +628,7 @@ Scope {
             vesktopConfig.running = true;
             if (root.login && root.loginReady) loginLook.write();
             if (root.wallpaper) loginPicture.running = true;
+            zendoTone.write();
         }
     }
 
@@ -632,6 +649,14 @@ Scope {
         path: root.dir + "/tone.lua"
         content: root.hyprland
         onSaved: hyprReload.running = true
+    }
+
+    // Written whole (FileView renames a temporary file over it), so Zendo
+    // never reads half a file.
+    Output {
+        id: zendoTone
+        path: root.dir + "/tone.json"
+        content: root.zendo
     }
 
     Output {
